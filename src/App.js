@@ -1,25 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import React from "react";
+import { useSelector } from "react-redux";
+import { Route, Routes } from "react-router-dom";
+import MainPage from "./pages/MainPage";
+import LoginUser from "./components/LoginUser";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const loginUser = useSelector((state) => state.loginReducer.user);
+    return (
+        <Routes>
+            {/* isAuthenticated-사용자가 인증되었으면 true ,아니면 false */}
+            <Route path="/" element={LoginUser(loginUser, <MainPage />)} />
+            <Route path="/login/signin" element={LoginUser(loginUser, <MainPage />)} />
+            <Route path="/games" element={LoginUser(loginUser, <MainPage />)} />
+        </Routes>
+    );
 }
 
 export default App;
