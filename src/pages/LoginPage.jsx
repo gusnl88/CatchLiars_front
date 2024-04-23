@@ -1,4 +1,3 @@
-// LoginPage.js
 import React from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../store/modules/login"; // login 액션을 가져옵니다.
@@ -30,6 +29,15 @@ const Mainpage = styled.div`
         .login_box {
             flex: 2;
         }
+        button {
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
     }
 `;
 export default function LoginPage() {
@@ -37,7 +45,7 @@ export default function LoginPage() {
     const navigate = useNavigate();
 
     const handleLogin = () => {
-        dispatch(login("devel", "dobong")); // 로그인 액션을 디스패치합니다.
+        dispatch(login("devel", "dobong")); // 로그인 값전달
         navigate("/games");
     };
 
@@ -52,7 +60,6 @@ export default function LoginPage() {
                 </div>
                 <div className="login_box">
                     <button onClick={handleLogin}>로그인</button>{" "}
-                    {/* 로그인 버튼을 클릭하면 handleLogin 함수가 호출됩니다. */}
                 </div>
             </div>
         </Mainpage>
