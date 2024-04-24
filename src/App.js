@@ -14,7 +14,7 @@ function App() {
     return (
         <Routes>
             <Route path="/" element={LoginUser(loginUser, <MainPage />)} />
-            <Route path="/login/signin" element={LoginUser(loginUser, <MainPage />)} />
+            <Route path="/login/signin" element={LoginUser(loginUser, <LoginForm />)} />
             <Route path="/games" element={LoginUser(loginUser, <MainPage />)} />
             <Route path="/games/list/:type" element={LoginUser(loginUser, <GameWaitngList />)} />
             <Route path="/users/mypage" element={LoginUser(loginUser, <Mypage />)} />
