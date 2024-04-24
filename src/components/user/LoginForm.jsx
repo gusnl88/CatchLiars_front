@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { login } from "../../store/modules/login";
+import RegisterForm from "./RegisterForm"; // 회원가입 폼 컴포넌트 임포트
 import { useNavigate } from "react-router-dom";
 
 function LoginForm() {
@@ -7,14 +10,15 @@ function LoginForm() {
         inputId: "",
         inputPw: "",
     });
+    const [showModal, setShowModal] = useState(false);
+    const [showRegister, setShowRegister] = useState(false); // 회원가입 폼 보여줄지 결정하는 상태
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // 폼 입력값 변경 시 상태 업데이트
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // 로그인 폼 제출 시 실행되는 함수
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -22,10 +26,9 @@ function LoginForm() {
                 `${process.env.REACT_APP_API_SERVER}/users/signin`,
                 formData
             );
-            console.log("서버 응답:", response.data); // 응답 내용을 콘솔에 출력
             if (response.data.loginSuccess) {
-                alert("로그인 성공!");
-                // 로그인 성공 후 리다이렉트 또는 다른 작업 수행
+                setShowModal(true);
+                dispatch(login(formData.inputId, formData.inputPw));
             } else {
                 const errorMessage = response.data.message
                     ? response.data.message.message
@@ -38,39 +41,65 @@ function LoginForm() {
         }
     };
 
-    // 회원가입 페이지로 이동하는 함수
     const handleSignup = () => {
-        navigate("/register");
+        setShowRegister(true); // 회원가입 폼을 보여주는 상태를 true로 설정
     };
 
+    const closeModalAndNavigate = () => {
+        setShowModal(false);
+        // navigate("/GameWaitingList");
+    };
+
+    if (showRegister) {
+        return <RegisterForm />; // 회원가입 컴포넌트 렌더링
+    }
+
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>로그인</h2>
-            <div>
-                <label>아이디:</label>
-                <input
-                    type="text"
-                    name="inputId"
-                    value={formData.inputId}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-            <div>
-                <label>비밀번호:</label>
-                <input
-                    type="password"
-                    name="inputPw"
-                    value={formData.inputPw}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-            <button type="submit">로그인</button>
-            <button type="button" onClick={handleSignup}>
-                회원가입
-            </button>
-        </form>
+        <div>
+            <form onSubmit={handleSubmit}>
+                <h2>로그인</h2>
+                <div>
+                    <label>아이디:</label>
+                    <input
+                        type="text"
+                        name="inputId"
+                        value={formData.inputId}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>비밀번호:</label>
+                    <input
+                        type="password"
+                        name="inputPw"
+                        value={formData.inputPw}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <button type="submit">로그인</button>
+                <button type="button" onClick={handleSignup}>
+                    회원가입
+                </button>
+            </form>
+            {showModal && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        backgroundColor: "white",
+                        padding: "20px",
+                        zIndex: 1000,
+                    }}
+                >
+                    <p>로그인 성공!</p>
+                    <button onClick={closeModalAndNavigate}>확인</button>
+                </div>
+            )}
+        </div>
     );
 }
 
