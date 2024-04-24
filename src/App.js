@@ -7,17 +7,21 @@ import LoginUser from "./components/LoginUser";
 import MapiaGame from "./pages/MapiaGame";
 import CatchLiars from "./pages/CatchLiars";
 import Mypage from "./pages/Mypage";
+import LoginForm from "./components/user/LoginForm";
+import RegisterForm from "./components/user/RegisterForm";
 
 function App() {
     const loginUser = useSelector((state) => state.loginReducer.user);
     return (
         <Routes>
             <Route path="/" element={LoginUser(loginUser, <MainPage />)} />
-            <Route path="/login/signin" element={LoginUser(loginUser, <MainPage />)} />
+            <Route path="/login/signin" element={LoginUser(loginUser, <LoginForm />)} />
             <Route path="/games" element={LoginUser(loginUser, <MainPage />)} />
+            <Route path="/login" element={LoginUser(loginUser, <MainPage />)} />
             <Route path="/games/mapia" element={LoginUser(loginUser, <MapiaGame />)} />
             <Route path="/games/catchliars" element={LoginUser(loginUser, <CatchLiars />)} />
             <Route path="/users/mypage" element={LoginUser(loginUser, <Mypage />)} />
+            <Route path="/register" element={LoginUser(loginUser, <RegisterForm />)} />
         </Routes>
     );
 }

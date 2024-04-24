@@ -46,7 +46,7 @@ export default function LoginPage() {
 
     const handleLogin = () => {
         dispatch(login("devel", "dobong")); // 로그인 값전달
-        navigate("/games");
+        navigate("/login/signin");
     };
 
     return (
