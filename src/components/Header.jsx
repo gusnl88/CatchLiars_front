@@ -5,13 +5,20 @@ import { logout } from "../store/modules/login";
 import styled from "styled-components";
 
 const HeaderPage = styled.header`
-    padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    .img_box {
+        width: 150px;
+        height: 90px;
+        img {
+            width: 100%;
+            object-fit: cover;
+        }
+    }
     .link_btn {
         display: flex;
-        position: relative; 
+        position: relative;
     }
     .link_btn a {
         color: black;
@@ -29,12 +36,12 @@ const HeaderPage = styled.header`
     }
     .notis-box {
         position: absolute;
-        width: 200px;
+        width: 180px;
         max-height: 200px;
         background-color: #ffffffaf;
         border-radius: 5px;
         padding: 20px;
-        display: ${(props) => (props.showNotis ? "block" : "none")};
+        display: ${(props) => (props.showNotis === "true" ? "block" : "none")};
         overflow-y: auto;
 
         box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
@@ -91,10 +98,11 @@ export default function Header() {
     };
 
     return (
-        <HeaderPage showNotis={showNotis}>
-            <div>
-                <h2>Catch Liars</h2>
-                <h5 style={{ color: "red", marginLeft: "30px" }}>mini games</h5>
+        <HeaderPage shownotis={showNotis ? "true" : "false"}>
+            <div className="img_box">
+                <Link to="/">
+                    <img src="/images/logo.png" alt="" />
+                </Link>
             </div>
             <div className="link_btn">
                 <Link to="/games">게임</Link>
