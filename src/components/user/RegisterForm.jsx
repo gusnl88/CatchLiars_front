@@ -13,11 +13,38 @@ function RegisterForm() {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        // Clear errors as the user types
+        setErrors({ ...errors, [e.target.name]: "" });
     };
 
-    console.log(process.env.REACT_APP_API_SERVER);
+    // Function to check duplicate id or email
+    const checkDuplicate = async (field, value) => {
+        if (!value) return; // If the field is empty, no need to check
+        try {
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_SERVER}/users/checkDuplicate`,
+                { field, value }
+            );
+            if (response.data === false) {
+                // Assuming the server returns false for duplicates
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    [field]: `This ${field} is already taken.`,
+                }));
+            }
+        } catch (error) {
+            console.error("Error checking duplicate:", error);
+            setServerError("Error checking for duplicates. Please try again later.");
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Check for any existing errors or duplicates before submitting
+        if (Object.values(errors).some((error) => error)) {
+            alert("Please resolve the errors before submitting.");
+            return;
+        }
 
         try {
             const response = await axios.post(
@@ -25,16 +52,15 @@ function RegisterForm() {
                 formData
             );
             if (response.data === true) {
-                // 회원가입 성공 시 처리
-                alert("회원가입이 완료되었습니다.");
-                // 혹은 다른 페이지로 리다이렉트 등
+                alert("Registration successful.");
             } else if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
-                setServerError("서버 응답이 올바르지 않습니다."); // 서버 응답이 true도 아니고 errors도 아닌 경우
+                setServerError("Unexpected server response. Please try again.");
             }
         } catch (error) {
-            setServerError("서버 오류가 발생했습니다."); // 서버 요청 자체가 실패한 경우
+            console.error("Registration error:", error);
+            setServerError("Server error occurred during registration.");
         }
     };
 
@@ -50,9 +76,10 @@ function RegisterForm() {
                         name="id"
                         value={formData.id}
                         onChange={handleChange}
+                        onBlur={() => checkDuplicate("id", formData.id)}
                         required
                     />
-                    {errors.id && <span>{errors.id.msg}</span>}
+                    {errors.id && <span>{errors.id}</span>}
                 </div>
                 <div>
                     <label htmlFor="pw">Password:</label>
@@ -64,7 +91,6 @@ function RegisterForm() {
                         onChange={handleChange}
                         required
                     />
-                    {errors.pw && <span>{errors.pw.msg}</span>}
                 </div>
                 <div>
                     <label htmlFor="nickname">Nickname:</label>
@@ -76,7 +102,6 @@ function RegisterForm() {
                         onChange={handleChange}
                         required
                     />
-                    {errors.nickname && <span>{errors.nickname.msg}</span>}
                 </div>
                 <div>
                     <label htmlFor="email">Email:</label>
@@ -86,9 +111,10 @@ function RegisterForm() {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
+                        onBlur={() => checkDuplicate("email", formData.email)}
                         required
                     />
-                    {errors.email && <span>{errors.email.msg}</span>}
+                    {errors.email && <span>{errors.email}</span>}
                 </div>
                 <div>
                     <button type="submit">Sign Up</button>

@@ -1,8 +1,9 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import { login } from "../store/modules/login"; // login 액션을 가져옵니다.
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import styled from "styled-components";
+
+// 여기서는 로그인 후 보여줄 컴포넌트를 임포트합니다.
+import LoginForm from "../components/user/LoginForm";
+
 const Mainpage = styled.div`
     display: flex;
     justify-content: center;
@@ -40,28 +41,31 @@ const Mainpage = styled.div`
         }
     }
 `;
+
 export default function LoginPage() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const [showLoginComponent, setShowLoginComponent] = useState(true);
 
     const handleLogin = () => {
-        dispatch(login("devel", "dobong")); // 로그인 값전달
-        navigate("/login/signin");
+        setShowLoginComponent(false); // 버튼 클릭시 컴포넌트 교체
     };
 
     return (
         <Mainpage>
-            <div className="main_box">
-                <div className="image_box">
-                    <img
-                        src="https://i.namu.wiki/i/ArUNQENRkTX5SjFpTZgBxJd2XoRhfTobswB6vn1aH72c5m2wOfvx4d_dsicMbtjw4Cgu3sc_NCZ4wNd9tGDQQOS96ySuF7m-WAXYgxovqUbN_U_-b-5TT1lXQV3oaNHYwCxehF7dOzDsXssc_1SLlA.webp"
-                        alt=""
-                    />
+            {showLoginComponent ? (
+                <div className="main_box">
+                    <div className="image_box">
+                        <img
+                            src="https://i.namu.wiki/i/ArUNQENRkTX5SjFpTZgBxJd2XoRhfTobswB6vn1aH72c5m2wOfvx4d_dsicMbtjw4Cgu3sc_NCZ4wNd9tGDQQOS96ySuF7m-WAXYgxovqUbN_U_-b-5TT1lXQV3oaNHYwCxehF7dOzDsXssc_1SLlA.webp"
+                            alt=""
+                        />
+                    </div>
+                    <div className="login_box">
+                        <button onClick={handleLogin}>로그인</button>
+                    </div>
                 </div>
-                <div className="login_box">
-                    <button onClick={handleLogin}>로그인</button>{" "}
-                </div>
-            </div>
+            ) : (
+                <LoginForm /> // 로그인 후 보여줄 컴포넌트
+            )}
         </Mainpage>
     );
 }
