@@ -16,7 +16,7 @@ const Main = styled.div`
         .game1,
         .game2 {
             width: 50%;
-            max-width: 300px; /* 최대 너비 지정 */
+            max-width: 350px; /* 최대 너비 지정 */
             margin-bottom: 20px;
             border-radius: 20px;
             overflow: hidden;

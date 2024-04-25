@@ -8,17 +8,19 @@ const HeaderPage = styled.header`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 10vh;
     .img_box {
-        width: 150px;
-        height: 90px;
+        height: 100%;
+        overflow: hidden; /* 부모 요소를 벗어나는 이미지를 숨깁니다. */
         img {
-            width: 100%;
-            object-fit: cover;
+            height: 100%;
+            object-fit: cover; /* 이미지를 부모 요소에 꽉 채웁니다. */
         }
     }
     .link_btn {
         display: flex;
         position: relative;
+        font-size: 15px;
     }
     .link_btn a {
         color: black;
@@ -29,19 +31,22 @@ const HeaderPage = styled.header`
         }
     }
     .notis-container {
+        top: 10px;
         position: relative;
         color: black;
         text-decoration: none;
-        margin: 10px 10px auto;
     }
     .notis-box {
+        z-index: 1;
         position: absolute;
-        width: 180px;
+        left: -100px;
+        top: 50px;
+        width: 200px;
         max-height: 200px;
         background-color: #ffffffaf;
         border-radius: 5px;
         padding: 20px;
-        display: ${(props) => (props.showNotis === "true" ? "block" : "none")};
+        display: ${(props) => (props.shownotis === "true" ? "block" : "none")};
         overflow-y: auto;
 
         box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);

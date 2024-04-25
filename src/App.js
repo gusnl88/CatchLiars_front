@@ -9,6 +9,7 @@ import Mypage from "./pages/Mypage";
 
 function App() {
     const loginUser = useSelector((state) => state.loginReducer.user);
+    console.log(loginUser);
     return (
         <Routes>
             <Route path="/" element={LoginUser(loginUser, <MainPage />)} />
