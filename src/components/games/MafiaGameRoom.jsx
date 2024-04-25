@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 const RoomContainer = styled.div`
     background-color: white;
+    border-radius: 10px;
     width: 100%;
     height: 100%;
     color: black;
@@ -55,12 +56,14 @@ const RoomContainer = styled.div`
             height: 30%;
         }
         .chat_box {
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             background-color: skyblue;
             height: 60%;
             .chat_main {
+                border-radius: 10px;
                 background-color: white;
                 margin: 10px auto;
                 width: 95%;
@@ -73,6 +76,14 @@ const RoomContainer = styled.div`
                 text-align: center;
                 input {
                     width: 85%;
+                }
+                button {
+                    width: 40px;
+                    margin-left: 5px;
+                    border: none;
+                    background-color: yellow;
+                    border-radius: 5px;
+                    cursor: pointer;
                 }
             }
         }
@@ -131,11 +142,11 @@ export default function MafiaGameRoom() {
                                     </div>
                                 </div>
                             ))
-                            .slice(0, 4)}
+                            .slice(4, 8)}
                     </div>
                     <div className="event_zone">
                         <div className="btn_box">
-                            <button>초대</button>
+                            <button>나가기</button>
                         </div>
                     </div>
                 </div>
