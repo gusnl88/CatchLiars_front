@@ -14,6 +14,17 @@ const RoomListContainer = styled.div`
     .game_table {
         border-collapse: collapse;
         width: 100%;
+        button {
+            background-color: #4caf50;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            width: 4rem;
+            cursor: pointer;
+            &:hover {
+                background-color: #2e8031;
+            }
+        }
         th,
         td {
             border: 1px solid #fffcfc;
@@ -22,6 +33,7 @@ const RoomListContainer = styled.div`
         }
         th {
             background-color: #b15151;
+            color: black;
         }
         a {
             text-decoration: none;
@@ -43,6 +55,9 @@ const RoomListContainer = styled.div`
             font-size: 16px;
             cursor: pointer;
             border-radius: 10px;
+            &:hover {
+                background-color: #2e8031;
+            }
         }
     }
     .paging_box {
@@ -54,9 +69,37 @@ const RoomListContainer = styled.div`
             border-radius: 10px;
             border: none;
             cursor: pointer;
+            &:hover {
+                background-color: #777977;
+            }
         }
         .active {
             background-color: #ff9300;
+            &:hover {
+                background-color: #ff9300;
+            }
+        }
+    }
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        color: black;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        h2 {
+            text-align: center;
+            margin: 15px;
         }
     }
 `;
@@ -71,6 +114,9 @@ const RoomList = ({
     type,
 }) => {
     const [gameStart, setGameStart] = useState(false);
+    const [selectedRoom, setSelectedRoom] = useState(null);
+    const [password, setPassword] = useState("");
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(roomLists.length / pageSize); i++) {
         pageNumbers.push(i);
@@ -86,6 +132,32 @@ const RoomList = ({
         //     alert("입장성공 소켓통신로직구현해야함 (인원수 +됨)");
         // }
         setGameStart(true);
+    };
+
+    const handleJoinRoom = (room) => {
+        console.log(room);
+        if (room.g_pw !== null) {
+            setSelectedRoom(room);
+            setShowPasswordModal(true);
+        } else {
+            joinRoom(room.g_seq);
+        }
+    };
+
+    const joinRoom = (roomId) => {
+        // 비밀번호 검사 로직을 통과한 후 입장 처리
+        setGameStart(true);
+    };
+
+    const handlePasswordSubmit = () => {
+        if (password === selectedRoom.g_pw) {
+            console.log(password, "or", selectedRoom.g_pw);
+            joinRoom(selectedRoom.g_seq);
+            setShowPasswordModal(false);
+        } else {
+            alert("비밀번호가 일치하지 않습니다.");
+            setPassword("");
+        }
     };
     return (
         <>
@@ -122,9 +194,9 @@ const RoomList = ({
                                         </td>
                                         <td>
                                             {item.g_state ? (
-                                                <Link onClick={() => handler(item.g_seq)}>
+                                                <button onClick={() => handleJoinRoom(item)}>
                                                     입장
-                                                </Link>
+                                                </button>
                                             ) : (
                                                 <span style={{ color: "red" }}>입장불가</span>
                                             )}
@@ -133,6 +205,7 @@ const RoomList = ({
                                 ))}
                             </tbody>
                         </table>
+
                         <div className="room_box">
                             <button onClick={roomOpenBtn}>방 만들기</button>
                         </div>
@@ -147,6 +220,21 @@ const RoomList = ({
                                 </button>
                             ))}
                         </div>
+                        {/* 비밀번호 입력 모달 */}
+                        {showPasswordModal && (
+                            <div className="modal">
+                                <div className="modal-content">
+                                    <button onClick={() => setShowPasswordModal(false)}>x</button>
+                                    <h2>비밀번호 입력</h2>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
+                                    <button onClick={handlePasswordSubmit}>확인</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </RoomListContainer>

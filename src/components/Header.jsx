@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { logout } from "../store/modules/login";
 import styled from "styled-components";
+import axios from "axios";
 
 const HeaderPage = styled.header`
     display: flex;
@@ -95,6 +96,7 @@ export default function Header() {
     }, []);
 
     const handleLogout = () => {
+        axios.get("http://localhost:8089/users/logout");
         dispatch(logout());
     };
 

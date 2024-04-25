@@ -54,6 +54,7 @@ const RoomRegister = ({ RoomRef, closeBtn, type }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const res = await axios.post(`http://localhost:8089/games/`, { title, pw, type });
+        console.log(res);
         if (res.data) {
             // ocket.emit("join_room", { title, pw, type }); // 방 정보를 소켓으로 전달
             // window.location.href = "/"; // 홈페이지로 이동
