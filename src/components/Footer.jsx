@@ -4,6 +4,7 @@ const Footers = styled.footer`
     display: flex;
     justify-content: end;
     background-color: #00154b;
+    height: 5%;
     button {
         background-color: #00154b;
         color: white;
