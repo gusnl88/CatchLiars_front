@@ -54,7 +54,7 @@ export default function GameList() {
         <Main>
             <div className="game_box">
                 <div className="game1">
-                    <Link to="/games/list/Mapia">
+                    <Link to="/games/list/Mafia">
                         <img
                             className="game_image"
                             src="https://img.danawa.com/prod_img/500000/032/935/img/13935032_1.jpg?shrink=330:*&_v=20210419150717"

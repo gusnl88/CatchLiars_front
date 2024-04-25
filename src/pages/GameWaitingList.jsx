@@ -11,7 +11,7 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 85%;
     background-color: #00154b;
     color: white;
     box-sizing: border-box;
@@ -32,11 +32,11 @@ export default function GameWaitingList() {
     const RoomRef = useRef(null);
 
     useEffect(() => {
-        let types = type === "Mapia" ? 1 : 0;
+        let types = type === "Mafia" ? 1 : 0;
         const fetchRoomList = async () => {
             try {
-                const response = await axios.get(`http://localhost:8089/games/${types}`);
-                setRoomList(response.data);
+                const res = await axios.get(`http://localhost:8089/games/list/${types}`);
+                setRoomList(res.data);
             } catch (error) {
                 console.error("Error fetching room list:", error);
             }
@@ -59,9 +59,6 @@ export default function GameWaitingList() {
     };
     return (
         <Container>
-            <div className="header_font">
-                <h1>{type} Room List</h1>
-            </div>
             <RoomList
                 roomLists={roomLists}
                 selectedRoomList={selectedRoomList}
@@ -69,8 +66,9 @@ export default function GameWaitingList() {
                 handleBtn={handleBtn}
                 RoomRef={RoomRef}
                 pageSize={pageSize}
+                type={type}
             />
-            <RoomRegister RoomRef={RoomRef} closeBtn={closeBtn} type={type === "mapia" ? 1 : 0} />
+            <RoomRegister RoomRef={RoomRef} closeBtn={closeBtn} type={type === "Mafia" ? 1 : 0} />
         </Container>
     );
 }

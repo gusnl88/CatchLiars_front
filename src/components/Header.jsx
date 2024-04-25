@@ -8,7 +8,7 @@ const HeaderPage = styled.header`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 10vh;
+    height: 10%;
     .img_box {
         height: 100%;
         overflow: hidden; /* 부모 요소를 벗어나는 이미지를 숨깁니다. */
