@@ -1,4 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import axiosUtils from '../../utils/axiosUtils'
 
 const RoomContainer = styled.div`
     background-color: white;
@@ -90,16 +92,22 @@ const RoomContainer = styled.div`
     }
 `;
 const nick = ["user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8"];
-console.log(nick);
-export default function MafiaGameRoom() {
+const MafiaGameRoom = ({ room }) => {
+    console.log(room);
+    const navigator = useNavigate();
+    const outBtn=()=>{
+        axiosUtils.patch(`/games/minus/${room.g_seq}`);
+        console.log('아웃')
+        navigator(-1);
+    }
     return (
         <RoomContainer>
             <div className="side_zone">
                 <div className="side_box">
                     <div className="user_box">
                         {nick
-                            ?.map((item) => (
-                                <div className="user_profile">
+                            ?.map((item, index) => (
+                                <div key={index} className="user_profile">
                                     <div className="profile_box">
                                         <img src="/images/profile.png" alt="" />
                                         <span>게임아이디: {item}</span>
@@ -134,8 +142,8 @@ export default function MafiaGameRoom() {
                 <div className="side_box">
                     <div className="user_box">
                         {nick
-                            ?.map((item) => (
-                                <div className="user_profile">
+                            ?.map((item, index) => (
+                                <div key={index} className="user_profile">
                                     <div className="profile_box">
                                         <img src="/images/profile.png" alt="" />
                                         <span>게임아이디: {item}</span>
@@ -146,11 +154,13 @@ export default function MafiaGameRoom() {
                     </div>
                     <div className="event_zone">
                         <div className="btn_box">
-                            <button>나가기</button>
+                            <button onClick={outBtn}>나가기</button>
                         </div>
                     </div>
                 </div>
             </div>
         </RoomContainer>
     );
-}
+};
+
+export default MafiaGameRoom;
