@@ -1,11 +1,10 @@
 // GameWaitingList.js
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import axios from "axios";
 import styled from "styled-components";
 import RoomRegister from "../components/games/RoomRegister";
 import RoomList from "../components/games/RoomList";
-
+import axiosUtils from "../utils/axiosUtils";
 const Container = styled.div`
     display: flex;
     flex-direction: column;
@@ -35,7 +34,7 @@ export default function GameWaitingList() {
         let types = type === "Mafia" ? 1 : 0;
         const fetchRoomList = async () => {
             try {
-                const res = await axios.get(`http://localhost:8089/games/list/${types}`);
+                const res = await axiosUtils.get(`/games/list/${types}`);
                 setRoomList(res.data);
             } catch (error) {
                 console.error("Error fetching room list:", error);

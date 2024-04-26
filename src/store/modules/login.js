@@ -2,14 +2,14 @@
 const initialState = {
     user: {
         id: sessionStorage.getItem("userId") || null,
-        name: sessionStorage.getItem("userName") || null,
+        nickName: sessionStorage.getItem("nickName") || null,
         isAuthenticated: sessionStorage.getItem("isAuthenticated") === "true",
     },
 };
 
 export function login(id, name) {
     sessionStorage.setItem("userId", id);
-    sessionStorage.setItem("userName", name);
+    sessionStorage.setItem("nickName", name);
     sessionStorage.setItem("isAuthenticated", "true");
     return {
         type: "LOGIN",
@@ -19,7 +19,7 @@ export function login(id, name) {
 
 export function logout() {
     sessionStorage.removeItem("userId");
-    sessionStorage.removeItem("userName");
+    sessionStorage.removeItem("nickName");
     sessionStorage.setItem("isAuthenticated", "false");
     return {
         type: "LOGOUT",
@@ -33,7 +33,7 @@ export function loginReducer(state = initialState, action) {
                 ...state,
                 user: {
                     id: action.payload.id,
-                    name: action.payload.name,
+                    nickName: action.payload.name,
                     isAuthenticated: true,
                 },
             };
@@ -42,7 +42,7 @@ export function loginReducer(state = initialState, action) {
                 ...state,
                 user: {
                     id: null,
-                    name: null,
+                    nickName: null,
                     isAuthenticated: false,
                 },
             };

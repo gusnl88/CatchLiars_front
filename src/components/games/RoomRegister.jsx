@@ -1,7 +1,6 @@
-import axios from "axios";
 import React, { useState } from "react";
 import styled from "styled-components";
-
+import axiosUtils from "../../utils/axiosUtils";
 const RoomRegisterContainer = styled.div`
     position: absolute;
     border: 1px solid black;
@@ -53,7 +52,8 @@ const RoomRegister = ({ RoomRef, closeBtn, type }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const res = await axios.post(`http://localhost:8089/games/`, { title, pw, type });
+
+        const res = await axiosUtils.post(`/games`, { title, pw, type });
         console.log(res);
         if (res.data) {
             // ocket.emit("join_room", { title, pw, type }); // 방 정보를 소켓으로 전달
