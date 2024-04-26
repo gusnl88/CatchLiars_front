@@ -96,8 +96,16 @@ export default function Header() {
     }, []);
 
     const handleLogout = () => {
-        axios.get("http://localhost:8089/users/logout");
-        dispatch(logout());
+        axios
+            .get("http://localhost:8089/users/logout", {
+                withCredentials: true,
+            })
+            .then((response) => {
+                dispatch(logout());
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     };
 
     const toggleNotis = () => {

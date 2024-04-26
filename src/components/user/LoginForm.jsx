@@ -24,9 +24,10 @@ function LoginForm() {
         try {
             const response = await axios.post(
                 `${process.env.REACT_APP_API_SERVER}/users/signin`,
-                formData
+                formData,
+                { withCredentials: true }
             );
-            if (response.data.loginSuccess) {
+            if (response.data) {
                 setShowModal(true);
                 dispatch(login(formData.inputId, formData.inputPw));
             } else {
