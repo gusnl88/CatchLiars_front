@@ -137,13 +137,13 @@ const ButtonContainer = styled.div`
     margin-top: 20px; // 상단 여백
 `;
 
-const Button = styled.button`
-    padding: 10px 20px;
-    margin-top: 5px;
-`;
-
 const ErrorSpan = styled.span`
     color: red;
+    margin: 5px;
+`;
+
+const Span = styled.span`
+    margin: 5px;
 `;
 
 function RegisterForm() {
@@ -156,12 +156,25 @@ function RegisterForm() {
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState("");
     const [showRegister, setShowRegister] = useState(true);
+    const [isRegistered, setIsRegistered] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
     const [availabilityMessages, setAvailabilityMessages] = useState({});
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         // setErrors({ ...errors, [e.target.name]: "" });
+        if (e.target.name === "pw") {
+            if (e.target.value.length < 5) {
+                setErrors({ ...errors, [e.target.name]: "5글자 이상 입력해주세요" });
+                setAvailabilityMessages({
+                    ...availabilityMessages,
+                    [e.target.name]: <ErrorSpan>5글자 이상 입력해주세요</ErrorSpan>,
+                });
+            } else {
+                setErrors({ ...errors, [e.target.name]: "" });
+                setAvailabilityMessages({ ...availabilityMessages, [e.target.name]: "" });
+            }
+        }
     };
 
     const handleBack = () => {
@@ -181,10 +194,16 @@ function RegisterForm() {
             });
             if (response.data === false) {
                 setErrors({ ...errors, [field]: "이미 사용중 입니다." });
-                setAvailabilityMessages({ ...availabilityMessages, [field]: "이미 사용중입니다." }); // 메시지 초기화
+                setAvailabilityMessages({
+                    ...availabilityMessages,
+                    [field]: <ErrorSpan>이미 사용중입니다.</ErrorSpan>,
+                }); // 메시지 초기화
             } else {
                 setErrors({ ...errors, [field]: "" }); // 에러 메시지 초기화
-                setAvailabilityMessages({ ...availabilityMessages, [field]: "사용 가능합니다." }); // 성공 메시지 설정
+                setAvailabilityMessages({
+                    ...availabilityMessages,
+                    [field]: <Span>사용 가능합니다.</Span>,
+                }); // 성공 메시지 설정
             }
         } catch (error) {
             console.error("Failed to check duplicate:", error);
@@ -194,7 +213,11 @@ function RegisterForm() {
     };
 
     if (!showRegister) {
-        return <LoginForm />; // showRegister가 false일 때 LoginForm을 렌더링
+        return <LoginForm />; // 뒤로가기 버튼
+    }
+
+    if (isRegistered) {
+        return <LoginForm />; // 회원가입 성공 시 로그인 컴포넌트로 전환
     }
 
     const handleSubmit = async (e) => {
@@ -215,8 +238,9 @@ function RegisterForm() {
             );
             if (response.data === true) {
                 alert("회원가입이 성공적으로 완료 되었습니다.");
+                setIsRegistered(true);
             } else if (response.data.errors) {
-                setErrors(response.data.errors);
+                // setErrors(response.data.errors);
             } else {
                 setServerError("오류가 발생했습니다. 다시 실행해주세요.");
             }
@@ -274,6 +298,7 @@ function RegisterForm() {
                             onChange={handleChange}
                             required
                         />
+                        <span>{availabilityMessages.pw}</span>
                     </PwContainer>
                     <NmContainer>
                         <DivNm>
