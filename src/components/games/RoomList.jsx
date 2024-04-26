@@ -1,10 +1,10 @@
 // RoomList.js
-import axios from "axios";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import MafiaGameRoom from "./MafiaGameRoom";
-
+import RoomRegister from "./RoomRegister";
+import GameList from "../main/GameList";
+import axiosUtils from '../../utils/axiosUtils'
 const RoomListContainer = styled.div`
     width: 90%;
     height: 90%;
@@ -113,10 +113,12 @@ const RoomList = ({
     pageSize,
     type,
 }) => {
-    const [gameStart, setGameStart] = useState(false);
+    const [gameStart, setGameStart] = useState("");
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [password, setPassword] = useState("");
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [newRoom, setNewRoom] = useState("");
+    const [room, setRoom] = useState([]);
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(roomLists.length / pageSize); i++) {
         pageNumbers.push(i);
@@ -125,33 +127,36 @@ const RoomList = ({
     const roomOpenBtn = () => {
         RoomRef.current.style.display = "block";
     };
-    const handler = async (g_seq) => {
-        // const res = await axios.patch(`http://localhost:8089/games/plus/${g_seq}`); 방인원수 증가 api
-        // if (res.data) {
-        //     window.location.reload();
-        //     alert("입장성공 소켓통신로직구현해야함 (인원수 +됨)");
-        // }
-        setGameStart(true);
-    };
+
+    useEffect(() => {
+        if (newRoom != "") {
+            setRoom(newRoom);
+            setGameStart("mafia");//새로운 방을 만들었을떄. (인원수는 디폴트1)
+        }
+    }, [newRoom]);
 
     const handleJoinRoom = (room) => {
-        console.log(room);
         if (room.g_pw !== null) {
             setSelectedRoom(room);
             setShowPasswordModal(true);
         } else {
-            joinRoom(room.g_seq);
+            joinRoom(room);
         }
     };
 
-    const joinRoom = (roomId) => {
+    const joinRoom = (room) => {
         // 비밀번호 검사 로직을 통과한 후 입장 처리
-        setGameStart(true);
+        if (room.g_type) {
+              axiosUtils.patch(`/games/plus/${room.g_seq}`);
+            setRoom(room);
+            setGameStart("mafia");
+        } else {
+            console.log("캐치라이어");
+        }
     };
 
     const handlePasswordSubmit = () => {
         if (password === selectedRoom.g_pw) {
-            console.log(password, "or", selectedRoom.g_pw);
             joinRoom(selectedRoom.g_seq);
             setShowPasswordModal(false);
         } else {
@@ -163,7 +168,11 @@ const RoomList = ({
         <>
             <RoomListContainer>
                 {gameStart ? (
-                    <MafiaGameRoom />
+                    gameStart === "mafia" ? (
+                        <MafiaGameRoom room={room} />
+                    ) : (
+                        <GameList room={room} />
+                    )
                 ) : (
                     <div>
                         <div className="header_font">
@@ -205,6 +214,11 @@ const RoomList = ({
                                 ))}
                             </tbody>
                         </table>
+                        <RoomRegister
+                            RoomRef={RoomRef}
+                            type={type === "Mafia" ? 1 : 0}
+                            setNewRoom={setNewRoom}
+                        />
 
                         <div className="room_box">
                             <button onClick={roomOpenBtn}>방 만들기</button>
