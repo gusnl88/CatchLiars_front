@@ -162,6 +162,29 @@ function RegisterForm() {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        // ID 필드에 대한 검증 로직 추가
+        if (e.target.name === "id") {
+            const validChars = /^[a-zA-Z0-9]+$/; // 영어와 숫자만 허용
+            if (!validChars.test(e.target.value) && e.target.value !== "") {
+                setErrors({ ...errors, [e.target.name]: "ID는 영어와 숫자만 입력 가능합니다." });
+                setAvailabilityMessages({
+                    ...availabilityMessages,
+                    [e.target.name]: <ErrorSpan>ID는 영어와 숫자만 입력 가능합니다.</ErrorSpan>,
+                });
+                return; // 유효하지 않은 문자가 포함된 경우 업데이트하지 않음
+            }
+            if (e.target.value.length < 5) {
+                setErrors({ ...errors, [e.target.name]: "5글자 이상 입력해주세요" });
+                setAvailabilityMessages({
+                    ...availabilityMessages,
+                    [e.target.name]: <ErrorSpan>5글자 이상 입력해주세요</ErrorSpan>,
+                });
+            } else {
+                setErrors({ ...errors, [e.target.name]: "" });
+                setAvailabilityMessages({ ...availabilityMessages, [e.target.name]: "" });
+            }
+        }
+
         // setErrors({ ...errors, [e.target.name]: "" });
         if (e.target.name === "pw") {
             if (e.target.value.length < 5) {
@@ -260,7 +283,10 @@ function RegisterForm() {
                         <li>모든 입력 필드는 반드시 작성해야 합니다.</li>
                         <li>이메일 주소는 회원가입 확인 및 비밀번호 재설정에 사용됩니다.</li>
                         <li>닉네임은 다른 사용자와 중복될 수 없습니다.</li>
-                        <li>아이디와 비밀번호는 5글자 이상 입력해주세요.</li>
+                        <li>
+                            아이디와 비밀번호는 5글자 이상 입력해주세요. 또한 아이디는 12글자 이하,
+                            비밀번호는 10글자 이하로 설정해주세요.{" "}
+                        </li>
                         <li>닉네임은 3글자 이상 입력해주세요.</li>
                         <li>이메일은 형식을 지켜서 작성해주시기 바립니다.</li>
                     </ul>
@@ -280,6 +306,7 @@ function RegisterForm() {
                             value={formData.id}
                             onChange={handleChange}
                             required
+                            maxLength={12}
                         />
                         <CheckButton type="button" onClick={() => checkDuplicate("id")}>
                             Check ID
@@ -297,6 +324,7 @@ function RegisterForm() {
                             value={formData.pw}
                             onChange={handleChange}
                             required
+                            maxLength={10}
                         />
                         <span>{availabilityMessages.pw}</span>
                     </PwContainer>
