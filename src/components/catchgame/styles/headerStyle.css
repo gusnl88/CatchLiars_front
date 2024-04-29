@@ -1,0 +1,48 @@
+.roomName {
+  border: solid 1px black;
+  display: flex;
+  text-align: center;
+  padding: 20px;
+  justify-content: center;
+  width: 90.3%;
+}
+
+.bar {
+  display: flex;
+}
+
+.timer {
+  border: solid 1px black;
+  display: flex;
+  text-align: center;
+  padding: 20px;
+  justify-content: center;
+  width: 19.7%;
+}
+
+.setting {
+  border: solid 1px black;
+  display: flex;
+  text-align: center;
+  padding: 20px;
+  justify-content: center;
+  width: 10%;
+}
+
+.gameInfo {
+  border: solid 1px black;
+  display: flex;
+  text-align: center;
+  padding: 15px 0px 25px;
+  justify-content: center;
+  width: 19.7%;
+}
+
+.word {
+  border: solid 1px black;
+  display: flex;
+  text-align: center;
+  padding: 40px;
+  justify-content: center;
+  width: 75%;
+}
