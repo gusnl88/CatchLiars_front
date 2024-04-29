@@ -20,13 +20,15 @@ export function login(id, name) {
 export function logout() {
     sessionStorage.removeItem("userId");
     sessionStorage.removeItem("nickName");
-    sessionStorage.setItem("isAuthenticated", "false");
+    sessionStorage.removeItem("isAuthenticated");
     return {
         type: "LOGOUT",
     };
 }
 
 export function loginReducer(state = initialState, action) {
+    console.log(state);
+    console.log("action.type", action.type);
     switch (action.type) {
         case "LOGIN":
             return {

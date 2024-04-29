@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { logout } from "../store/modules/login";
 import styled from "styled-components";
-import axios from "axios";
+import axiosUtils from "../utils/axiosUtils";
 
 const HeaderPage = styled.header`
     display: flex;
@@ -79,6 +79,7 @@ const HeaderPage = styled.header`
 
 export default function Header() {
     const dispatch = useDispatch();
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
     const [showNotis, setShowNotis] = useState(false);
     const notisRef = useRef();
     useEffect(() => {
@@ -96,12 +97,17 @@ export default function Header() {
     }, []);
 
     const handleLogout = () => {
-        axios
-            .get("http://localhost:8089/users/logout", {
+        axiosUtils.patch(`/users/stateFalse`, { withCredentials: true });
+        axiosUtils
+            .get(`/users/logout`, {
                 withCredentials: true,
             })
-            .then((response) => {
+            .then(() => {
+                console.log("aa");
                 dispatch(logout());
+                setIsAuthenticated(false);
+                console.log("123");
+                // window.location.reload();
             })
             .catch((error) => {
                 console.error("Error:", error);
@@ -155,9 +161,11 @@ export default function Header() {
                     </div>
                 </div>
                 <Link to="/users/mypage">마이페이지</Link>
-                <Link to="/" onClick={handleLogout}>
-                    로그아웃
-                </Link>
+                {isAuthenticated ? (
+                    <Link onClick={handleLogout}>로그아웃</Link>
+                ) : (
+                    <Link to="/">로그인</Link> // 로그인 링크로 변경
+                )}
             </div>
         </HeaderPage>
     );
