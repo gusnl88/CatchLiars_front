@@ -1,0 +1,39 @@
+.player {
+  border: solid 1px black;
+  width: 250px;
+  height: 107px;
+}
+
+.profileImage {
+  border: solid 1px black;
+  height: 107px;
+  width: 40%;
+  padding: 10px;
+}
+
+.playerInfo {
+  border: solid 1px black;
+  height: 107px;
+  width: 60%;
+  padding: 10px;
+}
+
+.playerNum {
+  border: solid 1px black;
+  height: 30%;
+}
+
+.score {
+  border: solid 1px black;
+  height: 30%;
+}
+
+.sequence {
+  border: solid 1px black;
+  height: 40%;
+}
+
+.Image {
+  border: solid 1px black;
+  height: 100%;
+}
