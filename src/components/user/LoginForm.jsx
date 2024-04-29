@@ -135,9 +135,12 @@ function LoginForm() {
                 formData
                 // { withCredentials: true }
             );
+
             if (response.data) {
                 setShowModal(true);
                 dispatch(login(formData.inputId, formData.inputPw));
+
+                axiosUtils.patch(`/users/stateTrue`, { withCredentials: true });
             } else {
                 const errorMessage = response.data.message
                     ? response.data.message.message
