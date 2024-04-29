@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import TimerStyle from "./Timer.style";
+import styled from "styled-components";
+
+const TimerStyle = styled.div`
+    display: flex;
+    background-image: url("/images/clock.gif");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 3rem;
+    height: 3rem;
+    justify-content: center;
+    align-items: center;
+`;
 
 const Timer = ({ gameStarted, nextPlayer }) => {
     const [remainTime, setRemainTime] = useState(5);

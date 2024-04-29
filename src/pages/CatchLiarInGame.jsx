@@ -3,6 +3,7 @@
 import Header from "../components/catchgame/Header";
 import Canvas from "../components/catchgame/Paint";
 import GameUser from "../components/catchgame/IngameUser";
+// import styled from "styled-components";
 
 function CatchLiarInGame() {
     return (

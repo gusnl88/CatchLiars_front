@@ -1,39 +1,37 @@
 .player {
-  border: solid 1px black;
-  width: 250px;
-  height: 107px;
+    border: solid 1px black;
+    width: 250px;
+    height: 107px;
 }
 
 .profileImage {
-  border: solid 1px black;
-  height: 107px;
-  width: 40%;
-  padding: 10px;
+    border: solid 1px black;
+    height: 107px;
+    width: 40%;
 }
 
 .playerInfo {
-  border: solid 1px black;
-  height: 107px;
-  width: 60%;
-  padding: 10px;
+    border: solid 1px black;
+    height: 107px;
+    width: 60%;
 }
 
 .playerNum {
-  border: solid 1px black;
-  height: 30%;
+    border: solid 1px black;
+    height: 30%;
 }
 
 .score {
-  border: solid 1px black;
-  height: 30%;
+    border: solid 1px black;
+    height: 30%;
 }
 
 .sequence {
-  border: solid 1px black;
-  height: 40%;
+    border: solid 1px black;
+    height: 38%;
 }
 
 .Image {
-  border: solid 1px black;
-  height: 100%;
+    border: solid 1px black;
+    height: 100%;
 }
