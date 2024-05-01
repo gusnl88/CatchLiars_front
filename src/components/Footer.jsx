@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const Footers = styled.footer`
@@ -23,7 +24,7 @@ export default function Footer() {
     return (
         <Footers>
             <button>채팅</button>
-            <button>친구목록</button>
+            <Link to="/users/friends">친구목록</Link>
         </Footers>
     );
 }

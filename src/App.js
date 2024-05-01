@@ -7,6 +7,8 @@ import LoginUser from "./components/LoginUser";
 import GameWaitngList from "./pages/GameWaitingList";
 import Mypage from "./pages/Mypage";
 import CatchLiarInGame from "./pages/CatchLiarInGame";
+import FriendList from "./pages/FriendList";
+import LankingPage from "./pages/LankingPage";
 
 function App() {
     const loginUser = useSelector((state) => state.loginReducer.user);
@@ -21,6 +23,8 @@ function App() {
                 path="/games/list/:CatchLiar/Ingame"
                 element={LoginUser(loginUser, <CatchLiarInGame />)}
             />
+            <Route path="users/friends" element={LoginUser(loginUser, <FriendList />)} />
+            <Route path="users/lank" element={LoginUser(loginUser, <LankingPage />)} />
         </Routes>
     );
 }
