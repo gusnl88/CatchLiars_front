@@ -127,6 +127,7 @@ export default function Header() {
             </div>
             <div className="link_btn">
                 <Link to="/games">게임</Link>
+                <Link to="/users/lank">유저 랭킹</Link>
                 <div className="notis-container">
                     <div ref={notisRef}>
                         <Link onClick={toggleNotis}>알림</Link>
