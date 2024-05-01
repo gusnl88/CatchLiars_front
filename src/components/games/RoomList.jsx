@@ -1,10 +1,10 @@
-// RoomList.js
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import MafiaGameRoom from "./MafiaGameRoom";
 import RoomRegister from "./RoomRegister";
 import GameList from "../main/GameList";
-import axiosUtils from '../../utils/axiosUtils'
+import axiosUtils from "../../utils/axiosUtils";
+
 const RoomListContainer = styled.div`
     width: 90%;
     height: 90%;
@@ -104,52 +104,70 @@ const RoomListContainer = styled.div`
     }
 `;
 
-const RoomList = ({
-    roomLists,
-    selectedRoomList,
-    selectedPage,
-    handleBtn,
-    RoomRef,
-    pageSize,
-    type,
-}) => {
+const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSize, type }) => {
     const [gameStart, setGameStart] = useState("");
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [password, setPassword] = useState("");
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [newRoom, setNewRoom] = useState("");
     const [room, setRoom] = useState([]);
-    const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(roomLists.length / pageSize); i++) {
-        pageNumbers.push(i);
-    }
+    const [pageNumbers, setPageNumbers] = useState([]);
+    const InputRef = useRef(null);
+    const RoomRef = useRef(null);
+    const TitleInput = useRef(null);
 
     const roomOpenBtn = () => {
         RoomRef.current.style.display = "block";
+        TitleInput.current.focus();
     };
+
+    useEffect(() => {
+        const numbers = [];
+        for (let i = 1; i <= Math.ceil(roomLists.length / pageSize); i++) {
+            numbers.push(i);
+        }
+        setPageNumbers(numbers);
+    }, [roomLists, pageSize]);
 
     useEffect(() => {
         if (newRoom != "") {
             setRoom(newRoom);
-            setGameStart("mafia");//새로운 방을 만들었을떄. (인원수는 디폴트1)
+            setGameStart("mafia"); //새로운 방을 만들었을떄. (인원수는 디폴트1)
         }
     }, [newRoom]);
 
-    const handleJoinRoom = (room) => {
+    const handleJoinRoom = async (room) => {
         if (room.g_pw !== null) {
             setSelectedRoom(room);
             setShowPasswordModal(true);
         } else {
-            joinRoom(room);
+            if (room.g_total >= 8) {
+                alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
+            } else {
+                try {
+                    await joinRoom(room);
+                } catch (error) {
+                    alert("해당 방은 존재하지 않습니다.");
+                    window.location.reload();
+                }
+            }
         }
     };
-
-    const joinRoom = (room) => {
+    useEffect(() => {
+        if (showPasswordModal && InputRef.current) {
+            InputRef.current.focus();
+        }
+    }, [showPasswordModal]);
+    const joinRoom = async (room) => {
         // 비밀번호 검사 로직을 통과한 후 입장 처리
         if (room.g_type) {
-              axiosUtils.patch(`/games/plus/${room.g_seq}`);
-            setRoom(room);
-            setGameStart("mafia");
+            if (room.g_total < 8) {
+                await axiosUtils.patch(`/games/plus/${room.g_seq}`);
+                setRoom(room);
+                setGameStart("mafia");
+            } else {
+                alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
+            }
         } else {
             console.log("캐치라이어");
         }
@@ -164,6 +182,7 @@ const RoomList = ({
             setPassword("");
         }
     };
+
     return (
         <>
             <RoomListContainer>
@@ -216,6 +235,7 @@ const RoomList = ({
                         </table>
                         <RoomRegister
                             RoomRef={RoomRef}
+                            TitleInput={TitleInput}
                             type={type === "Mafia" ? 1 : 0}
                             setNewRoom={setNewRoom}
                         />
@@ -238,12 +258,23 @@ const RoomList = ({
                         {showPasswordModal && (
                             <div className="modal">
                                 <div className="modal-content">
-                                    <button onClick={() => setShowPasswordModal(false)}>x</button>
+                                    <button
+                                        onClick={() => {
+                                            setShowPasswordModal(false);
+                                            setPassword("");
+                                        }}
+                                    >
+                                        x
+                                    </button>
                                     <h2>비밀번호 입력</h2>
                                     <input
+                                        ref={InputRef}
                                         type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
+                                        onKeyDown={(e) =>
+                                            e.key === "Enter" ? handlePasswordSubmit() : ""
+                                        }
                                     />
                                     <button onClick={handlePasswordSubmit}>확인</button>
                                 </div>
