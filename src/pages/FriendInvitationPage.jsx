@@ -54,7 +54,7 @@ function FriendInvitationPage() {
             const response = await axiosUtils.post(`/invites/accept`, { f_seq, type: 0 });
             if (response.data) {
                 alert("친구가 추가되었습니다.");
-                deleteInvitation(f_seq); // 초대 수락 후 삭제
+                deleteInvitation(i_seq); // 초대 수락 후 삭제
             }
         } catch (err) {
             alert("초대 수락에 실패했습니다.");
@@ -65,6 +65,7 @@ function FriendInvitationPage() {
         try {
             console.log("i_seq", i_seq);
             const response = await axiosUtils.delete(`/invites`, { data: { i_seq } });
+            console.log(response.data);
             if (response.data) {
                 fetchInvitations(); // 초대 삭제 후 목록 다시 불러오기
             } else {
@@ -84,7 +85,7 @@ function FriendInvitationPage() {
             <InvitationList>
                 {invitations.map((invite) => (
                     <InvitationItem key={invite.i_seq}>
-                        <span>{invite.senderName} 님이 친구 요청을 보냈습니다.</span>
+                        <span>{invite.nickname} 님이 친구 요청을 보냈습니다.</span>
                         <div>
                             <Button onClick={() => acceptInvitation(invite.f_seq, invite.i_seq)}>
                                 수락

@@ -24,8 +24,9 @@ export default function FriendList() {
         axiosUtils
             .get("/friends")
             .then((response) => {
+                // 필터링 로직: loginUser.id와 일치하는 u_seq를 가진 사용자를 제외
                 const filteredFriends = response.data.filter(
-                    (friend) => friend.u_seq !== loginUser.id
+                    (friend) => friend.id !== loginUser.id
                 );
                 setFriendList(filteredFriends);
             })
