@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import axiosUtils from "../../utils/axiosUtils";
 
@@ -49,11 +49,10 @@ const RoomRegisterContainer = styled.div`
     }
 `;
 
-const RoomRegister = ({ RoomRef, type, setNewRoom }) => {
+const RoomRegister = ({ RoomRef, type, setNewRoom, TitleInput }) => {
     const [title, setTitle] = useState("");
     const [pw, setPw] = useState(null);
     const [isPrivate, setIsPrivate] = useState(false);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -86,6 +85,7 @@ const RoomRegister = ({ RoomRef, type, setNewRoom }) => {
                     <input
                         type="text"
                         placeholder="방 제목"
+                        ref={TitleInput}
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required

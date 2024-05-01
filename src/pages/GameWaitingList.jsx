@@ -1,9 +1,10 @@
-// GameWaitingList.js
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import RoomList from "../components/games/RoomList";
 import axiosUtils from "../utils/axiosUtils";
+import io from "socket.io-client";
+
 const Container = styled.div`
     display: flex;
     flex-direction: column;
@@ -27,9 +28,19 @@ export default function GameWaitingList() {
     const [selectedPage, setSelectedPage] = useState(1);
     const pageSize = 10; // 10으로 설정 할것.
     const { type } = useParams();
-    const RoomRef = useRef(null);
+    const socketRef = useRef();
 
     let types = type === "Mafia" ? 1 : 0;
+
+    useEffect(() => {
+        socketRef.current = io("http://localhost:8089");
+        socketRef.current.on("updateRoomList", (data) => {
+            setRoomList(data);
+        });
+
+        return () => socketRef.current.disconnect();
+    }, []);
+
     useEffect(() => {
         const fetchRoomList = async () => {
             try {
@@ -41,13 +52,13 @@ export default function GameWaitingList() {
         };
 
         fetchRoomList();
-    }, [type]); // roomList가 변경될 때만 useEffect가 실행됩니다.
+    }, [type, types]); // roomList가 변경될 때만 useEffect가 실행됩니다.
 
     useEffect(() => {
         const start = (selectedPage - 1) * pageSize;
         const end = start + pageSize;
         setSelectedRoomList(roomLists.slice(start, end));
-    }, [selectedPage, roomLists]);
+    }, [selectedPage, roomLists, pageSize]);
 
     const handleBtn = (page) => {
         setSelectedPage(page);
@@ -60,7 +71,6 @@ export default function GameWaitingList() {
                 selectedRoomList={selectedRoomList}
                 selectedPage={selectedPage}
                 handleBtn={handleBtn}
-                RoomRef={RoomRef}
                 pageSize={pageSize}
                 type={type}
             />
