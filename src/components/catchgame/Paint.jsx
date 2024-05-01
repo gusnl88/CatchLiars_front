@@ -29,7 +29,7 @@ function Canvas() {
 
     useEffect(() => {
         // 웹 소켓 연결
-        const socket = socketIOClient("http://localhost:8080");
+        const socket = socketIOClient("http://localhost:8089");
         setSocket(socket);
 
         socket.on("drawing", (data) => {

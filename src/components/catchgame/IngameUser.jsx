@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from "react";
 import "./styles/gameplayer.css";
+import io from "socket.io-client";
+import { useSelector } from "react-redux";
 
+const socket = io.connect("http://localhost:8089", {
+    autoConnect: false,
+});
 export default function GameUser() {
+    const initSocketConnect = () => {
+        if (!socket.connected) socket.connect();
+    };
+
     const [players, setPlayers] = useState([]);
-
+    // const [socket, setSocket] = useState(null); // WebSocket 객체 추가
+    const loginUser = useSelector((state) => state.loginReducer.user);
+    // console.log(loginUser);
     useEffect(() => {
-        // 서버로부터 플레이어 정보를 받아오는 함수
-        const fetchPlayers = () => {
-            // 서버에서 플레이어 정보를 받아오는 작업
-            // 받아온 정보를 players 상태에 설정
-            const newPlayers = [
-                { id: 1, name: "Player 1", score: 100, sequence: "제 차례입니다!" },
-                {
-                    id: 2,
-                    name: "Player 2",
-                    score: 100,
-                    sequence: "그리는 순서가 1 차례 남았습니다!",
-                },
-                // 추가적인 플레이어 정보
-            ];
-            setPlayers(newPlayers);
-        };
+        initSocketConnect();
 
-        fetchPlayers();
+        // const socket = socketIOClient("http://localhost:8089");
+        // setSocket(socket);
 
-        // 여기에 소켓 통신 등을 사용하여 플레이어 정보를 업데이트하는 코드 작성
-    }, []);
+        socket.on("gameId", (data) => {
+            console.log(data);
+        });
+
+        socket.emit("loginUser", loginUser);
+        // socket.on("errorMsg", (msg) => {
+        //     alert(msg);
+        // });
+        socket.on("errorMsg", (msg) => {
+            alert(msg);
+        });
+        socket.on("updateUserId", (players) => {
+            setPlayers(players);
+
+            console.log(">>", players);
+        });
+    }, [players]);
 
     return (
         <>
@@ -37,9 +49,9 @@ export default function GameUser() {
                                 <div className="Image">프로필 사진</div>
                             </div>
                             <div className="playerInfo">
-                                <div className="playerNum">#{player.name}</div>
+                                <div className="playerNum">#{player.id}</div>
                                 <div className="score">score: {player.score}</div>
-                                <div className="sequence">{player.sequence}</div>
+                                <div className="sequence">1</div>
                             </div>
                         </div>
                     </div>

@@ -12,7 +12,7 @@ const TimerStyle = styled.div`
     align-items: center;
 `;
 
-const Timer = ({ gameStarted, nextPlayer }) => {
+const Timer = ({ gameStarted, nextPlayer, currentPlayer }) => {
     const [remainTime, setRemainTime] = useState(5);
 
     useEffect(() => {
@@ -24,7 +24,7 @@ const Timer = ({ gameStarted, nextPlayer }) => {
                         return prevTime - 1;
                     } else {
                         clearInterval(timer);
-                        nextPlayer(); // Game 컴포넌트의 nextPlayer 함수 호출
+                        nextPlayer(); // 다음 플레이어로 이동
                         return 5;
                     }
                 });
@@ -32,6 +32,13 @@ const Timer = ({ gameStarted, nextPlayer }) => {
         }
         return () => clearInterval(timer);
     }, [gameStarted, nextPlayer]);
+
+    useEffect(() => {
+        if (currentPlayer === 6) {
+            // currentPlayer가 6이 되면서 한 번만 실행됨
+            setRemainTime(5); // remainTime 초기화
+        }
+    }, [currentPlayer]);
 
     return (
         <TimerStyle>
