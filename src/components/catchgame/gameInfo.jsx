@@ -1,16 +1,10 @@
 import React from "react";
 import "./styles/startGameBtn.scss";
-const Game = ({ startGame, gameStarted, currentPlayer }) => {
-    //   const [gameStarted, setGameStarted] = useState(false);
-    //   const [currentPlayer, setCurrentPlayer] = useState(1);
+// import GameUser from "./GameUser";
+// import Players from "./Players";
 
-    //   const startGame = () => {
-    //     setGameStarted(true);
-    //   };
-
-    //   const nextPlayer = () => {
-    //     setCurrentPlayer((prevPlayer) => (prevPlayer % 6) + 1); // 6명까지 플레이어 변경
-    //   };
+const GameInfo = ({ startGame, gameStarted, currentPlayer, round }) => {
+    // const Players = Players(loginUser);
 
     return (
         <>
@@ -21,12 +15,13 @@ const Game = ({ startGame, gameStarted, currentPlayer }) => {
             )}
             {gameStarted && (
                 <div>
-                    <h1>게임</h1>
+                    <h1>Round {round}</h1>
                     <p>현재 플레이어: {currentPlayer}</p>
+                    {/* <GameUser /> */}
                 </div>
             )}
         </>
     );
 };
 
-export default Game;
+export default GameInfo;
