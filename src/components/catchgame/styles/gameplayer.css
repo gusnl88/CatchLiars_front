@@ -4,6 +4,10 @@
     height: 107px;
 }
 
+.player.first {
+    border: 1px solid red;
+}
+
 .profileImage {
     border: solid 1px black;
     height: 107px;
