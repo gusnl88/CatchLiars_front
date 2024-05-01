@@ -86,6 +86,10 @@ const RoomContainer = styled.div`
         .ment_box {
             background-color: #80808054;
             height: 30%;
+            .img_box {
+                height: 90%;
+                width: 100%;
+            }
         }
 
         .chat_box {
@@ -191,8 +195,9 @@ const MafiaGameRoom = ({ room }) => {
     const [isRoomOwner, setIsRoomOwner] = useState(false);
     const [isRoomFull, setIsRoomFull] = useState(false);
     const [isGameStarted, setIsGameStarted] = useState(false);
-    const [gameTime, setGameTime] = useState(10); // 초 단위로 설정
+    const [gameTime, setGameTime] = useState(5); // 초 단위로 설정
     const [voteSelect, setVoteSelect] = useState(false);
+    const [isDaytime, setIsDaytime] = useState(true);
     const loginUser = useSelector((state) => state.loginReducer.user);
     const chatContainerRef = useRef(null);
     const TitleRef = useRef(null);
@@ -209,27 +214,58 @@ const MafiaGameRoom = ({ room }) => {
         const newSocket = io(SOCKET_SERVER_URL);
         setSocket(newSocket);
 
-        newSocket.on("message", (message) => {
-            setMessages((prevMessages) => [...prevMessages, message]);
+        newSocket.on("message", (data) => {
+            console.log(data);
+            if (data.type === "message") {
+                console.log("진입햇어요");
+                setMessages((prevMessages) => [...prevMessages, data.message]);
+            } else if (data.type === "notice") {
+                TitleRef.current.innerHTML = `<span>${data.message}</span>`;
+                TitleRef.current.style.display = "flex";
+                setTimeout(() => {
+                    TitleRef.current.style.display = "none";
+                    TitleRef.current.innerHTML = "";
+                }, 3000);
+            }
         });
 
         newSocket.on("userList", (users) => {
             console.log(users);
             setUserList(users);
             setIsRoomOwner(users[0] === loginUser.id);
-            setIsRoomFull(users.length >= 3);
+            setIsRoomFull(users.length >= 1);
         });
-        newSocket.on("job", (job) => {
-            //게임시작  직업을 전달하고
-            setIsGameStarted(true);
-            console.log(`당신은 ${job}입니다.`);
-            console.log(userList);
-            TitleRef.current.style.display = "flex";
-            TitleRef.current.innerHTML = `<span>당신은 <span class="job">${job}</span>입니다.</span>`;
-            setTimeout(() => {
-                TitleRef.current.style.display = "none";
-                TitleRef.current.innerHTML = "";
-            }, 3000);
+        newSocket.on("job", (data) => {
+            const { job, mafiaList } = data;
+            // console.log('직업소개',job.mafiaList[0])
+            // 게임시작  직업을 전달하고
+            if (job === "마피아") {
+                let mafiaMessage = "";
+                setIsGameStarted(true);
+
+                for (let mafia of mafiaList) {
+                    mafiaMessage += `${mafia}  `;
+                }
+
+                TitleRef.current.innerHTML = `<span>당신은 <span class="job">${job}</span>입니다.</br>마피아는 지금 ${mafiaMessage}입니다</span>`;
+                console.log(`당신은 ${job}입니다.`);
+                console.log(userList);
+                TitleRef.current.style.display = "flex";
+                setTimeout(() => {
+                    TitleRef.current.style.display = "none";
+                    TitleRef.current.innerHTML = "";
+                }, 3000);
+            } else {
+                setIsGameStarted(true);
+                console.log(`당신은 ${job}입니다.`);
+                console.log(userList);
+                TitleRef.current.style.display = "flex";
+                TitleRef.current.innerHTML = `<span>당신은 <span class="job">${job}</span>입니다.<br>자유롭게 의견을 나누세요</span>`;
+                setTimeout(() => {
+                    TitleRef.current.style.display = "none";
+                    TitleRef.current.innerHTML = "";
+                }, 3000);
+            }
         });
         newSocket.on("victory", (data) => {
             setTimeout(() => {
@@ -238,26 +274,58 @@ const MafiaGameRoom = ({ room }) => {
         });
         newSocket.on("restart", (data) => {
             // 게임 다시 시작 처리
-            console.log(userList);
-            console.log("게임 다시 시작", data);
-            console.log("게임 다시 시작", data.maxVote, data.mafiaList);
-
-            if (data.maxVote === loginUser.id) {
-                setTimeout(() => {
-                    console.log(data.maxVote, "종료합니다");
-                    outBtn();
-                }, 3000);
+            console.log(data.isDaytime ? "마피아시간" : "낮투표시간");
+            let message;
+            if (data.isDaytime) {
+                message = `밤이 되었습니다. 마피아는 의견을 나누고 시민을 투표해 주세요.`;
+                setIsDaytime(false);
             } else {
-                console.log("재시작실행");
-                setGameTime(10);
-                startGame();
-                setVoteSelect(false);
+                message = `낮입니다 의견을 자유롭게 나누세요`;
+                setIsDaytime(true);
+            }
+            setMessages((prevMessages) => [...prevMessages, message]);
+            if (data.isDaytime) {
+                //전 투표가 낮이면(true)마피아 투표 로직
+
+                if (data.maxVote === loginUser.id) {
+                    setTimeout(() => {
+                        console.log(data.maxVote, "종료합니다");
+                        outBtn();
+                    }, 3000);
+                } else {
+                    for (const userId in data.userList) {
+                        if (data.mafiaList.includes(loginUser.id)) {
+                            console.log("마피아는 현재", data.userList[userId].userId);
+                            TitleRef.current.style.display = "flex";
+                            TitleRef.current.innerHTML = `마피아는 상의후 제한시간 내에 투표를 진행시켜 주세요.`;
+                            setTimeout(() => {
+                                TitleRef.current.style.display = "none";
+                                TitleRef.current.innerHTML = "";
+                            }, 3000);
+                            console.log("재시작실행");
+                            setGameTime(10);
+                            setVoteSelect(false);
+                        } else {
+                            setGameTime(10);
+                        }
+                    }
+                }
+            } else {
+                //전 투표가 밤이면(false)시민 투표 로직
+                if (data.maxVote === loginUser.id) {
+                    setTimeout(() => {
+                        console.log(data.maxVote, "종료합니다");
+                        outBtn();
+                    }, 3000);
+                } else {
+                    console.log("재시작실행");
+                    setGameTime(10);
+                    setVoteSelect(false);
+                }
             }
         });
 
-        if (room && loginUser) {
-            newSocket.emit("joinRoom", { roomId: room.g_seq, userId: loginUser.id });
-        }
+        newSocket.emit("joinRoom", { roomId: room.g_seq, userId: loginUser.id });
 
         const handleKeyDown = (event) => {
             if (event.key === "F5" || ((event.ctrlKey || event.metaKey) && event.key === "r")) {
@@ -313,11 +381,17 @@ const MafiaGameRoom = ({ room }) => {
     };
 
     const startGame = () => {
+        let message = ``;
+        if (isDaytime) {
+            message = `낮입니다 의견을 자유롭게 나누세요`;
+            setMessages((prevMessages) => [...prevMessages, message]);
+        }
+
         if (socket) {
             // 게임 시작
             console.log("시작");
             console.log(room.g_seq, "룸번호");
-            socket.emit("startGame", { roomId: room.g_seq });
+            socket.emit("startGame", { roomId: room.g_seq, isDaytime: isDaytime });
             setIsGameStarted(true); // 펄스 일때만 시작버튼이 보인다.
         }
     };
@@ -335,7 +409,7 @@ const MafiaGameRoom = ({ room }) => {
             console.log("투표", user, room.g_seq);
             setVoteSelect(true);
             // 투표 처리 로직 추가
-            socket.emit("vote", { userId: user, roomId: room.g_seq });
+            socket.emit("vote", { userId: user, roomId: room.g_seq, isDaytime });
             VoreRef.current.style.display = "none";
         } else {
             alert("이미투표하셧습니다.");
@@ -374,7 +448,14 @@ const MafiaGameRoom = ({ room }) => {
                     <h1>{room.g_title}</h1>
                 </div>
                 <div className="ment_box">
-                    <span>게임시간: {formatTime(gameTime)}</span>
+                    <span>
+                        게임시간: {formatTime(gameTime)}
+                        {isDaytime ? (
+                            <img className="img_box" src="/images/daytime.jpg" alt="" />
+                        ) : (
+                            <img className="img_box" src="/images/night.jpg" alt="" />
+                        )}
+                    </span>
                     <div ref={TitleRef} className="job_title"></div>
                     <div ref={VoreRef} className="vote_box">
                         {userList.map((item, index) => (
