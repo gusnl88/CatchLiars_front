@@ -2,6 +2,7 @@ import styled from "styled-components";
 import axiosUtils from "../utils/axiosUtils";
 import { useEffect, useState } from "react";
 import Friend from "../components/mypage/Friend";
+import { useSelector } from "react-redux";
 
 const Container = styled.div`
     display: flex;
@@ -18,12 +19,15 @@ export default function FriendList() {
     const [selectedFriendList, setSelectedFriendList] = useState([]); // 한 번에 보여줄 친구 목록
     const [selectedPage, setSelectedPage] = useState(1);
     const pageSize = 10; // 10으로 설정 할것.
-
+    const loginUser = useSelector((state) => state.loginReducer.user);
     useEffect(() => {
         axiosUtils
             .get("/friends")
             .then((response) => {
-                setFriendList(response.data);
+                const filteredFriends = response.data.filter(
+                    (friend) => friend.u_seq !== loginUser.id
+                );
+                setFriendList(filteredFriends);
             })
             .catch((err) => {
                 console.log(err);

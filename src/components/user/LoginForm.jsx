@@ -115,13 +115,14 @@ const ButtonContainer = styled.div`
 
 function LoginForm() {
     const [formData, setFormData] = useState({
+        // inputId: "12345",
+        // inputPw: "12345",
         inputId: "",
         inputPw: "",
     });
     const [showModal, setShowModal] = useState(false);
     const [showRegister, setShowRegister] = useState(false); // 회원가입 폼 보여줄지 결정하는 상태
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -138,7 +139,7 @@ function LoginForm() {
 
             if (response.data) {
                 setShowModal(true);
-                dispatch(login(formData.inputId, formData.inputPw));
+                dispatch(login(response.data.id, response.data.nickname));
 
                 axiosUtils.patch(`/users/stateTrue`, { withCredentials: true });
             } else {
