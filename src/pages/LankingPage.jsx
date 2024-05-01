@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import axiosUtils from "../utils/axiosUtils";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 const Container = styled.div`
     display: flex;
     flex-direction: column;
@@ -69,6 +70,7 @@ const UserListContainer = styled.div`
 
 export default function LankingPage() {
     const [userList, setUserList] = useState([]); // 유저 목록
+    const loginUser = useSelector((state) => state.loginReducer.user);
 
     useEffect(() => {
         axiosUtils.get("/users/lank").then((response) => {
@@ -121,12 +123,18 @@ export default function LankingPage() {
                                     </span>
                                 </td>
                                 <td>
-                                    <button
-                                        style={{ color: "blue" }}
-                                        onClick={() => postFriend(item.u_seq)}
-                                    >
-                                        친구 신청
-                                    </button>
+                                    {loginUser.id !== item.id ? (
+                                        <button
+                                            style={{ color: "blue" }}
+                                            onClick={() => postFriend(item.u_seq)}
+                                        >
+                                            친구 신청
+                                        </button>
+                                    ) : (
+                                        <button disabled style={{ color: "red" }}>
+                                            신청 불가
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

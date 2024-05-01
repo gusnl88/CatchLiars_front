@@ -20,11 +20,21 @@ const Footers = styled.footer`
     }
 `;
 
+const StyledLink = styled(Link)`
+    padding: 10px 15px;
+    margin: 5px;
+
+    color: white; /* 텍스트 색상 */
+    text-decoration: none; /* 밑줄 없앰 */
+    border-radius: 5px; /* 테두리 둥글게 */
+`;
+
 export default function Footer() {
     return (
         <Footers>
-            <button>채팅</button>
-            <Link to="/users/friends">친구목록</Link>
+            <StyledLink>채팅</StyledLink>
+            <StyledLink to="/users/friends">친구목록</StyledLink>
+            <StyledLink to="/users/friends/accept">초대</StyledLink>
         </Footers>
     );
 }
