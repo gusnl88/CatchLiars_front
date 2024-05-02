@@ -18,7 +18,7 @@ export default function FriendList() {
     const [friendList, setFriendList] = useState([]); // 친구 목록
     const [selectedFriendList, setSelectedFriendList] = useState([]); // 한 번에 보여줄 친구 목록
     const [selectedPage, setSelectedPage] = useState(1);
-    const pageSize = 10; // 10으로 설정 할것.
+    const pageSize = 15; // 10으로 설정 할것.
     const loginUser = useSelector((state) => state.loginReducer.user);
     useEffect(() => {
         axiosUtils
