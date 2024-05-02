@@ -10,6 +10,7 @@ import CatchLiarInGame from "./pages/CatchLiarInGame";
 import FriendList from "./pages/FriendList";
 import LankingPage from "./pages/LankingPage";
 import FriendInvitationPage from "./pages/FriendInvitationPage";
+import DmPage from "./pages/DmPage";
 
 function App() {
     const loginUser = useSelector((state) => state.loginReducer.user);
@@ -24,6 +25,7 @@ function App() {
                 path="/games/list/:CatchLiar/Ingame"
                 element={LoginUser(loginUser, <CatchLiarInGame />)}
             />
+            <Route path="dms" element={LoginUser(loginUser, <DmPage />)} />
             <Route path="users/friends" element={LoginUser(loginUser, <FriendList />)} />
             <Route path="users/lank" element={LoginUser(loginUser, <LankingPage />)} />
             <Route

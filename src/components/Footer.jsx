@@ -32,7 +32,7 @@ const StyledLink = styled(Link)`
 export default function Footer() {
     return (
         <Footers>
-            <StyledLink>채팅</StyledLink>
+            <StyledLink to="/dms">채팅</StyledLink>
             <StyledLink to="/users/friends">친구목록</StyledLink>
             <StyledLink to="/users/friends/accept">초대</StyledLink>
         </Footers>
