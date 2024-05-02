@@ -9,11 +9,11 @@ const Container = styled.div`
     flex: 1;
     background-color: #00154b;
     color: white;
-    font-size: 100px;
+    font-size: 70px;
 `;
 const UserListContainer = styled.div`
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
     max-width: 100%;
     max-height: 100%;
     overflow-y: auto;
@@ -25,13 +25,17 @@ const UserListContainer = styled.div`
             border: none;
             border-radius: 3px;
             color: white;
-            width: 5rem;
+            width: 4rem;
             cursor: pointer;
             &:hover {
                 background-color: #2e8031;
             }
         }
-        th,
+        th {
+            border: 1px solid #fffcfc;
+            padding: 8px;
+            text-align: center;
+        }
         td {
             border: 1px solid #fffcfc;
             padding: 8px;
@@ -97,7 +101,7 @@ export default function LankingPage() {
 
     return (
         <>
-            <Container>유저 랭킹</Container>
+            <Container>Rank</Container>
             <UserListContainer>
                 <table className="game_table">
                     <thead>
