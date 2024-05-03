@@ -72,6 +72,12 @@ const UserListContainer = styled.div`
     }
 `;
 
+const StyledTr = styled.tr`
+    background-color: ${(props) => (props.isSelf ? "#F6F6F6" : "none")};
+    border: ${(props) => (props.isSelf ? "3px solid yellow" : "none")};
+    color: black;
+`;
+
 export default function LankingPage() {
     const [userList, setUserList] = useState([]); // 유저 목록
     const loginUser = useSelector((state) => state.loginReducer.user);
@@ -116,7 +122,7 @@ export default function LankingPage() {
                     </thead>
                     <tbody>
                         {userList.map((item, index) => (
-                            <tr key={item.index}>
+                            <StyledTr key={item.index} isSelf={loginUser.id === item.id}>
                                 <td>{index + 1}</td>
                                 <td>{item.id}</td>
                                 <td>{item.nickname}</td>
@@ -140,7 +146,7 @@ export default function LankingPage() {
                                         </button>
                                     )}
                                 </td>
-                            </tr>
+                            </StyledTr>
                         ))}
                     </tbody>
                 </table>
