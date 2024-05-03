@@ -53,6 +53,12 @@ const Container = styled.div`
     font-size: 40px;
 `;
 
+const Input = styled.input`
+    width: 30%;
+    padding: 8px;
+    margin-left: 10px; // 라벨과 입력 필드 사이의 간격
+`;
+
 const ClossButton = styled.div`
     width: 100%;
     background-color: #00154b;
@@ -76,6 +82,16 @@ const ModalOverlay = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+`;
+const CheckButton = styled.button`
+    padding: 7px 10px; // Inputid와 동일한 패딩을 적용
+    margin-top: 3px;
+    margin-left: 5px;
+    cursor: pointer; // 버튼에 마우스 오버시 커서 변경
+    background-color: #00154b; // 배경 색상 설정
+    color: white; // 텍스트 색상 설정
+    border: none;
+    border-radius: 4px; // 테두리 둥글게 처리
 `;
 
 const ModalContent = styled.div`
@@ -200,7 +216,16 @@ const SaveButton = styled.button`
         cursor: not-allowed;
     }
 `;
+const ErrorSpan = styled.span`
+    color: red;
+    margin: 5px;
+`;
+
+const Span = styled.span`
+    margin: 5px;
+`;
 export default function Header() {
+    const [errors, setErrors] = useState({});
     const dispatch = useDispatch();
     const [isAuthenticated, setIsAuthenticated] = useState(true);
     const [showNotis, setShowNotis] = useState(false);
@@ -211,6 +236,7 @@ export default function Header() {
     const [newPassword, setNewPassword] = useState("");
     const [newNickname, setNewNickname] = useState(user.nickname);
     const notisRef = useRef();
+    const [availabilityMessages, setAvailabilityMessages] = useState({});
 
     useEffect(() => {
         if (isModalOpen) {
@@ -293,6 +319,37 @@ export default function Header() {
             });
     };
 
+    const checkDuplicate = async (field, value) => {
+        if (!value) {
+            setErrors({ ...errors, [field]: "This field cannot be empty." });
+            setAvailabilityMessages({ ...availabilityMessages, [field]: "" });
+            return;
+        }
+        try {
+            const response = await axiosUtils.post(`/users/check-duplicate`, {
+                field: field,
+                value: value,
+            });
+            if (response.data === false) {
+                setErrors({ ...errors, [field]: "이미 사용중입니다." });
+                setAvailabilityMessages({
+                    ...availabilityMessages,
+                    [field]: <ErrorSpan>이미 사용중입니다.</ErrorSpan>,
+                });
+            } else {
+                setErrors({ ...errors, [field]: "" });
+                setAvailabilityMessages({
+                    ...availabilityMessages,
+                    [field]: <Span>사용 가능합니다.</Span>,
+                });
+            }
+        } catch (error) {
+            console.error("Failed to check duplicate:", error);
+            setErrors({ ...errors, [field]: "Failed to check. Please try again." });
+            setAvailabilityMessages({ ...availabilityMessages, [field]: "" });
+        }
+    };
+
     const toggleNotis = () => {
         setShowNotis(!showNotis);
     };
@@ -373,22 +430,31 @@ export default function Header() {
                                             <form onSubmit={handleUpdateProfile}>
                                                 <div>
                                                     {"아이디 :"}
-                                                    <input type="text" value={user.id} disabled />
+                                                    <Input type="text" value={user.id} disabled />
                                                 </div>
                                                 <div>
                                                     {"닉네임 :"}
-                                                    <input
+                                                    <Input
                                                         type="text"
                                                         placeholder="새 닉네임"
-                                                        value={newNickname}
+                                                        // value={newNickname}
                                                         onChange={(e) =>
                                                             setNewNickname(e.target.value)
                                                         }
                                                     />
+                                                    <CheckButton
+                                                        type="button"
+                                                        onClick={() =>
+                                                            checkDuplicate("nickname", newNickname)
+                                                        }
+                                                    >
+                                                        Check
+                                                    </CheckButton>
+                                                    <span>{availabilityMessages.nickname}</span>
                                                 </div>
                                                 <div>
                                                     {"현재 비밀번호 :"}
-                                                    <input
+                                                    <Input
                                                         type="password"
                                                         placeholder="현재 비밀번호"
                                                         value={password}
@@ -396,18 +462,46 @@ export default function Header() {
                                                             setPassword(e.target.value)
                                                         }
                                                         required
+                                                        maxLength={10}
                                                     />
+                                                    {/* <span>{availabilityMessages.pw}</span> */}
                                                 </div>
                                                 <div>
                                                     {"새 비밀번호  :"}
-                                                    <input
+                                                    <Input
                                                         type="password"
                                                         placeholder="새 비밀번호"
                                                         value={newPassword}
-                                                        onChange={(e) =>
-                                                            setNewPassword(e.target.value)
-                                                        }
+                                                        name="pw"
+                                                        onChange={(e) => {
+                                                            setNewPassword(e.target.value); // newPassword 상태 업데이트
+                                                            if (e.target.value.length < 5) {
+                                                                setErrors({
+                                                                    ...errors,
+                                                                    [e.target.name]:
+                                                                        "5글자 이상 입력해주세요",
+                                                                });
+                                                                setAvailabilityMessages({
+                                                                    ...availabilityMessages,
+                                                                    [e.target.name]: (
+                                                                        <ErrorSpan>
+                                                                            5글자 이상 입력해주세요
+                                                                        </ErrorSpan>
+                                                                    ),
+                                                                });
+                                                            } else {
+                                                                setErrors({
+                                                                    ...errors,
+                                                                    [e.target.name]: "",
+                                                                });
+                                                                setAvailabilityMessages({
+                                                                    ...availabilityMessages,
+                                                                    [e.target.name]: "",
+                                                                });
+                                                            }
+                                                        }}
                                                     />
+                                                    <span>{availabilityMessages.pw}</span>
                                                 </div>
                                                 <SaveButton type="submit">저장하기</SaveButton>
                                             </form>
