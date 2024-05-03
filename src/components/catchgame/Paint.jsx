@@ -5,12 +5,13 @@ import socketIOClient from "socket.io-client";
 import "./styles/style.css";
 import "./styles/gameplayer.css";
 
-function Canvas({ players, gameStarted }) {
+function Canvas({ players, gameStarted, loginUser }) {
     const [ctx, setCtx] = useState(null);
     const [painting, setPainting] = useState(false);
     const [tool, setTool] = useState("auto");
     const [socket, setSocket] = useState(null);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0); // 현재 플레이어 인덱스 상태 추가
+    const [currentGamePlayer, setCurrentGamePlayer] = useState(false);
 
     const canvasRef = useRef(null);
     const rangeRef = useRef(null);
@@ -30,6 +31,7 @@ function Canvas({ players, gameStarted }) {
 
         socket.on("drawing", (data) => {
             drawLine(data);
+            console.log(data);
         });
 
         const canvas = canvasRef.current;
@@ -63,18 +65,22 @@ function Canvas({ players, gameStarted }) {
     useEffect(() => {
         const currentPlayer = playerRefs.current[currentPlayerIndex];
         if (currentPlayer) {
-            setPainting(true);
             currentPlayer.style.border = "2px solid red";
+
+            if (players.length > 0 && players[currentPlayerIndex].id === loginUser.id)
+                setCurrentGamePlayer(true);
+            else setCurrentGamePlayer(false);
+            if (!gameStarted) currentPlayer.style.border = "";
         }
+
         return () => {
             if (currentPlayer) {
-                setPainting(false);
+                setCurrentGamePlayer(false);
                 currentPlayer.style.border = "";
             }
         };
-    }, [currentPlayerIndex]);
+    }, [currentPlayerIndex, gameStarted, players, loginUser]);
 
-    useEffect(() => {}, [gameStarted]);
     // 그림그리기
     const drawLine = (data) => {
         if (!ctx) return;
@@ -92,26 +98,61 @@ function Canvas({ players, gameStarted }) {
         }
     };
 
-    const stopPainting = () => {
-        setPainting(false);
-    };
+    // const stopPainting = () => {
+    //     setPainting(false);
+    // };
 
-    const startPainting = () => {
+    // const startPainting = () => {
+    //     setPainting(true);
+    // };
+
+    // const onMouseMove = (event) => {
+    //     if (!ctx) return;
+    //     const x = event.nativeEvent.offsetX;
+    //     const y = event.nativeEvent.offsetY;
+    //     if (!painting) {
+    //         ctx.beginPath();
+    //         ctx.moveTo(x, y);
+    //     } else {
+    //         ctx.lineTo(x, y);
+    //         ctx.stroke();
+    //     }
+
+    //     if (socket) {
+    //         socket.emit("drawing", {
+    //             x: x,
+    //             y: y,
+    //             color: ctx.strokeStyle,
+    //             size: ctx.lineWidth,
+    //             isDraw: painting,
+    //         });
+    //     }
+    // };
+
+    const onMouseDown = (event) => {
+        if (!ctx || !gameStarted || !currentGamePlayer) return; // 현재 플레이어가 아니면 그림 그리기 시작하지 않음
+        const x = event.nativeEvent.offsetX;
+        const y = event.nativeEvent.offsetY;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
         setPainting(true);
+        // if (socket) {
+        //     socket.emit("drawing1", {
+        //         x: x,
+        //         y: y,
+        //         color: ctx.strokeStyle,
+        //         size: ctx.lineWidth,
+        //         isDraw: painting,
+        //     });
+        // }
     };
 
     const onMouseMove = (event) => {
-        if (!ctx) return;
+        if (!ctx || !gameStarted || !painting || !currentGamePlayer) return; // 그림 그리기 중이거나 현재 플레이어가 아니면 그림 그리기 동작하지 않음
         const x = event.nativeEvent.offsetX;
         const y = event.nativeEvent.offsetY;
-        if (!painting) {
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        }
-
+        ctx.lineTo(x, y);
+        ctx.stroke();
         if (socket) {
             socket.emit("drawing", {
                 x: x,
@@ -121,6 +162,18 @@ function Canvas({ players, gameStarted }) {
                 isDraw: painting,
             });
         }
+    };
+
+    const onMouseUp = () => {
+        if (!ctx || !gameStarted || !currentGamePlayer) return; // 현재 플레이어가 아니면 그림 그리기 종료하지 않음
+        ctx.closePath();
+        setPainting(false);
+    };
+
+    const onMouseLeave = () => {
+        if (!ctx || !gameStarted || !currentGamePlayer) return; // 현재 플레이어가 아니면 그림 그리기 중지하지 않음
+        ctx.closePath();
+        setPainting(false);
     };
 
     const handleColorClick = (color) => {
@@ -191,7 +244,8 @@ function Canvas({ players, gameStarted }) {
         }
     };
 
-    console.log(players);
+    // console.log(loginUser);
+    // console.log(players.id);
     return (
         <>
             <div className="box">
@@ -226,9 +280,9 @@ function Canvas({ players, gameStarted }) {
                         width={CANVAS_WIDTH}
                         height={CANVAS_HEIGHT}
                         onMouseMove={onMouseMove}
-                        onMouseDown={startPainting}
-                        onMouseUp={stopPainting}
-                        onMouseLeave={stopPainting}
+                        onMouseDown={onMouseDown}
+                        onMouseUp={onMouseUp}
+                        onMouseLeave={onMouseLeave}
                     />
 
                     <div className="controls">
