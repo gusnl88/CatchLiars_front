@@ -21,7 +21,7 @@ const TimerStyle = styled.div`
 const words = ["사과", "배", "노트북", "컴퓨터", "아이패드", "치킨"];
 let liar_idx = 0;
 
-const socket = io.connect("http://localhost:8089", {
+const socket = io.connect(process.env.REACT_APP_API_SERVER, {
     autoConnect: false,
 });
 
