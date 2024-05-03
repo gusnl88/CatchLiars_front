@@ -2,33 +2,65 @@ import React, { useEffect, useState } from "react";
 import axiosUtils from "../utils/axiosUtils";
 import styled from "styled-components";
 
-const Container = styled.div`
-    padding: 20px;
-    background-color: #f4f4f4;
-`;
-
-const InvitationList = styled.ul`
-    list-style: none;
-    padding: 0;
-`;
-
 const InvitationItem = styled.li`
-    background-color: #fff;
     margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap; // 내용이 넘칠 경우 다음 줄로 이동
+
+    div {
+        display: flex;
+        align-items: center;
+    }
 `;
 
-const Button = styled.button`
-    padding: 5px 10px;
-    margin-left: 10px;
+const Notisbox = styled.div`
+    z-index: 1;
+    position: absolute;
+    left: -160px;
+    top: 50px;
+    width: 320px;
+    max-height: 200px;
+    background-color: #ffffffaf;
+    border-radius: 5px;
+    padding: 20px;
+    overflow-y: auto;
+
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+`;
+
+const Nbutton = styled.button`
+    padding: 5px 10px; // 패딩 감소
+    margin-left: 2px;
+    font-size: 12px; // 글자 크기 증가
+    font-weight: bold;
+    color: white;
+    background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+    border: none;
+    border-radius: 30px;
     cursor: pointer;
+    outline: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-image: linear-gradient(to right, #2575fc 0%, #6a11cb 100%);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        transform: translateY(2px);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 3px rgba(50, 50, 250, 0.5);
+    }
 `;
 
-function FriendInvitationPage() {
+export default function FriendInvitationPage() {
     const [invitations, setInvitations] = useState([]);
     const [nickname, setNickname] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -80,27 +112,31 @@ function FriendInvitationPage() {
         }
     };
 
-    if (loading) return <Container>Loading...</Container>;
-    if (error) return <Container>Error: {error}</Container>;
-
     return (
-        <Container>
-            <h1>친구 초대 목록</h1>
-            <InvitationList>
-                {invitations.map((invite, index) => (
-                    <InvitationItem key={invite.i_seq}>
-                        <span>{nickname[index]} 님이 친구 요청을 보냈습니다.</span>
-                        <div>
-                            <Button onClick={() => acceptInvitation(invite.f_seq, invite.i_seq)}>
-                                수락
-                            </Button>
-                            <Button onClick={() => deleteInvitation(invite.i_seq)}>거절</Button>
-                        </div>
-                    </InvitationItem>
-                ))}
-            </InvitationList>
-        </Container>
+        <>
+            <Notisbox>
+                <ul>
+                    {invitations.length > 0 ? (
+                        invitations.map((invite, index) => (
+                            <InvitationItem key={invite.i_seq}>
+                                {nickname[index]} 님이 친구 요청을 보냈습니다.
+                                <div>
+                                    <Nbutton
+                                        onClick={() => acceptInvitation(invite.f_seq, invite.i_seq)}
+                                    >
+                                        수락
+                                    </Nbutton>
+                                    <Nbutton onClick={() => deleteInvitation(invite.i_seq)}>
+                                        거절
+                                    </Nbutton>
+                                </div>
+                            </InvitationItem>
+                        ))
+                    ) : (
+                        <li>친구 초대가 없습니다.</li>
+                    )}
+                </ul>
+            </Notisbox>
+        </>
     );
 }
-
-export default FriendInvitationPage;

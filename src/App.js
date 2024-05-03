@@ -7,7 +7,7 @@ import LoginUser from "./components/LoginUser";
 import GameWaitngList from "./pages/GameWaitingList";
 import Mypage from "./pages/Mypage";
 import CatchLiarInGame from "./pages/CatchLiarInGame";
-import FriendList from "./pages/FriendList";
+
 import LankingPage from "./pages/LankingPage";
 import FriendInvitationPage from "./pages/FriendInvitationPage";
 import DmPage from "./pages/DmPage";
@@ -26,7 +26,7 @@ function App() {
                 element={LoginUser(loginUser, <CatchLiarInGame />)}
             />
             <Route path="dms" element={LoginUser(loginUser, <DmPage />)} />
-            <Route path="users/friends" element={LoginUser(loginUser, <FriendList />)} />
+
             <Route path="users/lank" element={LoginUser(loginUser, <LankingPage />)} />
             <Route
                 path="users/friends/accept"
