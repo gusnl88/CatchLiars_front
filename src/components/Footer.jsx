@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import FriendList from "./friend/FriendList";
+import ChattingList from "./friend/ChattingList";
 
 const Footers = styled.footer`
     display: flex;
@@ -18,23 +21,54 @@ const Footers = styled.footer`
             color: skyblue;
         }
     }
+    .friend,.chatting{
+        width: 300px;
+    height: 600px;
+    position: absolute;
+    background: #ffffff92;
+    top: 100px;
+    border-radius: 10px;
+
+    }
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled.div`
     padding: 10px 15px;
     margin: 5px;
 
     color: white; /* 텍스트 색상 */
     text-decoration: none; /* 밑줄 없앰 */
     border-radius: 5px; /* 테두리 둥글게 */
+    cursor: pointer;
+
 `;
 
 export default function Footer() {
+    const [friendCheck,setFriendCheck]=useState(false);
+    const [chattingCheck,setChattingCheck]=useState(false);
+    const friendBtn=()=>{
+        friendCheck? setFriendCheck(false):setFriendCheck(true);
+        if(chattingCheck){
+            setChattingCheck(false)
+        }
+
+    }
+    const chattingBtn=()=>{
+        chattingCheck? setChattingCheck(false):setChattingCheck(true);
+        if(friendCheck){
+            setFriendCheck(false)
+        }
+
+    }
     return (
         <Footers>
-            <StyledLink to="/dms">채팅</StyledLink>
-            <StyledLink to="/users/friends">친구목록</StyledLink>
-            <StyledLink to="/users/friends/accept">초대</StyledLink>
+            <StyledLink ><a onClick={chattingBtn}>채팅</a></StyledLink>
+            {chattingCheck?<ChattingList/>:""}
+            {/* <StyledLink to="/users/friends">친구목록</StyledLink> */}
+            <StyledLink><a onClick={friendBtn}>친구목록</a></StyledLink>
+            {friendCheck? <FriendList/>:""}
+            
+            {/* <StyledLink to="/users/friends/accept">초대</StyledLink> */}
         </Footers>
     );
 }
