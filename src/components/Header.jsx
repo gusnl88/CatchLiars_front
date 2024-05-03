@@ -188,19 +188,6 @@ const HeaderPage = styled.header`
     }
 `;
 
-const InvitationItem = styled.li`
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap; // 내용이 넘칠 경우 다음 줄로 이동
-
-    div {
-        display: flex;
-        align-items: center;
-    }
-`;
-
 const SaveButton = styled.button`
     padding: 10px 20px;
     background-color: #4caf50; // 진한 녹색
@@ -239,34 +226,8 @@ const Span = styled.span`
     margin: 5px;
 `;
 
-const Nbutton = styled.button`
-    padding: 5px 10px; // 패딩 감소
-    margin-left: 2px;
-    font-size: 12px; // 글자 크기 증가
-    font-weight: bold;
-    color: white;
-    background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    outline: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-
-    &:hover {
-        background-image: linear-gradient(to right, #2575fc 0%, #6a11cb 100%);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-    }
-
-    &:active {
-        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
-        transform: translateY(2px);
-    }
-
-    &:focus {
-        box-shadow: 0 0 0 3px rgba(50, 50, 250, 0.5);
-    }
+const InvitationCount = styled.span`
+    color: red; // 텍스트 색상을 빨간색으로 설정
 `;
 export default function Header() {
     const [invitateCheck, setInvitateCheck] = useState(false);
@@ -282,6 +243,20 @@ export default function Header() {
     const [newNickname, setNewNickname] = useState(user.nickname);
     const notisRef = useRef();
     const [availabilityMessages, setAvailabilityMessages] = useState({});
+    const [invitations, setInvitations] = useState([]);
+
+    useEffect(() => {
+        const fetchInvitations = async () => {
+            try {
+                const response = await axiosUtils.get("/invites/list");
+                setInvitations(response.data.invitationList); // 초대 목록 상태 업데이트
+            } catch (error) {
+                console.error("Error fetching invitations:", error);
+            }
+        };
+
+        fetchInvitations();
+    }, []);
 
     const invitateBtn = () => {
         setShowNotis(!showNotis);
@@ -424,7 +399,12 @@ export default function Header() {
                 <Link to="/users/lank">유저 랭킹</Link>
                 <div className="notis-container">
                     <div shownotis={showNotis ? "true" : "false"} ref={notisRef}>
-                        <Link onClick={invitateBtn}>알림</Link>
+                        <Link onClick={invitateBtn}>
+                            알림{" "}
+                            {invitations.length > 0 && (
+                                <InvitationCount> ({invitations.length})</InvitationCount>
+                            )}
+                        </Link>
                         {invitateCheck ? <FriendInvitationPage /> : ""}
                     </div>
                 </div>
