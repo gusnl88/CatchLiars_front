@@ -3,8 +3,9 @@ import Canvas from "../components/catchgame/Paint";
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useSelector } from "react-redux";
-import GameInfo from "../components/catchgame/gameInfo";
+// import GameInfo from "../components/catchgame/gameInfo";
 import styled from "styled-components";
+import "../components/catchgame/styles/startGameBtn.scss";
 
 const TimerStyle = styled.div`
     display: flex;
@@ -17,6 +18,9 @@ const TimerStyle = styled.div`
     align-items: center;
 `;
 
+const words = ["사과", "배", "노트북", "컴퓨터", "아이패드", "치킨"];
+let liar_idx = 0;
+
 const socket = io.connect("http://localhost:8089", {
     autoConnect: false,
 });
@@ -27,26 +31,37 @@ function CatchLiarInGame() {
     const [round, setRound] = useState(1);
     const [remainTime, setRemainTime] = useState(5);
     const [players, setPlayers] = useState([]);
+    const [keywords, setKeywords] = useState([]);
     const loginUser = useSelector((state) => state.loginReducer.user);
 
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
     };
 
-    const nextPlayer = () => {
-        setCurrentPlayer((prevPlayer) => {
-            if (prevPlayer === players.length) {
-                setRound((prevRound) => prevRound + 1); // Round 증가
-                return 1; // 플레이어 다시 1번부터 시작
-            } else {
-                return prevPlayer + 1;
-            }
-        });
+    const startGame = (e) => {
+        e.preventDefault();
+        const max_idx = players.length - 1;
+        liar_idx = Math.floor(Math.random() * (max_idx - 0 + 1)); // 라이어 인덱스 랜덤 추출
+        // 무작위로 단어 2개 추출(첫 번째 단어가 라이어 단어)
+        const randomWords = words.sort(() => 0.5 - Math.random()).slice(0, 2);
+        setKeywords(randomWords);
+        setGameStarted(true);
+        socket.emit("gamestart", true);
     };
 
-    const startGame = () => {
-        setGameStarted(true);
-    };
+    socket.on("start", (start) => {
+        setGameStarted(start);
+    });
+
+    useEffect(() => {
+        if (gameStarted === true)
+            socket.on("updateGameData", (data) => {
+                setRemainTime(data.remainTime);
+                setCurrentPlayer(data.currentPlayer);
+                setRound(data.round);
+                setPlayers(data.players);
+            });
+    }, []);
 
     useEffect(() => {
         let timer;
@@ -56,22 +71,43 @@ function CatchLiarInGame() {
                     if (prevTime > 0) {
                         return prevTime - 1;
                     } else {
-                        clearInterval(timer);
-                        nextPlayer(); // 다음 플레이어로 이동
+                        setCurrentPlayer((prevPlayer) => {
+                            if (prevPlayer === players.length) {
+                                setRound((prevRound) => {
+                                    if (prevRound === 2) {
+                                        clearInterval(timer); // 2 라운드가 끝나면 타이머 종료
+                                        setGameStarted(false);
+                                        return 1;
+                                    }
+                                    return prevRound + 1; // Round 증가
+                                });
+                                return 1; // 플레이어 다시 1번부터 시작
+                            } else {
+                                return prevPlayer + 1;
+                            }
+                        });
                         return 5;
                     }
+                });
+
+                // gameStarted가 true인 경우에만 서버로 게임 데이터를 업데이트합니다.
+                socket.emit("updateGameData", {
+                    remainTime,
+                    currentPlayer,
+                    round,
+                    players,
                 });
             }, 1000);
         }
         return () => clearInterval(timer);
-    }, [gameStarted, nextPlayer]);
+    }, [gameStarted, setCurrentPlayer, setRound, remainTime, currentPlayer, round, players]);
 
-    useEffect(() => {
-        if (currentPlayer === 6) {
-            // currentPlayer가 6이 되면서 한 번만 실행됨
-            setRemainTime(5); // remainTime 초기화
-        }
-    }, [currentPlayer]);
+    // useEffect(() => {
+    //     if (currentPlayer === players.length && round === 2) {
+    //         // round가 2일 때만 해당 조건 추가
+    //         clearInterval(timerID); // 타이머 멈추기
+    //     }
+    // }, [currentPlayer, round, players.length, timerID]);
 
     useEffect(() => {
         initSocketConnect();
@@ -111,19 +147,40 @@ function CatchLiarInGame() {
                             </TimerStyle>
                         </div>
                         <div className="gameInfo">
-                            <GameInfo
-                                startGame={startGame}
-                                currentPlayer={currentPlayer}
-                                gameStarted={gameStarted}
-                                round={round}
-                            ></GameInfo>
+                            <div>
+                                {!gameStarted && (
+                                    <button
+                                        onClick={(e) => {
+                                            startGame(e);
+                                        }}
+                                        className="learn-more"
+                                    >
+                                        게임 시작
+                                    </button>
+                                )}
+                                {gameStarted && (
+                                    <div>
+                                        <h1>Round {round}</h1>
+                                        <br />
+                                        <p>
+                                            현재 플레이어:
+                                            <span style={{ color: "blue" }}>
+                                                {players.length > 0 &&
+                                                    players[currentPlayer - 1].nickName}
+                                            </span>
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <div className="word">제시어</div>
+                        <div className="word">
+                            {players[liar_idx] === loginUser ? keywords[0] : keywords[1]}
+                        </div>
                     </div>
                 </nav>
             </header>
             <div style={{ display: "flex" }}>
-                <Canvas players={players} gameStarted={gameStarted}></Canvas>
+                <Canvas players={players} gameStarted={gameStarted} loginUser={loginUser}></Canvas>
                 {/* <Chatting3></Chatting3> */}
             </div>
         </div>
