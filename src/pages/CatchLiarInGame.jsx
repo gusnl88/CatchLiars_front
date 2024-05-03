@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 // import GameInfo from "../components/catchgame/gameInfo";
 import styled from "styled-components";
 import "../components/catchgame/styles/startGameBtn.scss";
+import Chat from "../components/catchgame/chat";
 
 const TimerStyle = styled.div`
     display: flex;
@@ -18,7 +19,10 @@ const TimerStyle = styled.div`
     align-items: center;
 `;
 
-const socket = io.connect("http://localhost:8089", {
+const words = ["사과", "배", "노트북", "컴퓨터", "아이패드", "치킨"];
+let liar_idx = 0;
+
+const socket = io.connect(process.env.REACT_APP_API_SERVER, {
     autoConnect: false,
 });
 
@@ -28,6 +32,7 @@ function CatchLiarInGame() {
     const [round, setRound] = useState(1);
     const [remainTime, setRemainTime] = useState(5);
     const [players, setPlayers] = useState([]);
+    const [keywords, setKeywords] = useState([]);
     const loginUser = useSelector((state) => state.loginReducer.user);
 
     const initSocketConnect = () => {
@@ -36,6 +41,11 @@ function CatchLiarInGame() {
 
     const startGame = (e) => {
         e.preventDefault();
+        const max_idx = players.length - 1;
+        liar_idx = Math.floor(Math.random() * (max_idx - 0 + 1)); // 라이어 인덱스 랜덤 추출
+        // 무작위로 단어 2개 추출(첫 번째 단어가 라이어 단어)
+        const randomWords = words.sort(() => 0.5 - Math.random()).slice(0, 2);
+        setKeywords(randomWords);
         setGameStarted(true);
         socket.emit("gamestart", true);
     };
@@ -51,7 +61,10 @@ function CatchLiarInGame() {
                 setCurrentPlayer(data.currentPlayer);
                 setRound(data.round);
                 setPlayers(data.players);
+                console.log(">>", data);
             });
+        else {
+        }
     }, []);
 
     useEffect(() => {
@@ -104,7 +117,7 @@ function CatchLiarInGame() {
         initSocketConnect();
 
         socket.on("gameId", (data) => {
-            console.log("socketId", data);
+            // console.log("socketId", data);
         });
 
         socket.emit("loginUser", loginUser);
@@ -119,7 +132,7 @@ function CatchLiarInGame() {
         socket.on("updateUserId", (players) => {
             setPlayers(players);
 
-            console.log(">>", players);
+            // console.log(">>", players);
         });
     }, [players]);
 
@@ -170,7 +183,7 @@ function CatchLiarInGame() {
             </header>
             <div style={{ display: "flex" }}>
                 <Canvas players={players} gameStarted={gameStarted} loginUser={loginUser}></Canvas>
-                {/* <Chatting3></Chatting3> */}
+                <Chat loginUser={loginUser}></Chat>
             </div>
         </div>
     );
