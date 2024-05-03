@@ -139,7 +139,7 @@ function LoginForm() {
 
             if (response.data) {
                 setShowModal(true);
-                dispatch(login(response.data.id, response.data.nickname));
+                dispatch(login(response.data.u_seq,response.data.id, response.data.nickname,));
 
                 axiosUtils.patch(`/users/stateTrue`, { withCredentials: true });
             } else {
