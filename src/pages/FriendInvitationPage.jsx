@@ -30,6 +30,7 @@ const Button = styled.button`
 
 function FriendInvitationPage() {
     const [invitations, setInvitations] = useState([]);
+    const [nickname, setNickname] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -39,8 +40,11 @@ function FriendInvitationPage() {
 
     const fetchInvitations = async () => {
         try {
-            const response = await axiosUtils.get(`/invites/list/0`); // 친구 초대만 조회
-            setInvitations(response.data);
+            const response = await axiosUtils.get(`/invites/list`); // 친구 초대만 조회
+            // {invitationList: Array(1), nickname: Array(1)}
+            console.log(response.data.invitationList);
+            setInvitations(response.data.invitationList);
+            setNickname(response.data.nickname);
             setLoading(false);
         } catch (err) {
             console.error("Error fetching invitations:", err);
@@ -83,9 +87,9 @@ function FriendInvitationPage() {
         <Container>
             <h1>친구 초대 목록</h1>
             <InvitationList>
-                {invitations.map((invite) => (
+                {invitations.map((invite, index) => (
                     <InvitationItem key={invite.i_seq}>
-                        <span>{invite.nickname} 님이 친구 요청을 보냈습니다.</span>
+                        <span>{nickname[index]} 님이 친구 요청을 보냈습니다.</span>
                         <div>
                             <Button onClick={() => acceptInvitation(invite.f_seq, invite.i_seq)}>
                                 수락
