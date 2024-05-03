@@ -41,6 +41,7 @@ export default function GameWaitingList() {
     //     return () => socketRef.current.disconnect();
     // }, []);
 
+
     useEffect(() => {
         const fetchRoomList = async () => {
             try {

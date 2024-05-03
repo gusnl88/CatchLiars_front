@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import io from "socket.io-client";
 import styled from "styled-components";
 import axiosUtils from "../../utils/axiosUtils";
@@ -13,7 +13,6 @@ const RoomContainer = styled.div`
     height: 100%;
     color: black;
     display: flex;
-    justify-content: space-around;
     position: relative;
 
     .side_zone {
@@ -22,33 +21,56 @@ const RoomContainer = styled.div`
 
         .side_box {
             display: flex;
-            height: 100%;
             flex-direction: column;
+            height: 100%;
 
             .user_box {
-                height: 80%;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
 
                 .user_profile {
-                    height: 25%;
-                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 10px;
+                    padding: 5px;
+                    margin-bottom: 10px;
+                    background-color: #cac9c9;
 
-                    .profile_box {
-                        padding: 5px;
-                        height: 100%;
-                    }
-                    img {
-                        border-radius: 10px;
-                        height: 80%;
+                    .game_img {
                         width: 100%;
+                        img {
+                            width: 100%;
+                            height: 58px;
+                            border-radius: 10px;
+                        }
+                    }
+                    .profile_box {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        width: 100%;
+
+                        span {
+                            margin-left: 5px;
+                        }
+                        img {
+                            border-radius: 50%;
+                            width: 40px;
+                            height: 40px;
+                        }
                     }
                 }
             }
 
             .event_zone {
-                height: 20%;
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                height: 20%;
 
                 .btn_box {
                     button {
@@ -72,23 +94,44 @@ const RoomContainer = styled.div`
 
     .play_zone {
         width: 60%;
+        display: flex;
+        flex-direction: column;
 
         .title_box {
-            height: 10%;
+            height: 50px;
             display: flex;
             align-items: center;
-
+            padding: 0 20px;
+            border-bottom: 1px solid #ccc;
+            justify-content: space-around;
             h1 {
-                margin: 10px auto;
+                margin: 0;
             }
         }
 
         .ment_box {
+            flex: 1;
+            position: relative;
             background-color: #80808054;
-            height: 30%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 10px; /* 테두리를 둥글게 설정 */
+
             .img_box {
-                height: 90%;
+                position: absolute;
+                top: 0;
+                left: 0;
                 width: 100%;
+                height: 100%;
+                border-radius: 10px; /* 테두리를 둥글게 설정 */
+            }
+
+            .overlay {
+                position: absolute;
+                font-size: 20px;
+                color: #fff;
             }
         }
 
@@ -173,18 +216,45 @@ const RoomContainer = styled.div`
     }
     .vote_box {
         width: 300px;
-        height: 150px;
+        max-height: 150px; /* 최대 높이 지정 */
+        overflow-y: auto; /* 내용이 넘칠 때 스크롤 표시 */
         background-color: #a0a0a0;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         display: none;
+        flex-wrap: wrap;
         justify-content: center;
+        align-items: center;
         border-radius: 10px;
+        text-align: center;
+        padding: 10px;
     }
+
+    .vote_box button {
+        width: 80px; /* 버튼 너비를 줄입니다. */
+        height: 30px; /* 버튼 높이를 줄입니다. */
+        margin: 5px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        background-color: #f0a927;
+        font-weight: bold;
+    }
+
+    .vote_box button:hover {
+        background-color: #d9d8d8;
+    }
+
     .vote_btn {
         display: none;
+    }
+    .dm {
+        color: #e12a0e;
+    }
+    .notice {
+        color: green;
     }
 `;
 const MafiaGameRoom = ({ room }) => {
@@ -198,6 +268,8 @@ const MafiaGameRoom = ({ room }) => {
     const [gameTime, setGameTime] = useState(5); // 초 단위로 설정
     const [voteSelect, setVoteSelect] = useState(false);
     const [isDaytime, setIsDaytime] = useState(true);
+    const [dmTo, setDmTo] = useState("all");
+    const [mafiaList, setMafiaList] = useState([]);
     const loginUser = useSelector((state) => state.loginReducer.user);
     const chatContainerRef = useRef(null);
     const TitleRef = useRef(null);
@@ -208,6 +280,8 @@ const MafiaGameRoom = ({ room }) => {
             VoteBtnRef.current.style.display = "block"; // 투표 버튼을 보이게 설정
         } else if (gameTime < 0) {
             setGameTime(0); // 음수가 되는 것을 방지하기 위해 게임 시간을 0으로 설정
+        } else if (gameTime > 0) {
+            VoteBtnRef.current.style.display = "none"; // 투표 버튼을 보이게 설정
         }
     }, [gameTime]);
     useEffect(() => {
@@ -217,8 +291,11 @@ const MafiaGameRoom = ({ room }) => {
         newSocket.on("message", (data) => {
             console.log(data);
             if (data.type === "message") {
-                console.log("진입햇어요");
-                setMessages((prevMessages) => [...prevMessages, data.message]);
+                const newMessage = {
+                    message: data.message,
+                    isDm: data.dm,
+                };
+                setMessages((prevMessages) => [...prevMessages, newMessage]);
             } else if (data.type === "notice") {
                 TitleRef.current.innerHTML = `<span>${data.message}</span>`;
                 TitleRef.current.style.display = "flex";
@@ -231,7 +308,7 @@ const MafiaGameRoom = ({ room }) => {
 
         newSocket.on("userList", (users) => {
             console.log(users);
-            setUserList(users);
+            setUserList([...users]); // 배열을 복사해서 업데이트
             setIsRoomOwner(users[0] === loginUser.id);
             setIsRoomFull(users.length >= 1);
         });
@@ -249,6 +326,7 @@ const MafiaGameRoom = ({ room }) => {
 
                 TitleRef.current.innerHTML = `<span>당신은 <span class="job">${job}</span>입니다.</br>마피아는 지금 ${mafiaMessage}입니다</span>`;
                 console.log(`당신은 ${job}입니다.`);
+                setMafiaList(mafiaList);
                 console.log(userList);
                 TitleRef.current.style.display = "flex";
                 setTimeout(() => {
@@ -268,22 +346,40 @@ const MafiaGameRoom = ({ room }) => {
             }
         });
         newSocket.on("victory", (data) => {
-            setTimeout(() => {
-                outBtn();
-            }, 10000);
+            setIsGameStarted(false); // 게임 종료
+            setIsDaytime(true); // 낮으로 초기화
+            setMafiaList([]); // 마피아 리스트 초기화
+            // 여기에 남은 유저들의 상태 초기화 로직 추가
+            const users = Object.values(data);
+            setUserList([...users]);
+            setIsRoomOwner(users[0] === loginUser.id);
+            setIsRoomFull(users.length >= 1);
+            setVoteSelect(false);
+            // setTimeout(() => {
+            //     outBtn();
+            // }, 10000);
         });
         newSocket.on("restart", (data) => {
             // 게임 다시 시작 처리
             console.log(data.isDaytime ? "마피아시간" : "낮투표시간");
             let message;
+            let newMessage = {};
             if (data.isDaytime) {
-                message = `밤이 되었습니다. 마피아는 의견을 나누고 시민을 투표해 주세요.`;
+                message = `밤이 되었습니다. 마피아는 의견을 나누고 시민을 투표해 주세요.시민은 투표할수 없습니다.`;
+                newMessage = {
+                    message: message,
+                    isDm: data.dm,
+                };
                 setIsDaytime(false);
             } else {
                 message = `낮입니다 의견을 자유롭게 나누세요`;
+                newMessage = {
+                    message: message,
+                    isDm: data.dm,
+                };
                 setIsDaytime(true);
             }
-            setMessages((prevMessages) => [...prevMessages, message]);
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
             if (data.isDaytime) {
                 //전 투표가 낮이면(true)마피아 투표 로직
 
@@ -296,8 +392,6 @@ const MafiaGameRoom = ({ room }) => {
                     for (const userId in data.userList) {
                         if (data.mafiaList.includes(loginUser.id)) {
                             console.log("마피아는 현재", data.userList[userId].userId);
-                            TitleRef.current.style.display = "flex";
-                            TitleRef.current.innerHTML = `마피아는 상의후 제한시간 내에 투표를 진행시켜 주세요.`;
                             setTimeout(() => {
                                 TitleRef.current.style.display = "none";
                                 TitleRef.current.innerHTML = "";
@@ -367,7 +461,12 @@ const MafiaGameRoom = ({ room }) => {
 
     const sendMessage = () => {
         if (socket && message.trim() !== "") {
-            socket.emit("message", { roomId: room.g_seq, message });
+            const sendData = {
+                roomId: room.g_seq,
+                dm: dmTo, //all or socket.id
+                msg: message,
+            };
+            socket.emit("message", sendData);
             setMessage("");
         }
     };
@@ -381,12 +480,6 @@ const MafiaGameRoom = ({ room }) => {
     };
 
     const startGame = () => {
-        let message = ``;
-        if (isDaytime) {
-            message = `낮입니다 의견을 자유롭게 나누세요`;
-            setMessages((prevMessages) => [...prevMessages, message]);
-        }
-
         if (socket) {
             // 게임 시작
             console.log("시작");
@@ -412,10 +505,23 @@ const MafiaGameRoom = ({ room }) => {
             socket.emit("vote", { userId: user, roomId: room.g_seq, isDaytime });
             VoreRef.current.style.display = "none";
         } else {
-            alert("이미투표하셧습니다.");
+            alert("투표를 할 수 없습니다..");
             VoreRef.current.style.display = "none";
         }
     };
+    const userOptions = useMemo(() => {
+        const options = [];
+        for (let key in userList) {
+            if (userList[key] != loginUser.id) {
+                options.push(
+                    <option key={key} value={userList[key]}>
+                        {userList[key]}
+                    </option>
+                );
+            }
+        }
+        return options;
+    }, [userList]);
     return (
         <RoomContainer>
             <div className="side_zone">
@@ -424,10 +530,17 @@ const MafiaGameRoom = ({ room }) => {
                         {userList
                             ?.map((item, index) => (
                                 <div key={index} className="user_profile">
+                                    <div className="game_img">
+                                        <img src="/images/profile.png" alt="" />
+                                    </div>
                                     <div className="profile_box">
                                         <img src="/images/profile.png" alt="" />
-                                        <span>게임아이디: {item}</span>
-                                        {index === 0 && <span> (방장)</span>}
+                                        <span>
+                                            <p>
+                                                게임아이디: {item}
+                                                {index === 0 && <span> (방장)</span>}
+                                            </p>
+                                        </span>
                                     </div>
                                 </div>
                             ))
@@ -446,16 +559,20 @@ const MafiaGameRoom = ({ room }) => {
             <div className="play_zone">
                 <div className="title_box">
                     <h1>{room.g_title}</h1>
+                    {mafiaList.includes(loginUser.id) && (
+                        <span>마피아는: {mafiaList.join(", ")}</span>
+                    )}{" "}
                 </div>
                 <div className="ment_box">
                     <span>
                         게임시간: {formatTime(gameTime)}
                         {isDaytime ? (
-                            <img className="img_box" src="/images/daytime.jpg" alt="" />
+                            <img className="img_box" src="/images/daytime.gif" alt="" />
                         ) : (
-                            <img className="img_box" src="/images/night.jpg" alt="" />
+                            <img className="img_box" src="/images/night.gif" alt="" />
                         )}
                     </span>
+                    <div className="overlay">게임시간: {formatTime(gameTime)}</div>
                     <div ref={TitleRef} className="job_title"></div>
                     <div ref={VoreRef} className="vote_box">
                         {userList.map((item, index) => (
@@ -468,10 +585,25 @@ const MafiaGameRoom = ({ room }) => {
                 <div className="chat_box">
                     <div className="chat_main" ref={chatContainerRef}>
                         {messages.map((msg, index) => (
-                            <div key={index}>{msg}</div>
+                            <div
+                                key={index}
+                                className={
+                                    msg.isDm === "dm" ? "dm" : msg.isDm === "notice" ? "notice" : ""
+                                }
+                            >
+                                {msg.message ? msg.message : msg}
+                            </div>
                         ))}
                     </div>
                     <div className="chat_input">
+                        <select
+                            id="dm-select"
+                            value={dmTo}
+                            onChange={(e) => setDmTo(e.target.value)}
+                        >
+                            <option value="all">전체</option>
+                            {userOptions}
+                        </select>
                         <input
                             type="text"
                             value={message}
@@ -488,10 +620,17 @@ const MafiaGameRoom = ({ room }) => {
                         {userList
                             ?.map((item, index) => (
                                 <div key={index} className="user_profile">
+                                    <div className="game_img">
+                                        <img src="/images/profile.png" alt="" />
+                                    </div>
                                     <div className="profile_box">
                                         <img src="/images/profile.png" alt="" />
-                                        <span>게임아이디: {item}</span>
-                                        {index === 0 && <span> (방장)</span>}
+                                        <span>
+                                            <p>
+                                                게임아이디: {item}
+                                                {index === 0 && <span> (방장)</span>}
+                                            </p>
+                                        </span>
                                     </div>
                                 </div>
                             ))

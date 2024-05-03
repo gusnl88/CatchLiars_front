@@ -172,6 +172,7 @@ function CatchLiarInGame() {
                                     </div>
                                 )}
                             </div>
+
                         </div>
                         <div className="word">
                             {players[liar_idx] === loginUser ? keywords[0] : keywords[1]}

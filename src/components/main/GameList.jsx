@@ -21,21 +21,18 @@ const Main = styled.div`
             border-radius: 20px;
             overflow: hidden;
             position: relative;
-
             .game_image {
                 width: 100%;
-                height: auto;
+                height: 100%; /* 부모 div에 맞게 이미지 높이 설정 */
+                object-fit: cover; /* 이미지가 부모 요소에 맞춰져서 잘리지 않고 확대/축소됨 */
                 border-radius: 20px;
                 transition: transform 0.6s, filter 0.6s;
             }
-
-            &:hover {
-                .game_image {
-                    transform: scale(1.1);
-                    filter: brightness(80%);
-                }
+            &:hover .game_image,
+            &:hover .game_image {
+                transform: scale(1.1);
+                filter: brightness(80%);
             }
-
             @media (max-width: 768px) {
                 width: 90%; /* 모바일 화면에서는 한 열에 하나씩 표시 */
             }
@@ -55,20 +52,12 @@ export default function GameList() {
             <div className="game_box">
                 <div className="game1">
                     <Link to="/games/list/Mafia">
-                        <img
-                            className="game_image"
-                            src="https://img.danawa.com/prod_img/500000/032/935/img/13935032_1.jpg?shrink=330:*&_v=20210419150717"
-                            alt=""
-                        />
+                        <img className="game_image" src="/images/mafia.jpg" alt="" />
                     </Link>
                 </div>
                 <div className="game2">
                     <Link to="/games/list/Catchliars">
-                        <img
-                            className="game_image"
-                            src="https://i.namu.wiki/i/ArUNQENRkTX5SjFpTZgBxJd2XoRhfTobswB6vn1aH72c5m2wOfvx4d_dsicMbtjw4Cgu3sc_NCZ4wNd9tGDQQOS96ySuF7m-WAXYgxovqUbN_U_-b-5TT1lXQV3oaNHYwCxehF7dOzDsXssc_1SLlA.webp"
-                            alt=""
-                        />
+                        <img className="game_image" src="/images/catch.jpg" alt="" />
                     </Link>
                 </div>
             </div>
