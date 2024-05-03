@@ -9,6 +9,7 @@ import "../components/catchgame/styles/startGameBtn.scss";
 
 const TimerStyle = styled.div`
     display: flex;
+    background-color: white;
     background-image: url("/images/clock.gif");
     background-size: cover;
     background-repeat: no-repeat;
@@ -25,7 +26,7 @@ const socket = io.connect("http://localhost:8089", {
     autoConnect: false,
 });
 
-function CatchLiarInGame() {
+function CatchLiarInGame({ room }) {
     const [gameStarted, setGameStarted] = useState(false);
     const [currentPlayer, setCurrentPlayer] = useState(1);
     const [round, setRound] = useState(1);
@@ -172,7 +173,6 @@ function CatchLiarInGame() {
                                     </div>
                                 )}
                             </div>
-
                         </div>
                         <div className="word">
                             {players[liar_idx] === loginUser ? keywords[0] : keywords[1]}

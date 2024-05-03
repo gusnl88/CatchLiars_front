@@ -3,6 +3,7 @@ import styled from "styled-components";
 import MafiaGameRoom from "./MafiaGameRoom";
 import RoomRegister from "./RoomRegister";
 import GameList from "../main/GameList";
+import CatchLiarInGame from "../../pages/CatchLiarInGame";
 import axiosUtils from "../../utils/axiosUtils";
 
 const RoomListContainer = styled.div`
@@ -132,11 +133,12 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     useEffect(() => {
         if (newRoom != "") {
             setRoom(newRoom);
-            setGameStart("mafia"); //새로운 방을 만들었을떄. (인원수는 디폴트1)
+            setGameStart(type); //새로운 방을 만들었을떄. (인원수는 디폴트1)
         }
     }, [newRoom]);
 
     const handleJoinRoom = async (room) => {
+        console.log("room", room);
         if (room.g_pw !== null) {
             setSelectedRoom(room);
             setShowPasswordModal(true);
@@ -160,16 +162,12 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     }, [showPasswordModal]);
     const joinRoom = async (room) => {
         // 비밀번호 검사 로직을 통과한 후 입장 처리
-        if (room.g_type) {
-            if (room.g_total < 8) {
-                await axiosUtils.patch(`/games/plus/${room.g_seq}`);
-                setRoom(room);
-                setGameStart("mafia");
-            } else {
-                alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
-            }
+        if (room.g_total < 8) {
+            await axiosUtils.patch(`/games/plus/${room.g_seq}`);
+            setRoom(room);
+            setGameStart(type);
         } else {
-            console.log("캐치라이어");
+            alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
         }
     };
 
@@ -187,10 +185,10 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
         <>
             <RoomListContainer>
                 {gameStart ? (
-                    gameStart === "mafia" ? (
+                    gameStart === "Mafia" ? (
                         <MafiaGameRoom room={room} />
                     ) : (
-                        <GameList room={room} />
+                        <CatchLiarInGame room={room} />
                     )
                 ) : (
                     <div>
@@ -214,10 +212,14 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
                                         <td>{item.g_seq}</td>
                                         <td>{item.g_title}</td>
                                         <td>{item.g_pw === null ? "공개" : "비공개"}</td>
-                                        <td>{item.g_total}/8</td>
+                                        <td>
+                                            {item.g_type
+                                                ? `${item.g_total}/8`
+                                                : `${item.g_total}/6`}
+                                        </td>
                                         <td>
                                             <span style={{ color: item.g_state ? "green" : "red" }}>
-                                                {item.g_state ? "대기중" : "시작중"}
+                                                {item.g_state ? "대기중" : "게임중"}
                                             </span>
                                         </td>
                                         <td>
