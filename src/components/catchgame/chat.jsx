@@ -1,61 +1,122 @@
-// import styled from "styled-components";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import io from "socket.io-client";
+import Notice from "./Notice";
+import "./styles/chat.css";
 
-// const GlobalStyle = styled.div`
-//     @keyframes rotate {
-//         100% {
-//             transform: rotate(1turn);
-//         }
-//     }
+const socket = io.connect("http://localhost:8089", {
+    autoConnect: false,
+});
 
-//     @keyframes blink {
-//         40% {
-//             opacity: 0.5;
-//         }
-//         80% {
-//             opacity: 1;
-//         }
-//     }
+export default function Chat({ loginUser }) {
+    const initSocketConnect = () => {
+        if (!socket.connected) socket.connect();
+    };
+    // State 설정
+    const [msgInput, setMsgInput] = useState(""); // 메시지 입력 상태
+    const [chatList, setChatList] = useState([]); // 채팅 목록 상태
+    const [userList, setUserList] = useState({}); // 사용자 목록 상태
 
-//     .rotated_box {
-//         position: relative;
-//         width: 200px;
-//         height: 200px;
-//         overflow: hidden;
+    useEffect(() => {
+        initSocketConnect();
+        socket.emit("info", loginUser);
+        // notice
+        socket.on("notice1", (notice) => {
+            setChatList((prevChatList) => [...prevChatList, { type: "notice", content: notice }]);
+        });
 
-//         &::before {
-//             content: "";
-//             position: absolute;
-//             left: -50%;
-//             top: -50%;
-//             width: 200%;
-//             height: 200%;
-//             background-repeat: no-repeat;
-//             background-size: 50% 50%;
-//             background-position: 0 0, 100% 0, 100% 100%, 0 100%;
-//             background-image: linear-gradient(#399953, #399953), linear-gradient(#fbb300, #fbb300),
-//                 linear-gradient(#d53e33, #d53e33), linear-gradient(#377af5, #377af5);
-//             animation: rotate 3s linear infinite;
-//         }
+        //message
+        socket.on("message0", (data) => {
+            const { nick, message } = data;
+            const type = nick === loginUser.nickName ? "me" : "other";
+            const content = message;
 
-//         &:after {
-//             content: "";
-//             position: absolute;
-//             top: 6px;
-//             left: 6px;
-//             right: 6px;
-//             bottom: 6px;
-//             background: #fff;
-//         }
-//     }
-// `;
+            setChatList((prevChatList) => [...prevChatList, { type, content, nick }]);
+        });
 
-// export default function chat() {
-//     return (
-//         <GlobalStyle>
-//             <div style="display: flex; gap: 10px;">
-//                 <div class="rotated_box"></div>
-//                 <div class="rotated_box_demo"></div>
-//             </div>
-//         </GlobalStyle>
-//     );
-// }
+        socket.on("updateNickname", (nickInfo) => {
+            setUserList(nickInfo);
+        });
+
+        // 소켓 연결
+        // socket.connect();
+
+        // 컴포넌트 언마운트 시 소켓 연결 해제
+        // return () => {
+        //     socket.disconnect();
+        // };
+    }, []);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (msgInput.trim() === "") return;
+
+        // 메시지 전송
+        const sendData = {
+            nick: loginUser.nickName,
+            msg: msgInput,
+        };
+        socket.emit("sendMsg", sendData);
+
+        // 채팅 목록 상태 업데이트
+        const newChat = {
+            type: "me",
+            content: msgInput,
+            name: loginUser.id,
+        };
+        setChatList((prevChatList) => [...prevChatList, newChat]);
+
+        // 메시지 입력 상태 초기화
+        setMsgInput("");
+    };
+
+    // 사용자 목록을 위한 옵션 요소 생성
+
+    // 스크롤을 자동으로 아래로 이동하기 위한 Ref 설정
+    const scrollDiv = useRef(null);
+    useEffect(() => {
+        scrollDiv.current?.scrollIntoView({ behavior: "smooth" });
+    }, [chatList]);
+
+    console.log(chatList);
+
+    return (
+        <div className="container">
+            <header>CatchLiar🐛</header>
+            <section>
+                {/* 채팅 목록 출력 */}
+                {chatList.map((chat, i) =>
+                    chat.type === "notice" ? (
+                        <Notice key={i} chat={chat} />
+                    ) : (
+                        <div
+                            key={i}
+                            chat={chat}
+                            className={`speech ${chat.type}${chat.isDm ? "dm" : ""}`}
+                        >
+                            {chat.type === "other" && <span className="nickname">{chat.nick}</span>}
+                            <span className="msg-box">{chat.content}</span>
+                        </div>
+                    )
+                )}
+                <div ref={scrollDiv}></div>
+            </section>
+            {/* 메시지 입력 폼 */}
+            <form
+                className="msg-form"
+                id="msg-form"
+                onSubmit={(e) => {
+                    handleSubmit(e);
+                }}
+            >
+                <input
+                    type="text"
+                    placeholder="메세지 입력"
+                    value={msgInput}
+                    onChange={(e) => setMsgInput(e.target.value)}
+                />
+                <button>전송</button>
+            </form>
+            <button className="vote">투표하기</button>
+        </div>
+    );
+}

@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 // import GameInfo from "../components/catchgame/gameInfo";
 import styled from "styled-components";
 import "../components/catchgame/styles/startGameBtn.scss";
+import Chat from "../components/catchgame/chat";
 
 const TimerStyle = styled.div`
     display: flex;
@@ -61,7 +62,10 @@ function CatchLiarInGame({ room }) {
                 setCurrentPlayer(data.currentPlayer);
                 setRound(data.round);
                 setPlayers(data.players);
+                console.log(">>", data);
             });
+        else {
+        }
     }, []);
 
     useEffect(() => {
@@ -114,7 +118,7 @@ function CatchLiarInGame({ room }) {
         initSocketConnect();
 
         socket.on("gameId", (data) => {
-            console.log("socketId", data);
+            // console.log("socketId", data);
         });
 
         socket.emit("loginUser", loginUser);
@@ -129,7 +133,7 @@ function CatchLiarInGame({ room }) {
         socket.on("updateUserId", (players) => {
             setPlayers(players);
 
-            console.log(">>", players);
+            // console.log(">>", players);
         });
     }, [players]);
 
@@ -182,7 +186,7 @@ function CatchLiarInGame({ room }) {
             </header>
             <div style={{ display: "flex" }}>
                 <Canvas players={players} gameStarted={gameStarted} loginUser={loginUser}></Canvas>
-                {/* <Chatting3></Chatting3> */}
+                <Chat loginUser={loginUser}></Chat>
             </div>
         </div>
     );

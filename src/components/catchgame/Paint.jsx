@@ -20,7 +20,7 @@ function Canvas({ players, gameStarted, loginUser }) {
     const eraseRef = useRef(null);
     const playerRefs = useRef([]); // 플레이어 요소들을 저장할 배열 참조 추가
     const INITIAL_COLOR = "#000000";
-    const CANVAS_WIDTH = 700;
+    const CANVAS_WIDTH = 800;
     const CANVAS_HEIGHT = 600;
     const colors = ["black", "white", "red", "orange", "yellow", "green", "blue", "navy", "purple"];
 
@@ -28,9 +28,9 @@ function Canvas({ players, gameStarted, loginUser }) {
         const socket = socketIOClient(process.env.REACT_APP_API_SERVER);
         setSocket(socket);
 
-        socket.on("drawing", (data) => {
+        socket.on("drawing2", (data) => {
             drawLine(data);
-            console.log(data);
+            // console.log("receive data", data);
         });
 
         const canvas = canvasRef.current;
@@ -48,7 +48,7 @@ function Canvas({ players, gameStarted, loginUser }) {
 
         setCtx(context);
         setTool(`url("${pencilPng}") 0 64,auto`);
-    }, []);
+    }, [ctx]);
 
     useEffect(() => {
         if (!gameStarted) return;
@@ -82,6 +82,7 @@ function Canvas({ players, gameStarted, loginUser }) {
 
     // 그림그리기
     const drawLine = (data) => {
+        // console.log("draw", ctx);
         if (!ctx) return;
 
         const { x, y, color, size, isDraw } = data;
@@ -160,6 +161,7 @@ function Canvas({ players, gameStarted, loginUser }) {
                 size: ctx.lineWidth,
                 isDraw: painting,
             });
+            // console.log(ctx);
         }
     };
 
@@ -245,10 +247,12 @@ function Canvas({ players, gameStarted, loginUser }) {
 
     // console.log(loginUser);
     // console.log(players.id);
+    // console.log(players);
     return (
         <>
             <div className="box">
-                {players &&
+                {ctx &&
+                    players.length > 0 &&
                     players.map((player, index) => (
                         <div
                             className={`player `}
@@ -313,7 +317,10 @@ function Canvas({ players, gameStarted, loginUser }) {
                                 <div
                                     key={index}
                                     className="controls__color jsColor"
-                                    style={{ backgroundColor: color }}
+                                    style={{
+                                        backgroundColor: color,
+                                        boxShadow: "5px 5px 5px grey",
+                                    }}
                                     onClick={() => handleColorClick(color)}
                                 />
                             ))}
