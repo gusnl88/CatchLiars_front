@@ -19,7 +19,6 @@ function Canvas({ players, gameStarted, loginUser }) {
     const drawRef = useRef(null);
     const eraseRef = useRef(null);
     const playerRefs = useRef([]); // 플레이어 요소들을 저장할 배열 참조 추가
-
     const INITIAL_COLOR = "#000000";
     const CANVAS_WIDTH = 700;
     const CANVAS_HEIGHT = 600;

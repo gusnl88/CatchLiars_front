@@ -18,6 +18,9 @@ const TimerStyle = styled.div`
     align-items: center;
 `;
 
+const words = ["사과", "배", "노트북", "컴퓨터", "아이패드", "치킨"];
+let liar_idx = 0;
+
 const socket = io.connect("http://localhost:8089", {
     autoConnect: false,
 });
@@ -28,6 +31,7 @@ function CatchLiarInGame() {
     const [round, setRound] = useState(1);
     const [remainTime, setRemainTime] = useState(5);
     const [players, setPlayers] = useState([]);
+    const [keywords, setKeywords] = useState([]);
     const loginUser = useSelector((state) => state.loginReducer.user);
 
     const initSocketConnect = () => {
@@ -36,6 +40,11 @@ function CatchLiarInGame() {
 
     const startGame = (e) => {
         e.preventDefault();
+        const max_idx = players.length - 1;
+        liar_idx = Math.floor(Math.random() * (max_idx - 0 + 1)); // 라이어 인덱스 랜덤 추출
+        // 무작위로 단어 2개 추출(첫 번째 단어가 라이어 단어)
+        const randomWords = words.sort(() => 0.5 - Math.random()).slice(0, 2);
+        setKeywords(randomWords);
         setGameStarted(true);
         socket.emit("gamestart", true);
     };
@@ -163,8 +172,11 @@ function CatchLiarInGame() {
                                     </div>
                                 )}
                             </div>
+
                         </div>
-                        <div className="word">제시어</div>
+                        <div className="word">
+                            {players[liar_idx] === loginUser ? keywords[0] : keywords[1]}
+                        </div>
                     </div>
                 </nav>
             </header>

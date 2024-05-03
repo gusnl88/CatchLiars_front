@@ -32,6 +32,16 @@ export default function GameWaitingList() {
 
     let types = type === "Mafia" ? 1 : 0;
 
+    // useEffect(() => {
+    //     socketRef.current = io("http://localhost:8089");
+    //     socketRef.current.on("updateRoomList", (data) => {
+    //         setRoomList(data);
+    //     });
+
+    //     return () => socketRef.current.disconnect();
+    // }, []);
+
+
     useEffect(() => {
         const fetchRoomList = async () => {
             try {
