@@ -4,7 +4,7 @@ import styled from "styled-components";
 import axiosUtils from "../../utils/axiosUtils";
 import { useSelector } from "react-redux";
 
-const SOCKET_SERVER_URL = "http://localhost:8089";
+const SOCKET_SERVER_URL = process.env.REACT_APP_API_SERVER;
 
 const RoomContainer = styled.div`
     background-color: white;

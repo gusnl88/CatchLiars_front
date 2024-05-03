@@ -25,7 +25,7 @@ function Canvas({ players, gameStarted, loginUser }) {
     const colors = ["black", "white", "red", "orange", "yellow", "green", "blue", "navy", "purple"];
 
     useEffect(() => {
-        const socket = socketIOClient("http://localhost:8089");
+        const socket = socketIOClient(process.env.REACT_APP_API_SERVER);
         setSocket(socket);
 
         socket.on("drawing", (data) => {
