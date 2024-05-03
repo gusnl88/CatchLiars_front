@@ -18,9 +18,9 @@ const InvitationItem = styled.li`
 const Notisbox = styled.div`
     z-index: 1;
     position: absolute;
-    left: -160px;
+    left: -200px;
     top: 50px;
-    width: 320px;
+    width: 360px;
     max-height: 200px;
     background-color: #ffffffaf;
     border-radius: 5px;
