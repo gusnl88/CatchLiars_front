@@ -21,14 +21,14 @@ const Footers = styled.footer`
             color: skyblue;
         }
     }
-    .friend,.chatting{
+    .friend,
+    .chatting {
         width: 300px;
-    height: 600px;
-    position: absolute;
-    background: #ffffff92;
-    top: 100px;
-    border-radius: 10px;
-
+        height: 600px;
+        position: absolute;
+        background: #ffffff92;
+        top: 100px;
+        border-radius: 10px;
     }
 `;
 
@@ -40,34 +40,35 @@ const StyledLink = styled.div`
     text-decoration: none; /* 밑줄 없앰 */
     border-radius: 5px; /* 테두리 둥글게 */
     cursor: pointer;
-
 `;
 
 export default function Footer() {
-    const [friendCheck,setFriendCheck]=useState(false);
-    const [chattingCheck,setChattingCheck]=useState(false);
-    const friendBtn=()=>{
-        friendCheck? setFriendCheck(false):setFriendCheck(true);
-        if(chattingCheck){
-            setChattingCheck(false)
+    const [friendCheck, setFriendCheck] = useState(false);
+    const [chattingCheck, setChattingCheck] = useState(false);
+    const friendBtn = () => {
+        friendCheck ? setFriendCheck(false) : setFriendCheck(true);
+        if (chattingCheck) {
+            setChattingCheck(false);
         }
-
-    }
-    const chattingBtn=()=>{
-        chattingCheck? setChattingCheck(false):setChattingCheck(true);
-        if(friendCheck){
-            setFriendCheck(false)
+    };
+    const chattingBtn = () => {
+        chattingCheck ? setChattingCheck(false) : setChattingCheck(true);
+        if (friendCheck) {
+            setFriendCheck(false);
         }
-
-    }
+    };
     return (
         <Footers>
-            <StyledLink ><a onClick={chattingBtn}>채팅</a></StyledLink>
-            {chattingCheck?<ChattingList/>:""}
+            <StyledLink>
+                <a onClick={chattingBtn}>채팅</a>
+            </StyledLink>
+            {chattingCheck ? <ChattingList /> : ""}
             {/* <StyledLink to="/users/friends">친구목록</StyledLink> */}
-            <StyledLink><a onClick={friendBtn}>친구목록</a></StyledLink>
-            {friendCheck? <FriendList/>:""}
-            
+            <StyledLink>
+                <a onClick={friendBtn}>친구목록</a>
+            </StyledLink>
+            {friendCheck ? <FriendList /> : ""}
+
             {/* <StyledLink to="/users/friends/accept">초대</StyledLink> */}
         </Footers>
     );
