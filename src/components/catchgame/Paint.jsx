@@ -1,17 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import eraserPng from "./images/eraser.png";
 import pencilPng from "./images/pencil.png";
 import socketIOClient from "socket.io-client";
 import "./styles/style.css";
 import "./styles/gameplayer.css";
 
-function Canvas({ players, gameStarted, loginUser }) {
+function Canvas({ players, gameStarted, loginUser, room }) {
     const [ctx, setCtx] = useState(null);
     const [painting, setPainting] = useState(false);
     const [tool, setTool] = useState("auto");
     const [socket, setSocket] = useState(null);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0); // 현재 플레이어 인덱스 상태 추가
     const [currentGamePlayer, setCurrentGamePlayer] = useState(false);
+    const navigate = useNavigate();
 
     const canvasRef = useRef(null);
     const rangeRef = useRef(null);
@@ -27,6 +29,12 @@ function Canvas({ players, gameStarted, loginUser }) {
     useEffect(() => {
         const socket = socketIOClient(process.env.REACT_APP_API_SERVER);
         setSocket(socket);
+
+        // 소켓 연결이 끊겼을 때 자동으로 disconnect 이벤트 핸들러 실행
+        socket.on("disconnect", () => {
+            // 방을 나가는 로직 수행
+            socket.emit("leaveRoom", { g_seq: room.g_seq });
+        });
 
         socket.on("drawing2", (data) => {
             drawLine(data);
@@ -49,6 +57,32 @@ function Canvas({ players, gameStarted, loginUser }) {
         setCtx(context);
         setTool(`url("${pencilPng}") 0 64,auto`);
     }, [ctx]);
+
+    // 페이지를 벗어날 때 게임방을 나가는 함수
+    const leaveRoom = () => {
+        if (socket) {
+            // type은 게임방 경로를 변경할 경우를 대비해서 사용할 데이터임(경로 고정일 경우 삭제 예정)
+            socket.emit("leaveRoom", { g_seq: room.g_seq }); // 정상적으로 나가는 경우
+            socket.close();
+        }
+        navigate(0);
+    };
+
+    // useEffect(() => {
+    //     window.addEventListener("beforeunload", leaveRoom); // 페이지를 벗어날 때 leaveRoom 함수 호출
+
+    //     return () => {
+    //         window.removeEventListener("beforeunload", leaveRoom); // 페이지를 벗어날 때 이벤트 리스너 제거
+    //     };
+    // }, []);
+
+    // 페이지를 벗어날 경우 disconnect 이벤트 트리거
+    window.addEventListener("beforeunload", () => {
+        if (socket) {
+            socket.emit("leaveRoom", { g_seq: room.g_seq }); // 정상적으로 나가지 않는 경우
+            socket.disconnect();
+        }
+    });
 
     useEffect(() => {
         if (!gameStarted) return;
@@ -276,7 +310,9 @@ function Canvas({ players, gameStarted, loginUser }) {
                         </div>
                     ))}
 
-                <button className="quit">나가기</button>
+                <button className="quit" onClick={leaveRoom}>
+                    나가기
+                </button>
             </div>
             <div>
                 <div style={{ border: "1px solid black", cursor: tool }}>
