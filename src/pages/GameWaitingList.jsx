@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 import RoomList from "../components/games/RoomList";
 import axiosUtils from "../utils/axiosUtils";
@@ -11,7 +11,9 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     height: 85%;
-    background-color: #00154b;
+    /* background-color: #00154b; */
+    background-color: ${(props) =>
+        props.pathname === "/games/list/Catchliars" ? "gray" : "#00154b"};
     color: white;
     box-sizing: border-box;
     .header_font {
@@ -41,7 +43,6 @@ export default function GameWaitingList() {
     //     return () => socketRef.current.disconnect();
     // }, []);
 
-
     useEffect(() => {
         const fetchRoomList = async () => {
             try {
@@ -65,8 +66,9 @@ export default function GameWaitingList() {
         setSelectedPage(page);
     };
 
+    const { pathname } = useLocation();
     return (
-        <Container>
+        <Container pathname={pathname}>
             <RoomList
                 roomLists={roomLists}
                 selectedRoomList={selectedRoomList}
