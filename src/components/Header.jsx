@@ -188,6 +188,31 @@ const HeaderPage = styled.header`
     }
 `;
 
+const DeleteButton = styled.button`
+    padding: 10px 20px;
+    background-color: #f44336; // 빨간색
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+
+    &:hover {
+        background-color: #d32f2f; // 호버 시 색상 변경
+        transform: scale(1.05); // 호버 시 약간 확대
+    }
+
+    &:active {
+        background-color: #b71c1c; // 클릭 시 색상 변경
+    }
+
+    &:focus {
+        outline: none; // 포커스 시 외곽선 제거
+        box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.5); // 포커스 시 그림자 효과
+    }
+`;
+
 const SaveButton = styled.button`
     padding: 10px 20px;
     background-color: #4caf50; // 진한 녹색
@@ -244,6 +269,8 @@ export default function Header() {
     const notisRef = useRef();
     const [availabilityMessages, setAvailabilityMessages] = useState({});
     const [invitations, setInvitations] = useState([]);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageUrl, setImageUrl] = useState(""); // 업로드된 이미지 URL을 상태로 관리
 
     useEffect(() => {
         const fetchInvitations = async () => {
@@ -387,6 +414,65 @@ export default function Header() {
     const startEditing = () => {
         setIsEditing(true);
     };
+
+    const handleImageChange = (event) => {
+        setSelectedImage(event.target.files[0]);
+    };
+
+    // 서버로 이미지 파일을 전송하고 업데이트하는 함수
+    const handleImageUpload = async () => {
+        try {
+            if (!selectedImage) {
+                console.error("이미지를 선택하세요.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("id", user.id);
+            formData.append("fileInput", selectedImage);
+
+            await axiosUtils.patch("/users/mypage/image", formData, {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            console.log("프로필 이미지가 업데이트되었습니다.");
+            // 프로필 이미지 업데이트 후 필요한 작업을 수행할 수 있습니다.
+        } catch (error) {
+            console.error("프로필 이미지 업데이트 실패:", error);
+        }
+    };
+
+    const handleDeleteUser = async () => {
+        const confirmed = window.confirm("정말로 회원을 탈퇴하시겠습니까?");
+        if (confirmed) {
+            const password = prompt("비밀번호를 입력하세요:");
+            if (password) {
+                try {
+                    const userID = user.id; // 로그인된 사용자의 ID
+                    const response = await axiosUtils.delete("/users/myPage", {
+                        data: { id: userID, currentPassword: password }, // 로그인된 사용자의 ID를 요청 데이터에 포함
+                    });
+                    if (response.data === true) {
+                        // 회원 탈퇴 성공
+                        alert("회원 탈퇴가 완료되었습니다.");
+                        dispatch(logout());
+                        // 로그아웃 등의 추가 작업 수행
+                    } else {
+                        alert("비밀번호가 일치하지 않습니다. 다시 시도해주세요.");
+                    }
+                } catch (error) {
+                    console.error("회원 탈퇴 실패:", error);
+                    alert("회원 탈퇴 중 에러가 발생했습니다.");
+                }
+            } else {
+                alert("비밀번호를 입력해야 회원 탈퇴가 가능합니다.");
+            }
+        }
+    };
+
     return (
         <HeaderPage>
             <div className="img_box">
@@ -416,10 +502,14 @@ export default function Header() {
                                 <Container>마이페이지</Container>
                                 <Box>
                                     <Emptydiv></Emptydiv>
-                                    <ProfileImage
-                                        src="/images/userprofile.jpg"
-                                        alt="Profile Image"
-                                    />
+                                    {imageUrl ? (
+                                        <ProfileImage src={imageUrl} alt="Profile Image" />
+                                    ) : (
+                                        <ProfileImage
+                                            src="/images/userprofile.jpg"
+                                            alt="Profile Image"
+                                        />
+                                    )}
                                     {!isEditing ? (
                                         <InfoDiv>
                                             <div>아이디: {user.id}</div>
@@ -427,6 +517,13 @@ export default function Header() {
                                             <div>이메일: {user.email}</div>
                                             <div>점수: {user.score}</div>
                                             <SaveButton onClick={startEditing}>수정하기</SaveButton>
+                                            {isAuthenticated ? (
+                                                <DeleteButton onClick={handleDeleteUser}>
+                                                    회원 탈퇴
+                                                </DeleteButton>
+                                            ) : (
+                                                <Link onClick={handleLogout}></Link> // 로그인 링크로 변경
+                                            )}
                                         </InfoDiv>
                                     ) : (
                                         <InfoDiv>
@@ -508,6 +605,14 @@ export default function Header() {
                                                     <span>{availabilityMessages.pw}</span>
                                                 </div>
                                                 <SaveButton type="submit">저장하기</SaveButton>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                />
+                                                <button onClick={handleImageUpload}>
+                                                    이미지 변경
+                                                </button>
                                             </form>
                                         </InfoDiv>
                                     )}
