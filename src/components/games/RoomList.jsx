@@ -141,14 +141,26 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     }, [newRoom]);
 
     const handleJoinRoom = async (room) => {
+        let flag = 1; // 방 입장 가능여부를 의미
         console.log("room", room);
         if (room.g_pw !== null) {
             setSelectedRoom(room);
             setShowPasswordModal(true);
         } else {
-            if (room.g_total >= 8) {
-                alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
+            if (room.g_type) {
+                // 마피아
+                if (room.g_total >= 8) {
+                    alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
+                    flag = 0;
+                }
             } else {
+                // 캐치라이어
+                if (room.g_total >= 6) {
+                    alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
+                    flag = 0;
+                }
+            }
+            if (flag) {
                 try {
                     await joinRoom(room);
                 } catch (error) {

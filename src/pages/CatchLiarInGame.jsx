@@ -231,6 +231,7 @@ function CatchLiarInGame({ room }) {
                     players={players}
                     gameStarted={gameStarted}
                     loginUser={loginUser}
+                    room={room}
                 ></Canvas>
 
                 <Chat loginUser={loginUser}></Chat>
