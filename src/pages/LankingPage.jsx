@@ -80,6 +80,7 @@ const StyledTr = styled.tr`
 
 export default function LankingPage() {
     const [userList, setUserList] = useState([]); // 유저 목록
+    const [searchKeyword, setSearchKeyword] = useState(""); // 검색어 상태
     const loginUser = useSelector((state) => state.loginReducer.user);
 
     useEffect(() => {
@@ -87,7 +88,23 @@ export default function LankingPage() {
             setUserList(response.data);
         });
     }, []);
+    const handleSearchChange = (e) => {
+        setSearchKeyword(e.target.value);
+    };
 
+    // 검색 버튼 클릭 시 호출되는 함수
+    const handleSearch = async () => {
+        try {
+            const response = await axiosUtils.get("/users/search", {
+                params: {
+                    keyword: searchKeyword,
+                },
+            });
+            setUserList(response.data);
+        } catch (error) {
+            console.error("Error searching users:", error);
+        }
+    };
     const postFriend = async (u_seq) => {
         const isConfirmed = window.confirm("친구 신청을 하시겠습니까?");
 
@@ -109,6 +126,15 @@ export default function LankingPage() {
         <>
             <Container>Rank</Container>
             <UserListContainer>
+                <div>
+                    <input
+                        type="text"
+                        placeholder="검색어를 입력하세요"
+                        value={searchKeyword}
+                        onChange={handleSearchChange}
+                    />
+                    <button onClick={handleSearch}>검색</button>
+                </div>
                 <table className="game_table">
                     <thead>
                         <tr>
