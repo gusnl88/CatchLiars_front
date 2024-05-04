@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import FriendList from "./friend/FriendList";
 import ChattingList from "./friend/ChattingList";
@@ -7,7 +7,9 @@ import ChattingList from "./friend/ChattingList";
 const Footers = styled.footer`
     display: flex;
     justify-content: end;
-    background-color: #00154b;
+    /* background-color: #00154b; */
+    background-color: ${(props) =>
+        props.pathname === "/games/list/Catchliars" ? "pink" : "#00154b"};
     height: 5%;
     button {
         background-color: #00154b;
@@ -57,8 +59,11 @@ export default function Footer() {
             setFriendCheck(false);
         }
     };
+
+    const { pathname } = useLocation();
+    console.log(pathname);
     return (
-        <Footers>
+        <Footers pathname={pathname}>
             <StyledLink>
                 <a onClick={chattingBtn}>채팅</a>
             </StyledLink>

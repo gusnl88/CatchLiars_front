@@ -1,20 +1,20 @@
 .canvas {
-    width: 800px;
-    height: 600px;
+    width: 850px;
+    height: 458px;
     background-color: white;
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.068);
 }
 
 .controls {
-    margin-top: 30px;
+    /* margin-top: 5px; */
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 .controls .controls__btns {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .controls__btns button {

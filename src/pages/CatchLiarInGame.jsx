@@ -35,6 +35,8 @@ function CatchLiarInGame({ room }) {
     const [players, setPlayers] = useState([]);
     const [keywords, setKeywords] = useState([]);
     const loginUser = useSelector((state) => state.loginReducer.user);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalTime, setModalTime] = useState(5);
 
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
@@ -42,13 +44,31 @@ function CatchLiarInGame({ room }) {
 
     const startGame = (e) => {
         e.preventDefault();
-        const max_idx = players.length - 1;
-        liar_idx = Math.floor(Math.random() * (max_idx - 0 + 1)); // 라이어 인덱스 랜덤 추출
-        // 무작위로 단어 2개 추출(첫 번째 단어가 라이어 단어)
-        const randomWords = words.sort(() => 0.5 - Math.random()).slice(0, 2);
-        setKeywords(randomWords);
-        setGameStarted(true);
-        socket.emit("gamestart", true);
+        setModalTime(5);
+        setModalOpen(true);
+
+        const timer = setInterval(() => {
+            setModalTime((prevTime) => {
+                if (prevTime > 0) {
+                    return prevTime - 1;
+                } else {
+                    clearInterval(timer);
+                    setModalOpen(false);
+
+                    const max_idx = players.length - 1;
+                    liar_idx = Math.floor(Math.random() * (max_idx - 0 + 1)); // 라이어 인덱스 랜덤 추출
+                    // 무작위로 단어 2개 추출(첫 번째 단어가 라이어 단어)
+                    const randomWords = words.sort(() => 0.5 - Math.random()).slice(0, 2);
+                    setKeywords(randomWords);
+                    setGameStarted(true);
+
+                    socket.emit("gamestart", true);
+                    // socket.emit("modal", { modalOpen, modalTime });
+
+                    return 0;
+                }
+            });
+        }, 1000);
     };
 
     socket.on("start", (start) => {
@@ -56,17 +76,28 @@ function CatchLiarInGame({ room }) {
     });
 
     useEffect(() => {
-        if (gameStarted === true)
-            socket.on("updateGameData", (data) => {
-                setRemainTime(data.remainTime);
-                setCurrentPlayer(data.currentPlayer);
-                setRound(data.round);
-                setPlayers(data.players);
-                console.log(">>", data);
-            });
-        else {
-        }
+        socket.emit("modal", { modalOpen, modalTime });
+    }, [modalOpen, modalTime]);
+
+    useEffect(() => {
+        socket.on("modal", (data) => {
+            setModalOpen(data.modalOpen);
+            setModalTime(data.modalTime);
+        });
     }, []);
+
+    // useEffect(() => {
+    //     if (gameStarted === true)
+    //         socket.on("updateGameData", (data) => {
+    //             setRemainTime(data.remainTime);
+    //             setCurrentPlayer(data.currentPlayer);
+    //             setRound(data.round);
+    //             setPlayers(data.players);
+    //             console.log(">>", data);
+    //         });
+    //     else {
+    //     }
+    // }, []);
 
     useEffect(() => {
         let timer;
@@ -138,9 +169,19 @@ function CatchLiarInGame({ room }) {
     }, [players]);
 
     return (
-        <div>
+        <div style={{ backgroundColor: "white", color: "black", justifyContent: "left" }}>
             <header className="header">
                 <nav>
+                    {modalOpen && (
+                        <div className="modal">
+                            {/* 모달 내용 */}
+                            <div className="modal-content">
+                                <h2>게임이 준비 중입니다...</h2>
+                                <br />
+                                <h2>{modalTime}초뒤 게임이 시작됩니다</h2>
+                            </div>
+                        </div>
+                    )}
                     <div className="bar">
                         <div className="roomName">방이름</div>
                         <div className="setting">설정</div>
@@ -185,7 +226,13 @@ function CatchLiarInGame({ room }) {
                 </nav>
             </header>
             <div style={{ display: "flex" }}>
-                <Canvas players={players} gameStarted={gameStarted} loginUser={loginUser}></Canvas>
+                <Canvas
+                    style={{ width: "100%", height: "100%", flex: "1" }}
+                    players={players}
+                    gameStarted={gameStarted}
+                    loginUser={loginUser}
+                ></Canvas>
+
                 <Chat loginUser={loginUser}></Chat>
             </div>
         </div>

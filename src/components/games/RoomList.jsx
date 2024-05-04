@@ -5,10 +5,13 @@ import RoomRegister from "./RoomRegister";
 import GameList from "../main/GameList";
 import CatchLiarInGame from "../../pages/CatchLiarInGame";
 import axiosUtils from "../../utils/axiosUtils";
+import { useLocation } from "react-router-dom";
 
 const RoomListContainer = styled.div`
-    width: 90%;
-    height: 90%;
+    /* width: 90%;
+    height: 90%; */
+    width: ${(props) => (props.pathname === "/games/list/Catchliars" ? "80%" : "90%")};
+    height: ${(props) => (props.pathname === "/games/list/Catchliars" ? "97%" : "90%")};
     max-width: 100%;
     max-height: 100%;
     overflow-y: auto;
@@ -181,9 +184,11 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
         }
     };
 
+    const { pathname } = useLocation();
+    console.log(pathname);
     return (
         <>
-            <RoomListContainer>
+            <RoomListContainer pathname={pathname}>
                 {gameStart ? (
                     gameStart === "Mafia" ? (
                         <MafiaGameRoom room={room} />

@@ -20,8 +20,8 @@ function Canvas({ players, gameStarted, loginUser }) {
     const eraseRef = useRef(null);
     const playerRefs = useRef([]); // 플레이어 요소들을 저장할 배열 참조 추가
     const INITIAL_COLOR = "#000000";
-    const CANVAS_WIDTH = 800;
-    const CANVAS_HEIGHT = 600;
+    const CANVAS_WIDTH = 850;
+    const CANVAS_HEIGHT = 458;
     const colors = ["black", "white", "red", "orange", "yellow", "green", "blue", "navy", "purple"];
 
     useEffect(() => {
@@ -245,6 +245,10 @@ function Canvas({ players, gameStarted, loginUser }) {
         }
     };
 
+    const goBack = () => {
+        window.history.back();
+    };
+
     // console.log(loginUser);
     // console.log(players.id);
     // console.log(players);
@@ -272,7 +276,7 @@ function Canvas({ players, gameStarted, loginUser }) {
                         </div>
                     ))}
 
-                <button className="player">나가기</button>
+                <button className="quit">나가기</button>
             </div>
             <div>
                 <div style={{ border: "1px solid black", cursor: tool }}>
