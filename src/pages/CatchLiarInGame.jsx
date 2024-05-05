@@ -183,7 +183,7 @@ function CatchLiarInGame({ room }) {
                         </div>
                     )}
                     <div className="bar">
-                        <div className="roomName">방이름</div>
+                        <div className="roomName">{room.g_title}</div>
                         <div className="setting">설정</div>
                     </div>
                     <div className="bar">
