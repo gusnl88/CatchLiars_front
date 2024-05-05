@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Notice from "./Notice";
 import "./styles/chat.css";
@@ -15,6 +15,7 @@ export default function Chat({ loginUser }) {
     const [msgInput, setMsgInput] = useState(""); // 메시지 입력 상태
     const [chatList, setChatList] = useState([]); // 채팅 목록 상태
     const [userList, setUserList] = useState({}); // 사용자 목록 상태
+    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
 
     useEffect(() => {
         initSocketConnect();
@@ -79,6 +80,14 @@ export default function Chat({ loginUser }) {
 
     console.log(chatList);
 
+    const handleVoteClick = () => {
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
     return (
         <div className="container">
             <header>CatchLiar🐛</header>
@@ -116,7 +125,21 @@ export default function Chat({ loginUser }) {
                 />
                 <button>전송</button>
             </form>
-            <button className="vote">투표하기</button>
+            <button className="vote" onClick={handleVoteClick}>
+                투표하기
+            </button>
+
+            {/* 모달창 */}
+            {showModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={closeModal}>
+                            &times;
+                        </span>
+                        <p>모달 내용</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
