@@ -78,6 +78,15 @@ const StyledTr = styled.tr`
     color: black;
 `;
 
+const SearchDiv = styled.div`
+    text-align: right;
+    padding-right: 1rem;
+`;
+
+const SearchButton = styled.button`
+    background: none;
+    border: none;
+`;
 export default function LankingPage() {
     const [userList, setUserList] = useState([]); // 유저 목록
     const [searchKeyword, setSearchKeyword] = useState(""); // 검색어 상태
@@ -126,15 +135,15 @@ export default function LankingPage() {
         <>
             <Container>Rank</Container>
             <UserListContainer>
-                <div>
+                <SearchDiv>
                     <input
                         type="text"
-                        placeholder="검색어를 입력하세요"
+                        placeholder="유저명을 입력하세요"
                         value={searchKeyword}
                         onChange={handleSearchChange}
                     />
-                    <button onClick={handleSearch}>검색</button>
-                </div>
+                    <SearchButton onClick={handleSearch}>검색</SearchButton>
+                </SearchDiv>
                 <table className="game_table">
                     <thead>
                         <tr>
