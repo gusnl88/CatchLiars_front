@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import eraserPng from "./images/eraser.png";
 import pencilPng from "./images/pencil.png";
 import socketIOClient from "socket.io-client";
@@ -30,12 +30,6 @@ function Canvas({ players, gameStarted, loginUser, room }) {
         const socket = socketIOClient(process.env.REACT_APP_API_SERVER);
         setSocket(socket);
 
-        // 소켓 연결이 끊겼을 때 자동으로 disconnect 이벤트 핸들러 실행
-        socket.on("disconnect", () => {
-            // 방을 나가는 로직 수행
-            socket.emit("leaveRoom", { g_seq: room.g_seq });
-        });
-
         socket.on("drawing2", (data) => {
             drawLine(data);
             // console.log("receive data", data);
@@ -58,26 +52,32 @@ function Canvas({ players, gameStarted, loginUser, room }) {
         setTool(`url("${pencilPng}") 0 64,auto`);
     }, [ctx]);
 
+    useEffect(() => {
+        return () => {
+            // 컴포넌트가 언마운트될 때 이벤트 핸들러 제거
+            window.removeEventListener("popstate", null);
+            window.removeEventListener("beforeunload", null);
+        };
+    }, []);
+
     // 페이지를 벗어날 때 게임방을 나가는 함수
     const leaveRoom = () => {
         if (socket) {
-            // type은 게임방 경로를 변경할 경우를 대비해서 사용할 데이터임(경로 고정일 경우 삭제 예정)
             socket.emit("leaveRoom", { g_seq: room.g_seq }); // 정상적으로 나가는 경우
             socket.close();
         }
         navigate(0);
     };
 
-    // useEffect(() => {
-    //     window.addEventListener("beforeunload", leaveRoom); // 페이지를 벗어날 때 leaveRoom 함수 호출
-
-    //     return () => {
-    //         window.removeEventListener("beforeunload", leaveRoom); // 페이지를 벗어날 때 이벤트 리스너 제거
-    //     };
-    // }, []);
-
     // 페이지를 벗어날 경우 disconnect 이벤트 트리거
     window.addEventListener("beforeunload", () => {
+        if (socket) {
+            socket.emit("leaveRoom", { g_seq: room.g_seq }); // 정상적으로 나가지 않는 경우
+            socket.disconnect();
+        }
+    });
+    // 뒤로 가기
+    window.addEventListener("popstate", () => {
         if (socket) {
             socket.emit("leaveRoom", { g_seq: room.g_seq }); // 정상적으로 나가지 않는 경우
             socket.disconnect();
