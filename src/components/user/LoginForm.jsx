@@ -4,7 +4,19 @@ import { login } from "../../store/modules/login";
 import RegisterForm from "./RegisterForm"; // 회원가입 폼 컴포넌트 임포트
 import { useNavigate } from "react-router-dom";
 import axiosUtils from "../../utils/axiosUtils";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+
+const responsiveWidth = css`
+    width: 100%;
+    @media (min-width: 768px) {
+        /* 태블릿 */
+        width: 500px;
+    }
+    @media (min-width: 1024px) {
+        /* 데스크탑 */
+        width: 1000px;
+    }
+`;
 
 const MainContainer = styled.div`
     display: flex;
@@ -16,15 +28,14 @@ const MainContainer = styled.div`
 `;
 
 const Container1 = styled.div`
-    width: 1000px;
     margin: 0 auto 20px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
+    ${responsiveWidth}
 `;
 const Container2 = styled.div`
-    width: 1000px;
     margin: 0 auto 20px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -32,6 +43,7 @@ const Container2 = styled.div`
     flex-direction: column;
     /* justify-content: center; */
     align-items: center;
+    ${responsiveWidth}
 `;
 
 const SubTitle = styled.h2`
@@ -139,7 +151,7 @@ function LoginForm() {
 
             if (response.data) {
                 setShowModal(true);
-                dispatch(login(response.data.u_seq,response.data.id, response.data.nickname,));
+                dispatch(login(response.data.u_seq, response.data.id, response.data.nickname));
 
                 axiosUtils.patch(`/users/stateTrue`, { withCredentials: true });
             } else {
