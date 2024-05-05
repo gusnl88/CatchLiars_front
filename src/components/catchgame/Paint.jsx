@@ -170,15 +170,17 @@ function Canvas({ players, gameStarted, loginUser, room }) {
         ctx.beginPath();
         ctx.moveTo(x, y);
         setPainting(true);
-        // if (socket) {
-        //     socket.emit("drawing1", {
-        //         x: x,
-        //         y: y,
-        //         color: ctx.strokeStyle,
-        //         size: ctx.lineWidth,
-        //         isDraw: painting,
-        //     });
-        // }
+
+        if (socket) {
+            socket.emit("drawing", {
+                x: x,
+                y: y,
+                color: ctx.strokeStyle,
+                size: ctx.lineWidth,
+                isDraw: painting,
+            });
+            // console.log(ctx);
+        }
     };
 
     const onMouseMove = (event) => {
@@ -199,16 +201,40 @@ function Canvas({ players, gameStarted, loginUser, room }) {
         }
     };
 
-    const onMouseUp = () => {
+    const onMouseUp = (event) => {
         if (!ctx || !gameStarted || !currentGamePlayer) return; // 현재 플레이어가 아니면 그림 그리기 종료하지 않음
         ctx.closePath();
         setPainting(false);
+
+        if (socket) {
+            const x = event.nativeEvent.offsetX;
+            const y = event.nativeEvent.offsetY;
+            socket.emit("drawing", {
+                x: x,
+                y: y,
+                color: ctx.strokeStyle,
+                size: ctx.lineWidth,
+                isDraw: painting,
+            });
+        }
     };
 
-    const onMouseLeave = () => {
+    const onMouseLeave = (event) => {
         if (!ctx || !gameStarted || !currentGamePlayer) return; // 현재 플레이어가 아니면 그림 그리기 중지하지 않음
         ctx.closePath();
         setPainting(false);
+
+        if (socket) {
+            const x = event.nativeEvent.offsetX;
+            const y = event.nativeEvent.offsetY;
+            socket.emit("drawing", {
+                x: x,
+                y: y,
+                color: ctx.strokeStyle,
+                size: ctx.lineWidth,
+                isDraw: painting,
+            });
+        }
     };
 
     const handleColorClick = (color) => {
