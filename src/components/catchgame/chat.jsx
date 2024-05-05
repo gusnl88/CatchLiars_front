@@ -136,7 +136,16 @@ export default function Chat({ loginUser }) {
                         <span className="close" onClick={closeModal}>
                             &times;
                         </span>
-                        <p>모달 내용</p>
+                        <p>투표 대상 선택</p>
+                        <br />
+                        <div className="user-list">
+                            {Object.values(userList).map((user, index) => (
+                                <div key={index}>
+                                    <button>{user}</button>
+                                    <br />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
