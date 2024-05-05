@@ -168,6 +168,8 @@ function CatchLiarInGame({ room }) {
         });
     }, [players]);
 
+    if (players.length > 0) console.log(players[0].id);
+
     return (
         <div style={{ backgroundColor: "white", color: "black", justifyContent: "left" }}>
             <header className="header">
@@ -194,7 +196,9 @@ function CatchLiarInGame({ room }) {
                         </div>
                         <div className="gameInfo">
                             <div>
-                                {!gameStarted && (
+                                {!gameStarted &&
+                                players.length > 0 &&
+                                players[0].id === loginUser.id ? (
                                     <button
                                         onClick={(e) => {
                                             startGame(e);
@@ -203,7 +207,7 @@ function CatchLiarInGame({ room }) {
                                     >
                                         게임 시작
                                     </button>
-                                )}
+                                ) : null}
                                 {gameStarted && (
                                     <div>
                                         <h1>Round {round}</h1>
@@ -231,7 +235,6 @@ function CatchLiarInGame({ room }) {
                     players={players}
                     gameStarted={gameStarted}
                     loginUser={loginUser}
-                    room={room}
                 ></Canvas>
 
                 <Chat loginUser={loginUser}></Chat>
