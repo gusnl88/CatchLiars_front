@@ -2,9 +2,22 @@ import { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { logout } from "../store/modules/login";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import axiosUtils from "../utils/axiosUtils";
 import FriendInvitationPage from "../pages/FriendInvitationPage";
+
+const responsiveModal = css`
+    width: 100%; // 모바일 기본 너비
+    max-width: 500px; // 최대 너비 제한
+    @media (min-width: 768px) {
+        // 태블릿 화면에서는
+        max-width: 700px; // 너비를 700px로
+    }
+    @media (min-width: 1024px) {
+        // 데스크탑에서는
+        max-width: 1000px; // 1000px 너비 사용
+    }
+`;
 
 const ProfileImage = styled.img`
     width: 150px; // 이미지 너비 설정
@@ -96,7 +109,8 @@ const CheckButton = styled.button`
 `;
 
 const ModalContent = styled.div`
-    width: 1000px; // 너비 설정
+    ${responsiveModal}
+
     height: 500px; // 높이 설정
     background-color: white; // 배경색
     border-radius: 8px; // 모서리 둥글게
@@ -253,6 +267,19 @@ const Span = styled.span`
 
 const InvitationCount = styled.span`
     color: red; // 텍스트 색상을 빨간색으로 설정
+`;
+
+const ButtonDiv = styled.div`
+    display: flex;
+    flex-direction: row; // 기본적으로 가로 배치
+    justify-content: space-around; // 버튼 사이 공간을 균등하게 분배
+    margin-top: 1rem;
+
+    @media (max-width: 768px) {
+        // 태블릿 및 모바일 화면에서
+        flex-direction: column; // 버튼을 세로로 배치
+        align-items: center; // 센터 정렬로 버튼 정렬
+    }
 `;
 export default function Header() {
     const [invitateCheck, setInvitateCheck] = useState(false);
@@ -431,7 +458,7 @@ export default function Header() {
             formData.append("id", user.id);
             formData.append("fileInput", selectedImage);
 
-            await axiosUtils.patch("/users/mypage/image", formData, {
+            await axiosUtils.patch("/users/myPage/image", formData, {
                 withCredentials: true,
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -516,14 +543,18 @@ export default function Header() {
                                             <div>닉네임: {user.nickname}</div>
                                             <div>이메일: {user.email}</div>
                                             <div>점수: {user.score}</div>
-                                            <SaveButton onClick={startEditing}>수정하기</SaveButton>
-                                            {isAuthenticated ? (
-                                                <DeleteButton onClick={handleDeleteUser}>
-                                                    회원 탈퇴
-                                                </DeleteButton>
-                                            ) : (
-                                                <Link onClick={handleLogout}></Link> // 로그인 링크로 변경
-                                            )}
+                                            <ButtonDiv>
+                                                <SaveButton onClick={startEditing}>
+                                                    수정하기
+                                                </SaveButton>
+                                                {isAuthenticated ? (
+                                                    <DeleteButton onClick={handleDeleteUser}>
+                                                        회원 탈퇴
+                                                    </DeleteButton>
+                                                ) : (
+                                                    <Link onClick={handleLogout}></Link> // 로그인 링크로 변경
+                                                )}
+                                            </ButtonDiv>
                                         </InfoDiv>
                                     ) : (
                                         <InfoDiv>

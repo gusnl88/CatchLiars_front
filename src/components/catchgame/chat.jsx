@@ -164,6 +164,7 @@ export default function Chat({ loginUser, gameStarted, showModal, setShowModal, 
                         <span className="close" onClick={closeModal}>
                             &times;
                         </span>
+
                         <p>투표 대상 선택</p> <span>{timerCount}초후 게임이 종료됩니다...</span>
                         <br />
                         <div className="user-list">
@@ -179,6 +180,7 @@ export default function Chat({ loginUser, gameStarted, showModal, setShowModal, 
                                     </div>
                                 ))}
                             </div>
+
                         </div>
                     </div>
                 </div>

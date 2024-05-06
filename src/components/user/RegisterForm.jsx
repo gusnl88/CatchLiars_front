@@ -2,7 +2,19 @@ import React, { useState } from "react";
 import LoginForm from "./LoginForm";
 import axiosUtils from "../../utils/axiosUtils";
 import axios from "axios";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+
+const responsiveContainer = css`
+    width: 100%; // 기본으로 90% 사용
+    @media (min-width: 768px) {
+        // 태블릿
+        width: 70%;
+    }
+    @media (min-width: 1024px) {
+        // 데스크탑
+        width: 1000px; // 데스크탑에서는 1000px 고정
+    }
+`;
 
 const MainContainer = styled.div`
     display: flex;
@@ -14,6 +26,7 @@ const MainContainer = styled.div`
 `;
 
 const Container = styled.div`
+    ${responsiveContainer}
     width: 1000px;
     margin: 0 auto 20px;
     padding: 20px;
