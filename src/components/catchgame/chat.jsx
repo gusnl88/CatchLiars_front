@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Notice from "./Notice";
 import "./styles/chat.css";
+import "./styles/voteBtn.scss";
+import styled from "styled-components";
 
 const socket = io.connect("http://localhost:8089", {
     autoConnect: false,
 });
 
-export default function Chat({ loginUser }) {
+export default function Chat({ loginUser, gameStarted, showModal, setShowModal, timerCount }) {
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
     };
@@ -15,7 +17,9 @@ export default function Chat({ loginUser }) {
     const [msgInput, setMsgInput] = useState(""); // 메시지 입력 상태
     const [chatList, setChatList] = useState([]); // 채팅 목록 상태
     const [userList, setUserList] = useState({}); // 사용자 목록 상태
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    // const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    const [userVotes, setUserVotes] = useState({}); // 사용자별 투표 수 상태
+    const [hasVoted, setHasVoted] = useState(false);
 
     useEffect(() => {
         initSocketConnect();
@@ -38,8 +42,13 @@ export default function Chat({ loginUser }) {
             setUserList(nickInfo);
         });
 
-        // 소켓 연결
-        // socket.connect();
+        socket.on("voteUpdate", (votedUser) => {
+            setUserVotes((prevUserVotes) => ({
+                ...prevUserVotes,
+                [votedUser]: (prevUserVotes[votedUser] || 0) + 1,
+            }));
+            // socket.emit("voteUpdate", userVotes);
+        });
 
         // 컴포넌트 언마운트 시 소켓 연결 해제
         // return () => {
@@ -78,8 +87,6 @@ export default function Chat({ loginUser }) {
         scrollDiv.current?.scrollIntoView({ behavior: "smooth" });
     }, [chatList]);
 
-    console.log(chatList);
-
     const handleVoteClick = () => {
         setShowModal(true);
     };
@@ -88,9 +95,28 @@ export default function Chat({ loginUser }) {
         setShowModal(false);
     };
 
+    const handleVote = (votedUser) => {
+        // 이미 투표한 경우 처리
+        if (hasVoted) {
+            console.log("이미 투표하셨습니다.");
+            return;
+        }
+
+        // 투표처리
+        console.log(`${votedUser}에게 투표하셨습니다.`);
+
+        socket.emit("CatchVote", votedUser);
+
+        // 투표 처리 후 상태 업데이트
+        setHasVoted(true);
+    };
+
+    console.log("유저리스트", Object.values(userList)?.length);
+
     return (
         <div className="container">
             <header>CatchLiar🐛</header>
+
             <section>
                 {/* 채팅 목록 출력 */}
                 {chatList.map((chat, i) =>
@@ -125,9 +151,11 @@ export default function Chat({ loginUser }) {
                 />
                 <button>전송</button>
             </form>
-            <button className="vote" onClick={handleVoteClick}>
-                투표하기
-            </button>
+            {gameStarted ? (
+                <button className="vote" onClick={handleVoteClick}>
+                    투표하기
+                </button>
+            ) : null}
 
             {/* 모달창 */}
             {showModal && (
@@ -136,15 +164,23 @@ export default function Chat({ loginUser }) {
                         <span className="close" onClick={closeModal}>
                             &times;
                         </span>
-                        <p>투표 대상 선택</p>
+
+                        <p>투표 대상 선택</p> <span>{timerCount}초후 게임이 종료됩니다...</span>
                         <br />
                         <div className="user-list">
-                            {Object.values(userList).map((user, index) => (
-                                <div key={index}>
-                                    <button>{user}</button>
-                                    <br />
-                                </div>
-                            ))}
+                            <div className="grid-container">
+                                {Object.values(userList).map((user, index) => (
+                                    <div key={index} className="grid-item">
+                                        <button onClick={() => handleVote(user)}>
+                                            {user}{" "}
+                                            <span className="vote-count">
+                                                - {userVotes[user] || 0}표
+                                            </span>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
                         </div>
                     </div>
                 </div>
