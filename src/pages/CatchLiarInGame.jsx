@@ -50,28 +50,34 @@ function CatchLiarInGame({ room }) {
     const [modalTime, setModalTime] = useState(5);
     const [liarIdx, setLiarIdx] = useState(null);
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
-    const [timerCount, setTimerCount] = useState(30); // 타이머 카운트 다운
+    const [timer, setTimer] = useState(true); // 전체 타이머 상태
+    const [timerCount, setTimerCount] = useState(20);
+    const [resultModal, setResultModal] = useState(false);
+    const [restartBtn, setRestartBtn] = useState(false);
 
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
     };
-    const VoteTime = () => {
-        let timer; // timer 변수를 함수 내에서 정의합니다.
-        timer = setInterval(() => {
-            setTimerCount((prevCount) => {
-                if (prevCount > 0) {
-                    return prevCount - 1;
-                } else {
-                    clearInterval(timer);
-                    setShowModal(false);
 
-                    return 30;
-                }
-            });
-        }, 1000);
+    useEffect(() => {
+        let interval;
+        if (!timer) {
+            interval = setInterval(() => {
+                setTimerCount((prevCount) => {
+                    if (prevCount > 0) {
+                        return prevCount - 1;
+                    } else {
+                        clearInterval(interval);
+                        setShowModal(false);
+                        setResultModal(true);
+                        setRestartBtn(true);
+                    }
+                });
+            }, 1000);
+        }
 
-        return () => clearInterval(timer);
-    };
+        return () => clearInterval(interval);
+    }, [timer]);
 
     const startGame = () => {
         setModalTime(5);
@@ -137,44 +143,53 @@ function CatchLiarInGame({ room }) {
     }, []);
 
     useEffect(() => {
-        let timer;
         if (gameStarted) {
-            timer = setInterval(() => {
-                setRemainTime((prevTime) => {
-                    if (prevTime > 0) {
-                        return prevTime - 1;
+            // 타이머 시작
+            let interval;
+            if (gameStarted && remainTime > 0 && currentPlayer <= players.length && round <= 2) {
+                interval = setInterval(() => {
+                    setRemainTime((prevSeconds) => prevSeconds - 1);
+                }, 1000);
+            }
+
+            // 0초에 도달하면 라운드 종료
+            if (remainTime === 0) {
+                setRemainTime(5); // 초 초기화
+                setCurrentPlayer((prevIndex) => prevIndex + 1); // 다음 플레이어 인덱스로 이동
+                if (currentPlayer === players.length) {
+                    if (round === 2) {
+                        clearInterval(interval); // 타이머 종료
+                        setTimer(false);
                     } else {
-                        setCurrentPlayer((prevPlayer) => {
-                            if (prevPlayer === players.length) {
-                                setRound((prevRound) => {
-                                    if (prevRound === 2) {
-                                        clearInterval(timer); // 라운드가 2가 되면 타이머 중지
-                                        setGameStarted(false);
-                                    } else return prevRound + 1; // Round 증가
-                                });
-                                return 1; // 플레이어 다시 1번부터 시작
-                            } else {
-                                return prevPlayer + 1;
-                            }
-                        });
-                        return 5;
+                        setRound((prevRound) => prevRound + 1); // 라운드 증가
+                        setCurrentPlayer(1); // 플레이어 인덱스 초기화
                     }
-                });
+                }
+            }
 
-                // gameStarted가 true인 경우에만 서버로 게임 데이터를 업데이트합니다.
-                socket.emit("updateGameData", {
-                    remainTime,
-                    currentPlayer,
-                    round,
-                    players,
-                });
-            }, 1000);
+            socket.emit("updateGameData", {
+                remainTime,
+                currentPlayer,
+                round,
+                players,
+                timer,
+            });
+
+            return () => {
+                clearInterval(interval);
+            };
         }
-
-        return () => {
-            clearInterval(timer); // clean-up 함수에서 타이머를 중지시킵니다.
-        };
-    }, [gameStarted, setCurrentPlayer, setRound, remainTime, currentPlayer, round, players]);
+    }, [
+        gameStarted,
+        setCurrentPlayer,
+        setRound,
+        remainTime,
+        currentPlayer,
+        round,
+        players,
+        timer,
+        loginUser,
+    ]);
 
     useEffect(() => {
         initSocketConnect();
@@ -197,8 +212,8 @@ function CatchLiarInGame({ room }) {
         });
     }, [players]);
 
-    console.log("라이어", players[liarIdx]);
-    console.log("키워드", keywords[0]);
+    // if (liarIdx) console.log("라이어", players[liarIdx].nickName);
+    // console.log("키워드", keywords[0]);
 
     return (
         <div style={{ backgroundColor: "white", color: "black" }}>
@@ -233,8 +248,9 @@ function CatchLiarInGame({ room }) {
                                         <p>
                                             현재 플레이어:
                                             <span style={{ color: "blue" }}>
-                                                {players.length > 0 &&
-                                                    players[currentPlayer - 1].nickName}
+                                                {players.length > 0
+                                                    ? players[currentPlayer - 1]?.nickName
+                                                    : null}
                                             </span>
                                         </p>
                                     </div>
@@ -260,6 +276,7 @@ function CatchLiarInGame({ room }) {
                     players={players}
                     gameStarted={gameStarted}
                     loginUser={loginUser}
+                    timer={timer}
                 ></Canvas>
 
                 <Chat
@@ -267,7 +284,15 @@ function CatchLiarInGame({ room }) {
                     gameStarted={gameStarted}
                     showModal={showModal}
                     setShowModal={setShowModal}
+                    timer={timer}
                     timerCount={timerCount}
+                    resultModal={resultModal}
+                    setResultModal={setResultModal}
+                    setGameStarted={setGameStarted}
+                    restartBtn={restartBtn}
+                    setRestartBtn={setRestartBtn}
+                    liarIdx={liarIdx}
+                    players={players}
                 ></Chat>
             </div>
 
