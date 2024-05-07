@@ -60,11 +60,20 @@ const Nbutton = styled.button`
     }
 `;
 
+const CloseButton = styled.span`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+`;
+
 export default function FriendInvitationPage() {
     const [invitations, setInvitations] = useState([]);
     const [nickname, setNickname] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showModal, setShowModal] = useState(true);
 
     useEffect(() => {
         fetchInvitations();
@@ -112,31 +121,40 @@ export default function FriendInvitationPage() {
         }
     };
 
+    const closeModal = () => {
+        setShowModal(false); // showModal 상태 변경
+    };
+
     return (
         <>
-            <Notisbox>
-                <ul>
-                    {invitations.length > 0 ? (
-                        invitations.map((invite, index) => (
-                            <InvitationItem key={invite.i_seq}>
-                                {nickname[index]} 님이 친구 요청을 보냈습니다.
-                                <div>
-                                    <Nbutton
-                                        onClick={() => acceptInvitation(invite.f_seq, invite.i_seq)}
-                                    >
-                                        수락
-                                    </Nbutton>
-                                    <Nbutton onClick={() => deleteInvitation(invite.i_seq)}>
-                                        거절
-                                    </Nbutton>
-                                </div>
-                            </InvitationItem>
-                        ))
-                    ) : (
-                        <li>친구 초대가 없습니다.</li>
-                    )}
-                </ul>
-            </Notisbox>
+            {showModal && ( // showModal 상태에 따라 모달 표시 여부 결정
+                <Notisbox>
+                    <CloseButton onClick={closeModal}>x</CloseButton>
+                    <ul>
+                        {invitations.length > 0 ? (
+                            invitations.map((invite, index) => (
+                                <InvitationItem key={invite.i_seq}>
+                                    {nickname[index]} 님이 친구 요청을 보냈습니다.
+                                    <div>
+                                        <Nbutton
+                                            onClick={() =>
+                                                acceptInvitation(invite.f_seq, invite.i_seq)
+                                            }
+                                        >
+                                            수락
+                                        </Nbutton>
+                                        <Nbutton onClick={() => deleteInvitation(invite.i_seq)}>
+                                            거절
+                                        </Nbutton>
+                                    </div>
+                                </InvitationItem>
+                            ))
+                        ) : (
+                            <li>친구 초대가 없습니다.</li>
+                        )}
+                    </ul>
+                </Notisbox>
+            )}
         </>
     );
 }

@@ -3,10 +3,22 @@ import Canvas from "../components/catchgame/Paint";
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useSelector } from "react-redux";
-// import GameInfo from "../components/catchgame/gameInfo";
 import styled from "styled-components";
 import "../components/catchgame/styles/startGameBtn.scss";
 import Chat from "../components/catchgame/chat";
+
+const Catch = styled.div`
+    position: relative;
+    /* background-color: white; */
+    background-image: url("/images/CatchLiar.gif");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 10rem;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    bottom: 20%;
+`;
 
 const TimerStyle = styled.div`
     display: flex;
@@ -21,7 +33,6 @@ const TimerStyle = styled.div`
 `;
 
 const words = ["사과", "배", "노트북", "컴퓨터", "아이패드", "치킨"];
-let liar_idx = 0;
 
 const socket = io.connect(process.env.REACT_APP_API_SERVER, {
     autoConnect: false,
@@ -37,15 +48,49 @@ function CatchLiarInGame({ room }) {
     const loginUser = useSelector((state) => state.loginReducer.user);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalTime, setModalTime] = useState(5);
+    const [liarIdx, setLiarIdx] = useState(null);
+    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    const [timer, setTimer] = useState(true); // 전체 타이머 상태
+    const [timerCount, setTimerCount] = useState(20);
+    const [resultModal, setResultModal] = useState(false);
+    const [restartBtn, setRestartBtn] = useState(false);
 
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
     };
 
-    const startGame = (e) => {
-        e.preventDefault();
+    useEffect(() => {
+        let interval;
+        if (!timer) {
+            interval = setInterval(() => {
+                setTimerCount((prevCount) => {
+                    if (prevCount > 0) {
+                        return prevCount - 1;
+                    } else {
+                        clearInterval(interval);
+                        setShowModal(false);
+                        setResultModal(true);
+                        setRestartBtn(true);
+                    }
+                });
+            }, 1000);
+        }
+
+        return () => clearInterval(interval);
+    }, [timer]);
+
+    const startGame = () => {
         setModalTime(5);
         setModalOpen(true);
+
+        const max_idx = players.length - 1;
+        const randomLiarIdx = Math.floor(Math.random() * (max_idx - 0 + 1)); // 라이어 인덱스 랜덤 추출
+        setLiarIdx(randomLiarIdx);
+
+        const randomWords = words.sort(() => 0.5 - Math.random()).slice(0, 1);
+        setKeywords(randomWords);
+
+        socket.emit("wordData", randomWords);
 
         const timer = setInterval(() => {
             setModalTime((prevTime) => {
@@ -54,26 +99,37 @@ function CatchLiarInGame({ room }) {
                 } else {
                     clearInterval(timer);
                     setModalOpen(false);
-
-                    const max_idx = players.length - 1;
-                    liar_idx = Math.floor(Math.random() * (max_idx - 0 + 1)); // 라이어 인덱스 랜덤 추출
-                    // 무작위로 단어 2개 추출(첫 번째 단어가 라이어 단어)
-                    const randomWords = words.sort(() => 0.5 - Math.random()).slice(0, 2);
-                    setKeywords(randomWords);
                     setGameStarted(true);
-
                     socket.emit("gamestart", true);
-                    // socket.emit("modal", { modalOpen, modalTime });
-
                     return 0;
                 }
             });
         }, 1000);
     };
 
-    socket.on("start", (start) => {
-        setGameStarted(start);
-    });
+    socket.on(
+        "start",
+        (start) => {
+            setGameStarted(start);
+        },
+        []
+    );
+
+    useEffect(() => {
+        socket.on("wordData", (data) => {
+            setKeywords(data);
+        });
+    }, []);
+
+    useEffect(() => {
+        socket.emit("liarData", liarIdx);
+    }, [liarIdx]);
+
+    useEffect(() => {
+        socket.on("liarData", (data) => {
+            setLiarIdx(data);
+        });
+    }, []);
 
     useEffect(() => {
         socket.emit("modal", { modalOpen, modalTime });
@@ -86,64 +142,54 @@ function CatchLiarInGame({ room }) {
         });
     }, []);
 
-    // useEffect(() => {
-    //     if (gameStarted === true)
-    //         socket.on("updateGameData", (data) => {
-    //             setRemainTime(data.remainTime);
-    //             setCurrentPlayer(data.currentPlayer);
-    //             setRound(data.round);
-    //             setPlayers(data.players);
-    //             console.log(">>", data);
-    //         });
-    //     else {
-    //     }
-    // }, []);
-
     useEffect(() => {
-        let timer;
         if (gameStarted) {
-            timer = setInterval(() => {
-                setRemainTime((prevTime) => {
-                    if (prevTime > 0) {
-                        return prevTime - 1;
+            // 타이머 시작
+            let interval;
+            if (gameStarted && remainTime > 0 && currentPlayer <= players.length && round <= 2) {
+                interval = setInterval(() => {
+                    setRemainTime((prevSeconds) => prevSeconds - 1);
+                }, 1000);
+            }
+
+            // 0초에 도달하면 라운드 종료
+            if (remainTime === 0) {
+                setRemainTime(5); // 초 초기화
+                setCurrentPlayer((prevIndex) => prevIndex + 1); // 다음 플레이어 인덱스로 이동
+                if (currentPlayer === players.length) {
+                    if (round === 2) {
+                        clearInterval(interval); // 타이머 종료
+                        setTimer(false);
                     } else {
-                        setCurrentPlayer((prevPlayer) => {
-                            if (prevPlayer === players.length) {
-                                setRound((prevRound) => {
-                                    if (prevRound === 2) {
-                                        clearInterval(timer); // 2 라운드가 끝나면 타이머 종료
-                                        setGameStarted(false);
-                                        return 1;
-                                    }
-                                    return prevRound + 1; // Round 증가
-                                });
-                                return 1; // 플레이어 다시 1번부터 시작
-                            } else {
-                                return prevPlayer + 1;
-                            }
-                        });
-                        return 5;
+                        setRound((prevRound) => prevRound + 1); // 라운드 증가
+                        setCurrentPlayer(1); // 플레이어 인덱스 초기화
                     }
-                });
+                }
+            }
 
-                // gameStarted가 true인 경우에만 서버로 게임 데이터를 업데이트합니다.
-                socket.emit("updateGameData", {
-                    remainTime,
-                    currentPlayer,
-                    round,
-                    players,
-                });
-            }, 1000);
+            socket.emit("updateGameData", {
+                remainTime,
+                currentPlayer,
+                round,
+                players,
+                timer,
+            });
+
+            return () => {
+                clearInterval(interval);
+            };
         }
-        return () => clearInterval(timer);
-    }, [gameStarted, setCurrentPlayer, setRound, remainTime, currentPlayer, round, players]);
-
-    // useEffect(() => {
-    //     if (currentPlayer === players.length && round === 2) {
-    //         // round가 2일 때만 해당 조건 추가
-    //         clearInterval(timerID); // 타이머 멈추기
-    //     }
-    // }, [currentPlayer, round, players.length, timerID]);
+    }, [
+        gameStarted,
+        setCurrentPlayer,
+        setRound,
+        remainTime,
+        currentPlayer,
+        round,
+        players,
+        timer,
+        loginUser,
+    ]);
 
     useEffect(() => {
         initSocketConnect();
@@ -163,28 +209,20 @@ function CatchLiarInGame({ room }) {
         });
         socket.on("updateUserId", (players) => {
             setPlayers(players);
-
-            // console.log(">>", players);
         });
     }, [players]);
 
-    if (players.length > 0) console.log(players[0].id);
+    // if (liarIdx) console.log("라이어", players[liarIdx].nickName);
+    // console.log("키워드", keywords[0]);
 
     return (
-        <div style={{ backgroundColor: "white", color: "black", justifyContent: "left" }}>
+        <div style={{ backgroundColor: "white", color: "black" }}>
             <header className="header">
                 <nav>
-                    {modalOpen && (
-                        <div className="modal">
-                            {/* 모달 내용 */}
-                            <div className="modal-content">
-                                <h2>게임이 준비 중입니다...</h2>
-                                <br />
-                                <h2>{modalTime}초뒤 게임이 시작됩니다</h2>
-                            </div>
-                        </div>
-                    )}
                     <div className="bar">
+                        <div className="logo">
+                            <Catch></Catch>
+                        </div>
                         <div className="roomName">{room.g_title}</div>
                         <div className="setting">설정</div>
                     </div>
@@ -199,12 +237,7 @@ function CatchLiarInGame({ room }) {
                                 {!gameStarted &&
                                 players.length > 0 &&
                                 players[0].id === loginUser.id ? (
-                                    <button
-                                        onClick={(e) => {
-                                            startGame(e);
-                                        }}
-                                        className="learn-more"
-                                    >
+                                    <button onClick={startGame} className="learn-more">
                                         게임 시작
                                     </button>
                                 ) : null}
@@ -215,8 +248,9 @@ function CatchLiarInGame({ room }) {
                                         <p>
                                             현재 플레이어:
                                             <span style={{ color: "blue" }}>
-                                                {players.length > 0 &&
-                                                    players[currentPlayer - 1].nickName}
+                                                {players.length > 0
+                                                    ? players[currentPlayer - 1]?.nickName
+                                                    : null}
                                             </span>
                                         </p>
                                     </div>
@@ -224,21 +258,65 @@ function CatchLiarInGame({ room }) {
                             </div>
                         </div>
                         <div className="word">
-                            {players[liar_idx] === loginUser ? keywords[0] : keywords[1]}
+                            <h1>
+                                {gameStarted
+                                    ? players[liarIdx]?.id === loginUser?.id
+                                        ? `글자수는 ${keywords[0]?.length} 글자 입니다.`
+                                        : keywords[0]
+                                    : "제시어"}
+                            </h1>
                         </div>
                     </div>
                 </nav>
             </header>
+
             <div style={{ display: "flex" }}>
                 <Canvas
                     style={{ width: "100%", height: "100%", flex: "1" }}
                     players={players}
                     gameStarted={gameStarted}
                     loginUser={loginUser}
+                    timer={timer}
                 ></Canvas>
 
-                <Chat loginUser={loginUser}></Chat>
+                <Chat
+                    loginUser={loginUser}
+                    gameStarted={gameStarted}
+                    showModal={showModal}
+                    setShowModal={setShowModal}
+                    timer={timer}
+                    timerCount={timerCount}
+                    resultModal={resultModal}
+                    setResultModal={setResultModal}
+                    setGameStarted={setGameStarted}
+                    restartBtn={restartBtn}
+                    setRestartBtn={setRestartBtn}
+                    liarIdx={liarIdx}
+                    players={players}
+                ></Chat>
             </div>
+
+            {modalOpen && (
+                <div className="modal">
+                    {/* 모달 내용 */}
+                    <div className="modal-content">
+                        {players[liarIdx]?.id === loginUser.id ? (
+                            <div>
+                                <h2>
+                                    당신은 <span style={{ color: "red" }}>라이어</span> 입니다!
+                                </h2>
+                                <h2>라이어에게는 제시어가 공개되지 않습니다</h2>
+                                <h2>주어진 힌트를 참고하여 정체를 들키지 마세요!</h2>
+                            </div>
+                        ) : (
+                            <h2>게임이 준비 중입니다...</h2>
+                        )}
+
+                        <br />
+                        <h2>{modalTime}초뒤 게임이 시작됩니다</h2>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

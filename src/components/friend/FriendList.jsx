@@ -1,6 +1,7 @@
+import React, { useState } from "react";
 import styled from "styled-components";
-import axiosUtils from "../../utils/axiosUtils"; // Ensure the path and name are correct
-import { useEffect, useState } from "react";
+import axiosUtils from "../../utils/axiosUtils";
+import { useEffect } from "react";
 
 const MainContainer = styled.div`
     width: 500px;
@@ -12,6 +13,14 @@ const MainContainer = styled.div`
     border-radius: 10px;
     padding: 20px;
     overflow-y: auto;
+`;
+
+const CloseButton = styled.span`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
 `;
 
 const FriendItem = styled.li`
@@ -49,21 +58,23 @@ const Buttondiv = styled.div`
 `;
 const StyledLink = styled.div`
     padding: 10px 15px;
-    margin-right: 10px; /* Add margin between links */
-    color: black; /* 텍스트 색상 */
-    text-decoration: none; /* 밑줄 없앰 */
+    margin-right: 10px;
+    color: black;
+    text-decoration: none;
     cursor: pointer;
 `;
 
 export default function FriendList() {
-    const [friends, setFriends] = useState([]); // State to store friends
-    const [expandedIndex, setExpandedIndex] = useState(null); // State to track expanded friend item index
+    const [friends, setFriends] = useState([]);
+    const [expandedIndex, setExpandedIndex] = useState(null);
+    const [showModal, setShowModal] = useState(true); // 모달 상태 변수 추가
 
     useEffect(() => {
         const fetchFriends = async () => {
             try {
-                const response = await axiosUtils.get("/friends");
-                setFriends(response.data);
+
+                const res = await axiosUtils.get("/friends");
+                setFriends(res.data);
             } catch (error) {
                 console.error("Error fetching friends:", error);
             }
@@ -82,7 +93,7 @@ export default function FriendList() {
                 withCredentials: true,
             });
             if (res.data) {
-                fetchFriends(); // 새로운 친구 목록을 가져오는 함수 호출
+                fetchFriends();
             } else {
                 console.error("Failed to delete friend");
             }
@@ -93,8 +104,8 @@ export default function FriendList() {
 
     const fetchFriends = async () => {
         try {
-            const res = await axiosUtils.get("/friends"); // 새로운 친구 목록을 가져오는 요청
-            setFriends(res.data); // 가져온 데이터로 친구 목록 상태를 업데이트
+            const res = await axiosUtils.get("/friends");
+            setFriends(res.data);
         } catch (error) {
             console.error("Error fetching friends:", error);
         }
@@ -104,40 +115,48 @@ export default function FriendList() {
         setExpandedIndex(index === expandedIndex ? null : index);
     };
 
-    return (
-        <MainContainer>
-            <Divtitle>
-                <h3>친구 목록</h3>
-            </Divtitle>
-            {friends.length > 0 ? (
-                <ul>
-                    {friends.map((item, index) => (
-                        <FriendItem key={item.u_seq} onClick={() => toggleExpand(index)}>
-                            <FriendInfo>
-                                {item.nickname} -{" "}
-                                <span style={{ color: item.connect ? "green" : "red" }}>
-                                    {item.connect ? "접속중O" : "접속중X"}
-                                </span>
-                            </FriendInfo>
+    const closeModal = () => {
+        setShowModal(false); // showModal 상태 변경
+    };
 
-                            {expandedIndex === index && (
-                                <Buttondiv>
-                                    <StyledLink>
-                                        <a>메시지 전송</a>
-                                    </StyledLink>
-                                    <StyledLink>
-                                        {" "}
-                                        <a onClick={() => deleteFriend(item.u_seq)}>친구 삭제</a>
-                                    </StyledLink>
-                                </Buttondiv>
-                            )}
-                            <ArrowIcon expanded={expandedIndex === index} />
-                        </FriendItem>
-                    ))}
-                </ul>
-            ) : (
-                <p>친구가 없습니다.</p>
-            )}
-        </MainContainer>
+    return (
+        showModal && (
+            <MainContainer>
+                <CloseButton onClick={closeModal}>x</CloseButton>
+                <Divtitle>
+                    <h3>친구 목록</h3>
+                </Divtitle>
+                {friends.length > 0 ? (
+                    <ul>
+                        {friends.map((item, index) => (
+                            <FriendItem key={item.u_seq} onClick={() => toggleExpand(index)}>
+                                <FriendInfo>
+                                    {item.nickname} -{" "}
+                                    <span style={{ color: item.connect ? "green" : "red" }}>
+                                        {item.connect ? "접속중O" : "접속중X"}
+                                    </span>
+                                </FriendInfo>
+
+                                {expandedIndex === index && (
+                                    <Buttondiv>
+                                        <StyledLink>
+                                            <a>메시지 전송</a>
+                                        </StyledLink>
+                                        <StyledLink>
+                                            <a onClick={() => deleteFriend(item.u_seq)}>
+                                                친구 삭제
+                                            </a>
+                                        </StyledLink>
+                                    </Buttondiv>
+                                )}
+                                <ArrowIcon expanded={expandedIndex === index} />
+                            </FriendItem>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>친구가 없습니다.</p>
+                )}
+            </MainContainer>
+        )
     );
 }

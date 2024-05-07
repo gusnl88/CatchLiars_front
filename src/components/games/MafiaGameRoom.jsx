@@ -73,6 +73,7 @@ const RoomContainer = styled.div`
                 height: 20%;
 
                 .btn_box {
+                    display: flex;
                     button {
                         width: 100px;
                         height: 30px;
@@ -256,6 +257,33 @@ const RoomContainer = styled.div`
     .notice {
         color: green;
     }
+    .invitation {
+        width: 300px;
+        height: 400px;
+        background: #808080b5;
+        position: absolute;
+        top: 10%;
+        left: 35%;
+        border-radius: 10px;
+        z-index: 1;
+        display: none;
+        overflow-y: scroll;
+        .friend_box {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .close_btn {
+            display: flex;
+            justify-content: end;
+            font-size: 20px;
+            padding: 10px;
+            cursor: pointer;
+            a:hover {
+                background-color: white;
+            }
+        }
+    }
 `;
 const MafiaGameRoom = ({ room }) => {
     const [socket, setSocket] = useState(null);
@@ -270,11 +298,13 @@ const MafiaGameRoom = ({ room }) => {
     const [isDaytime, setIsDaytime] = useState(true);
     const [dmTo, setDmTo] = useState("all");
     const [mafiaList, setMafiaList] = useState([]);
+    const [friendList, setFriendList] = useState([]);
     const loginUser = useSelector((state) => state.loginReducer.user);
     const chatContainerRef = useRef(null);
     const TitleRef = useRef(null);
     const VoreRef = useRef(null);
     const VoteBtnRef = useRef(null);
+    const InvitaionBox = useRef(null);
     useEffect(() => {
         if (gameTime === 0) {
             VoteBtnRef.current.style.display = "block"; // 투표 버튼을 보이게 설정
@@ -345,16 +375,43 @@ const MafiaGameRoom = ({ room }) => {
                 }, 3000);
             }
         });
-        newSocket.on("victory", (data) => {
+        newSocket.on("victory", async (userIdList, victoryList, winner) => {
             setIsGameStarted(false); // 게임 종료
             setIsDaytime(true); // 낮으로 초기화
             setMafiaList([]); // 마피아 리스트 초기화
             // 여기에 남은 유저들의 상태 초기화 로직 추가
-            const users = Object.values(data);
-            setUserList([...users]);
-            setIsRoomOwner(users[0] === loginUser.id);
-            setIsRoomFull(users.length >= 1);
+            setUserList([...userIdList]);
+            setIsRoomOwner(userIdList[0] === loginUser.id);
+            setIsRoomFull(userIdList.length >= 1);
             setVoteSelect(false);
+
+            if (winner === "mafia") {
+                console.log("마피아승리");
+                for (let user of victoryList) {
+                    if (user === loginUser.id) {
+                        const res = await axiosUtils.patch("/users/score", {
+                            u_seq: loginUser.u_seq,
+                        });
+                        if (res) {
+                            alert("마피아가 승리하셧습니다!!!. 스코어점수가 올라갑니다.");
+                        }
+                    }
+                }
+                // 마피아가 이겼을 때의 로직
+                // 여기에 마피아가 이겼을 때의 추가적인 처리 로직을 작성하세요.
+            } else {
+                for (let user of victoryList) {
+                    if (user === loginUser.id) {
+                        const res = await axiosUtils.patch("/users/score", {
+                            u_seq: loginUser.u_seq,
+                        });
+                        if (res) {
+                            alert("시민이 승리하셧습니다!!. 스코어점수가 올라갑니다.");
+                        }
+                    }
+                }
+            }
+
             // setTimeout(() => {
             //     outBtn();
             // }, 10000);
@@ -472,13 +529,21 @@ const MafiaGameRoom = ({ room }) => {
     };
 
     const outBtn = () => {
+        //직접 나갈시
         axiosUtils.patch(`/games/minus/${room.g_seq}`);
         if (socket) {
             socket.disconnect();
         }
         window.location.reload();
     };
-
+    const vitctory = () => {
+        console.log(loginUser.u_seq);
+        axiosUtils.patch(`/games/minus/${room.g_seq}`);
+        if (socket) {
+            socket.disconnect();
+        }
+        window.location.reload();
+    };
     const startGame = () => {
         if (socket) {
             // 게임 시작
@@ -522,6 +587,37 @@ const MafiaGameRoom = ({ room }) => {
         }
         return options;
     }, [userList]);
+
+    const inviBtn = async () => {
+        const res = await axiosUtils.get("/friends");
+        const connectedFriends = res.data.filter((friend) => friend.connect === true);
+        console.log(connectedFriends);
+
+        setFriendList(connectedFriends);
+        InvitaionBox.current.style.display = "block";
+    };
+    const inviOutBtn = () => {
+        InvitaionBox.current.style.display = "none";
+    };
+    const invitationBtn = async (u_seq) => {
+        const data = {
+            u_seq: u_seq,
+            type: 1,
+            g_seq: room.g_seq,
+        };
+
+        try {
+            const res = await axiosUtils.post("/invites", data);
+            console.log(res.data, "현재데이터는???");
+            if (res.data === true) {
+                alert("초대하였습니다");
+            }
+        } catch (error) {
+            console.error("초대 요청 실패:", error);
+            alert("초대 요청 실패");
+        }
+    };
+
     return (
         <RoomContainer>
             <div className="side_zone">
@@ -551,7 +647,33 @@ const MafiaGameRoom = ({ room }) => {
                             {isRoomOwner && isRoomFull && !isGameStarted && (
                                 <button onClick={startGame}>게임 시작</button>
                             )}
-                            <button>초대</button>
+                            <button onClick={() => inviBtn()}>초대</button>
+                            <div ref={InvitaionBox} className="invitation">
+                                <div className="close_btn">
+                                    <a onClick={inviOutBtn}>x</a>
+                                </div>
+                                <span>접속중이 유저</span>
+                                {friendList.map((item, index) => (
+                                    <div key={index} className="friend_box">
+                                        <span>{item.id}</span>
+                                        <button onClick={() => invitationBtn(item.u_seq)}>
+                                            초대
+                                        </button>
+                                    </div>
+                                ))}
+                                {/* <div className="friend_box">
+                                    <span>친구아이디</span>
+                                    <button>초대</button>
+                                </div>
+                                <div className="friend_box">
+                                    <span>친구아이디</span>
+                                    <button>초대</button>
+                                </div>
+                                <div className="friend_box">
+                                    <span>친구아이디</span>
+                                    <button>초대</button>
+                                </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -2,12 +2,27 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Notice from "./Notice";
 import "./styles/chat.css";
+import "./styles/voteBtn.scss";
 
 const socket = io.connect("http://localhost:8089", {
     autoConnect: false,
 });
 
-export default function Chat({ loginUser }) {
+export default function Chat({
+    loginUser,
+    gameStarted,
+    showModal,
+    setShowModal,
+    timer,
+    timerCount,
+    resultModal,
+    setResultModal,
+    setGameStarted,
+    restartBtn,
+    setRestartBtn,
+    liarIdx,
+    players,
+}) {
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
     };
@@ -15,7 +30,11 @@ export default function Chat({ loginUser }) {
     const [msgInput, setMsgInput] = useState(""); // 메시지 입력 상태
     const [chatList, setChatList] = useState([]); // 채팅 목록 상태
     const [userList, setUserList] = useState({}); // 사용자 목록 상태
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    const [userVotes, setUserVotes] = useState({}); // 사용자별 투표 수 상태
+    const [hasVoted, setHasVoted] = useState(false);
+    const [modalResult, setModalResult] = useState(false);
+    const [winner, setWinner] = useState("");
+    const [maxUser, setMaxUser] = useState("");
 
     useEffect(() => {
         initSocketConnect();
@@ -28,7 +47,7 @@ export default function Chat({ loginUser }) {
         //message
         socket.on("message0", (data) => {
             const { nick, message } = data;
-            const type = nick === loginUser.nickName ? "me" : "other";
+            const type = loginUser && loginUser.nickName === data.nick ? "me" : "other";
             const content = message;
 
             setChatList((prevChatList) => [...prevChatList, { type, content, nick }]);
@@ -38,14 +57,19 @@ export default function Chat({ loginUser }) {
             setUserList(nickInfo);
         });
 
-        // 소켓 연결
-        // socket.connect();
+        socket.on("voteUpdate", (votedUser) => {
+            setUserVotes((prevUserVotes) => ({
+                ...prevUserVotes,
+                [votedUser]: (prevUserVotes[votedUser] || 0) + 1,
+            }));
+            // socket.emit("voteUpdate", userVotes);
+        });
 
         // 컴포넌트 언마운트 시 소켓 연결 해제
         // return () => {
         //     socket.disconnect();
         // };
-    }, []);
+    }, [loginUser]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -78,19 +102,89 @@ export default function Chat({ loginUser }) {
         scrollDiv.current?.scrollIntoView({ behavior: "smooth" });
     }, [chatList]);
 
-    console.log(chatList);
-
     const handleVoteClick = () => {
         setShowModal(true);
     };
 
+    const restart = () => {
+        setGameStarted(false);
+        setRestartBtn(false);
+    };
+
     const closeModal = () => {
         setShowModal(false);
+        setModalResult(false);
+        setWinner("");
     };
+
+    const handleVote = (votedUser) => {
+        // 이미 투표한 경우 처리
+        if (hasVoted) {
+            console.log("이미 투표하셨습니다.");
+            return;
+        }
+
+        // 투표처리
+        console.log(`${votedUser}에게 투표하셨습니다.`);
+
+        socket.emit("CatchVote", votedUser);
+
+        // 투표 처리 후 상태 업데이트
+        setHasVoted(true);
+    };
+
+    const checkWinner = () => {
+        const voteCounts = Object.values(userVotes);
+        const maxVotes = Math.max(...voteCounts);
+        const maxVoteUser = Object.keys(userVotes).filter((user) => userVotes[user] === maxVotes);
+        console.log("maxVoteUser:", maxVoteUser);
+        setMaxUser(maxVoteUser);
+        setModalResult(true);
+
+        if (maxVoteUser.includes(players[liarIdx].nickName) && maxVoteUser.length === 1) {
+            console.log("라이어가 패배했습니다!");
+            // 라이어 패배
+            socket.emit("winner", { result: "시민", isWinner: true });
+        } else if (maxVoteUser.length > 1) {
+            console.log("무승부입니다!");
+            setWinner("무승부");
+            // 무승부
+            socket.emit("winner", { result: "무승부", isWinner: false });
+        } else {
+            console.log("시민이 패배했습니다!");
+            // 시민 패배
+            socket.emit("winner", { result: "라이어", isWinner: false });
+        }
+    };
+
+    useEffect(() => {
+        socket.on("winner", (data) => {
+            console.log("게임 결과:", data.result);
+            setWinner(data.result);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!timer) {
+            setShowModal(true);
+        }
+    }, [timer, setShowModal]);
+
+    useEffect(() => {
+        if (resultModal) {
+            checkWinner();
+        }
+    }, [resultModal]);
+
+    // console.log("1>>>>>>", maxUser.includes(loginUser.nickName));
+    // if (liarIdx) console.log("2>>>>>:", maxUser.includes(players[liarIdx].nickName));
+    // console.log("유저리스트", Object.values(userList)?.length);
+    // console.log("userVotes", userVotes);
 
     return (
         <div className="container">
             <header>CatchLiar🐛</header>
+
             <section>
                 {/* 채팅 목록 출력 */}
                 {chatList.map((chat, i) =>
@@ -125,9 +219,36 @@ export default function Chat({ loginUser }) {
                 />
                 <button>전송</button>
             </form>
-            <button className="vote" onClick={handleVoteClick}>
-                투표하기
-            </button>
+            {gameStarted ? (
+                !restartBtn ? (
+                    <button className="vote" onClick={handleVoteClick}>
+                        투표하기
+                    </button>
+                ) : (
+                    <button className="vote" onClick={restart}>
+                        재시작
+                    </button>
+                )
+            ) : null}
+            {/* 결과 모달창 */}
+            {modalResult && (
+                <div className="modal">
+                    <div className="modal-content" style={{ width: "500px", height: "300px" }}>
+                        <span className="close" onClick={closeModal}>
+                            &times;
+                        </span>
+                        {winner === "라이어" ? (
+                            <h1>라이어가 승리했습니다!</h1>
+                        ) : winner === "무승부" ? (
+                            <h1>무승부 입니다!</h1>
+                        ) : (
+                            <h1>시민팀이 승리했습니다!</h1>
+                        )}
+
+                        <br />
+                    </div>
+                </div>
+            )}
 
             {/* 모달창 */}
             {showModal && (
@@ -136,15 +257,22 @@ export default function Chat({ loginUser }) {
                         <span className="close" onClick={closeModal}>
                             &times;
                         </span>
+                        {!timer && <span>{timerCount}초후 게임이 종료됩니다...</span>}
                         <p>투표 대상 선택</p>
                         <br />
                         <div className="user-list">
-                            {Object.values(userList).map((user, index) => (
-                                <div key={index}>
-                                    <button>{user}</button>
-                                    <br />
-                                </div>
-                            ))}
+                            <div className="grid-container">
+                                {Object.values(userList).map((user, index) => (
+                                    <div key={index} className="grid-item">
+                                        <button onClick={() => handleVote(user)}>
+                                            {user}{" "}
+                                            <span className="vote-count">
+                                                - {userVotes[user] || 0}표
+                                            </span>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
