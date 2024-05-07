@@ -69,17 +69,17 @@ export default function Chat({
             setUserList(nickInfo);
         });
 
-        socket.on("ctx", (data) => {
-            setCtx(data);
-        });
+        // socket.on("timerCount", (data) => {
+        //     setTimerCount(data);
+        // });
 
-        socket.on("round", (data) => {
-            setRound(data);
-        });
+        // socket.on("round", (data) => {
+        //     setRound(data);
+        // });
 
-        socket.on("current", (data) => {
-            setCurrentPlayer(data);
-        });
+        // socket.on("current", (data) => {
+        //     setCurrentPlayer(data);
+        // });
 
         socket.on("voteUpdate", (votedUser) => {
             setUserVotes((prevUserVotes) => ({
@@ -130,20 +130,6 @@ export default function Chat({
         setShowModal(true);
     };
 
-    const restart = () => {
-        setGameStarted(false);
-
-        setRestartBtn(false);
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, 850, 458);
-        setTimerCount(20);
-        setRound(1);
-        setCurrentPlayer(1);
-        socket.emit("ctx", ctx);
-        socket.emit("round", round);
-        socket.emit("current", currentPlayer);
-    };
-
     const closeModal = () => {
         setShowModal(false);
         setModalResult(false);
@@ -173,29 +159,31 @@ export default function Chat({
         console.log("maxVoteUser:", maxVoteUser);
         // setMaxUser(maxVoteUser);
         setModalResult(true);
-        setGameStarted(false);
-        socket.emit("gamestart", false, room.g_seq);
 
         if (maxVoteUser.includes(players[liarIdx].nickName) && maxVoteUser.length === 1) {
             console.log("라이어가 패배했습니다!");
             // 라이어 패배
-            socket.emit("winner", { result: "시민", isWinner: true });
+            socket.emit("winner", "시민");
         } else if (maxVoteUser.length > 1) {
             console.log("무승부입니다!");
-            setWinner("무승부");
+            // setWinner("무승부");
             // 무승부
-            socket.emit("winner", { result: "무승부", isWinner: false });
+            socket.emit("winner", "무승부");
         } else {
             console.log("시민이 패배했습니다!");
             // 시민 패배
-            socket.emit("winner", { result: "라이어", isWinner: false });
+            socket.emit("winner", "라이어");
         }
+
+        setGameStarted(false);
+        socket.emit("gamestart", false, room.g_seq);
+        setUserVotes({});
     };
 
     useEffect(() => {
         socket.on("winner", (data) => {
-            console.log("게임 결과:", data.result);
-            setWinner(data.result);
+            console.log("게임 결과:", data);
+            setWinner(data);
         });
     }, []);
 
@@ -260,11 +248,7 @@ export default function Chat({
                     <button className="vote" onClick={handleVoteClick}>
                         투표하기
                     </button>
-                ) : (
-                    <button className="vote" onClick={restart}>
-                        재시작
-                    </button>
-                )
+                ) : null
             ) : null}
             {/* 결과 모달창 */}
             {modalResult && (

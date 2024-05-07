@@ -8,7 +8,7 @@ import axiosUtils from "../../utils/axiosUtils";
 import { useLocation } from "react-router-dom";
 
 const RoomListContainer = styled.div`
-    width: ${(props) => (props.pathname === "/games/list/Catchliars" ? "80%" : "90%")};
+    width: ${(props) => (props.pathname === "/games/list/Catchliars" ? "75%" : "90%")};
     height: ${(props) => (props.pathname === "/games/list/Catchliars" ? "97%" : "90%")};
     max-width: 100%;
     max-height: 100%;
@@ -196,15 +196,14 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     }, [showPasswordModal]);
 
     const joinRoom = async (room) => {
-        console.log("룸값은?",room)
         if (type!="Mafia") {
+
             await axiosUtils.patch(`/games/plus/${room.g_seq}`);
             setRoom(room);
             setGameStart(type);
         } else {
             await axiosUtils.patch(`/games/plus/${room.g_seq}`);
             window.location.href = `/games/list/${type}/${room.g_seq}`;
-
         }
     };
 

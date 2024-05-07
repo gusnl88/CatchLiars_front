@@ -43,6 +43,9 @@ function Canvas({
             // console.log("receive data", data);
         });
 
+        // socket.on("ctx", (data) => {
+        //     setCtx(data);
+        // });
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
 
@@ -182,15 +185,15 @@ function Canvas({
         ctx.beginPath();
         ctx.moveTo(x, y);
         setPainting(true);
-        // if (socket) {
-        //     socket.emit("drawing1", {
-        //         x: x,
-        //         y: y,
-        //         color: ctx.strokeStyle,
-        //         size: ctx.lineWidth,
-        //         isDraw: painting,
-        //     });
-        // }
+        if (socket) {
+            socket.emit("drawing", {
+                x: x,
+                y: y,
+                color: ctx.strokeStyle,
+                size: ctx.lineWidth,
+                isDraw: painting,
+            });
+        }
     };
 
     const onMouseMove = (event) => {
@@ -211,16 +214,40 @@ function Canvas({
         }
     };
 
-    const onMouseUp = () => {
+    const onMouseUp = (event) => {
         if (!ctx || !gameStarted || !currentGamePlayer) return; // 현재 플레이어가 아니면 그림 그리기 종료하지 않음
+        const x = event.nativeEvent.offsetX;
+        const y = event.nativeEvent.offsetY;
         ctx.closePath();
         setPainting(false);
+        if (socket) {
+            socket.emit("drawing", {
+                x: x,
+                y: y,
+                color: ctx.strokeStyle,
+                size: ctx.lineWidth,
+                isDraw: painting,
+            });
+            // console.log(ctx);
+        }
     };
 
-    const onMouseLeave = () => {
+    const onMouseLeave = (event) => {
         if (!ctx || !gameStarted || !currentGamePlayer) return; // 현재 플레이어가 아니면 그림 그리기 중지하지 않음
+        const x = event.nativeEvent.offsetX;
+        const y = event.nativeEvent.offsetY;
         ctx.closePath();
         setPainting(false);
+        if (socket) {
+            socket.emit("drawing", {
+                x: x,
+                y: y,
+                color: ctx.strokeStyle,
+                size: ctx.lineWidth,
+                isDraw: painting,
+            });
+            // console.log(ctx);
+        }
     };
 
     const handleColorClick = (color) => {
@@ -234,6 +261,15 @@ function Canvas({
         const size = event.target.value;
         ctx.lineWidth = size;
     };
+
+    useEffect(() => {
+        const page = canvasRef.current.getContext("2d");
+
+        if (!gameStarted) {
+            page.fillStyle = "white";
+            page.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
+    }, [gameStarted]);
 
     const handleNewClick = () => {
         const page = canvasRef.current.getContext("2d");
