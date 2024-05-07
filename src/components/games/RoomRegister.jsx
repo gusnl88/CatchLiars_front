@@ -11,6 +11,7 @@ const RoomRegisterContainer = styled.div`
     border-radius: 10px;
     width: 40%;
     background-color: #8b8585e0;
+    z-index: 2;
     display: none;
     .close_btn {
         text-align: end;
