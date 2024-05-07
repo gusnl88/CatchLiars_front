@@ -475,6 +475,7 @@ export default function Header() {
                 setNewPassword("");
                 setPassword("");
                 setNewNickname(updatedNickname);
+                setIsModalOpen(false);
             } else {
                 setUpdateMessage("업데이트 실패: " + response.data.message);
                 setUpdateModalOpen(true);
@@ -594,20 +595,19 @@ export default function Header() {
                 },
             });
 
+            console.log("서버 응답:", response.data); // 응답 전체를 로그로 출력
+
             if (response.status === 200) {
-                // 서버로부터 받은 응답에서 이미지 URL을 추출
-                const newImageUrl = `${user.image}`; // 예: response.data.imageUrl
-                // console.log(newImageUrl);
-                console.log("프로필 이미지가 업데이트되었습니다.");
-                setImageUrl(newImageUrl); // 이미지 URL 상태 업데이트
-                setUser({ ...user, image: newImageUrl }); // 사용자 객체 업데이트
-                toggleModal(); // 모달 창 닫기
+                const newImageUrl = response.data.imageUrl; // 응답 구조에 따라 경로 조정 필요
+                console.log("새로운 이미지 URL:", newImageUrl);
+                setImageUrl(newImageUrl);
+                setUser({ ...user, image: newImageUrl });
             } else {
                 alert("이미지 업데이트에 실패했습니다.");
             }
         } catch (error) {
             console.error("프로필 이미지 업데이트 실패:", error);
-            alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");
+            // alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");
         }
     };
 

@@ -15,6 +15,14 @@ const MainContainer = styled.div`
     border-radius: 10px;
     padding: 20px;
     overflow-y: auto;
+
+    @media (max-width: 768px) {
+        width: 200px;
+        height: 400px;
+        left: 70%;
+        transform: translateX(-50%);
+        top: 350px;
+    }
 `;
 
 const CloseButton = styled.span`
@@ -31,6 +39,12 @@ const FriendItem = styled.li`
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    @media screen and (max-width: 600px) {
+        /* 화면 너비가 600px 이하일 때 적용되는 스타일 */
+        flex-direction: column;
+        align-items: flex-start;
+    }
 `;
 
 const ArrowIcon = styled.span`
@@ -43,11 +57,21 @@ const ArrowIcon = styled.span`
     transition: transform 0.3s ease;
     transform: ${(props) => (props.expanded ? "rotate(0deg)" : "rotate(180deg)")};
     margin-left: auto;
+
+    @media screen and (max-width: 600px) {
+        /* 화면 너비가 600px 이하일 때 적용되는 스타일 */
+        margin-left: 0; /* 추가된 스타일 */
+        display: none;
+    }
 `;
 
 const FriendInfo = styled.div`
     display: flex;
     align-items: center;
+
+    @media screen and (max-width: 600px) {
+        font-size: 12px;
+    }
 `;
 
 const Divtitle = styled.div`
@@ -57,6 +81,12 @@ const Divtitle = styled.div`
 const Buttondiv = styled.div`
     display: flex;
     flex-direction: row;
+
+    @media screen and (max-width: 600px) {
+        /* 화면 너비가 600px 이하일 때 적용되는 스타일 */
+        flex-direction: column;
+        align-items: flex-start;
+    }
 `;
 const StyledLink = styled.div`
     padding: 10px 15px;
@@ -64,6 +94,13 @@ const StyledLink = styled.div`
     color: black;
     text-decoration: none;
     cursor: pointer;
+
+    @media screen and (max-width: 600px) {
+        /* 화면 너비가 600px 이하일 때 적용되는 스타일 */
+        font-size: 14px;
+        margin-right: 0px;
+        padding: 5px;
+    }
 `;
 
 export default function FriendList() {
