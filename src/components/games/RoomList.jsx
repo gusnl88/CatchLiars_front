@@ -144,7 +144,7 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
         let flag = 1; // 방 입장 가능여부를 의미
         console.log("room", room);
         if (room.g_pw !== null) {
-            setSelectedRoom(room);
+            await setSelectedRoom(room);
             setShowPasswordModal(true);
         } else {
             if (room.g_type) {
@@ -163,6 +163,7 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
             if (flag) {
                 try {
                     await joinRoom(room);
+                    await setSelectedRoom(room);
                 } catch (error) {
                     alert("해당 방은 존재하지 않습니다.");
                     window.location.reload();

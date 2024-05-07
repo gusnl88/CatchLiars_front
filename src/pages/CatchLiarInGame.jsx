@@ -37,7 +37,7 @@ function CatchLiarInGame({ room }) {
     const loginUser = useSelector((state) => state.loginReducer.user);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalTime, setModalTime] = useState(5);
-
+    console.log("============게임방 정보", room);
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
     };
@@ -235,6 +235,7 @@ function CatchLiarInGame({ room }) {
                     players={players}
                     gameStarted={gameStarted}
                     loginUser={loginUser}
+                    room={room}
                 ></Canvas>
 
                 <Chat loginUser={loginUser}></Chat>
