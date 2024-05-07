@@ -11,28 +11,35 @@ import CatchLiarInGame from "./pages/CatchLiarInGame";
 import LankingPage from "./pages/LankingPage";
 import FriendInvitationPage from "./pages/FriendInvitationPage";
 import DmPage from "./pages/DmPage";
+import SessionCheck from "./components/main/SessionCheck";
 
 function App() {
     const loginUser = useSelector((state) => state.loginReducer.user);
     console.log(loginUser);
     return (
-        <Routes>
-            <Route path="/" element={LoginUser(loginUser, <MainPage />)} />
-            <Route path="/games" element={LoginUser(loginUser, <MainPage />)} />
-            <Route path="/games/list/:type" element={LoginUser(loginUser, <GameWaitngList />)} />
-            <Route path="/users/mypage" element={LoginUser(loginUser, <Mypage />)} />
-            <Route
-                path="/games/list/:CatchLiar/Ingame"
-                element={LoginUser(loginUser, <CatchLiarInGame />)}
-            />
-            <Route path="dms" element={LoginUser(loginUser, <DmPage />)} />
+        <>
+            {loginUser && <SessionCheck />}
+            <Routes>
+                <Route path="/" element={LoginUser(loginUser, <MainPage />)} />
+                <Route path="/games" element={LoginUser(loginUser, <MainPage />)} />
+                <Route
+                    path="/games/list/:type"
+                    element={LoginUser(loginUser, <GameWaitngList />)}
+                />
+                <Route path="/users/mypage" element={LoginUser(loginUser, <Mypage />)} />
+                <Route
+                    path="/games/list/:CatchLiar/Ingame"
+                    element={LoginUser(loginUser, <CatchLiarInGame />)}
+                />
+                <Route path="dms" element={LoginUser(loginUser, <DmPage />)} />
 
-            <Route path="users/lank" element={LoginUser(loginUser, <LankingPage />)} />
-            <Route
-                path="users/friends/accept"
-                element={LoginUser(loginUser, <FriendInvitationPage />)}
-            ></Route>
-        </Routes>
+                <Route path="users/lank" element={LoginUser(loginUser, <LankingPage />)} />
+                <Route
+                    path="users/friends/accept"
+                    element={LoginUser(loginUser, <FriendInvitationPage />)}
+                ></Route>
+            </Routes>
+        </>
     );
 }
 

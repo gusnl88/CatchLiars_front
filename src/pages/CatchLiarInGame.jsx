@@ -55,6 +55,7 @@ function CatchLiarInGame({ room }) {
     const [resultModal, setResultModal] = useState(false);
     const [restartBtn, setRestartBtn] = useState(false);
 
+
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
     };
@@ -276,6 +277,7 @@ function CatchLiarInGame({ room }) {
                     players={players}
                     gameStarted={gameStarted}
                     loginUser={loginUser}
+                    room={room}
                     timer={timer}
                 ></Canvas>
 
