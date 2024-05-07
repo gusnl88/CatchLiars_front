@@ -63,12 +63,14 @@ const RoomRegister = ({ RoomRef, type, setNewRoom, TitleInput }) => {
         e.preventDefault();
 
         const res = await axiosUtils.post(`/games`, { title, pw, type });
-        if (res.data) {
+        if (!type) {
             setNewRoom(res.data);
             closeBtn();
             setTitle("");
             setIsPrivate(false);
+        }else{
             window.location.href = `/games/list/${type?"Mafia":"Catchliars"}/${res.data.g_seq}`;
+
         }
     };
     const closeBtn = () => {
