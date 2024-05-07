@@ -354,7 +354,7 @@ const RoomContainer = styled.div`
 `;
 const MafiaGameRoom = () => {
     const { roomId } = useParams();
-    let room=roomId
+    let room = roomId;
     const [socket, setSocket] = useState(null);
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
@@ -368,7 +368,7 @@ const MafiaGameRoom = () => {
     const [dmTo, setDmTo] = useState("all");
     const [mafiaList, setMafiaList] = useState([]);
     const [friendList, setFriendList] = useState([]);
-    const [gameStart,setGameStart]=useState(false);
+    const [gameStart, setGameStart] = useState(false);
     const loginUser = useSelector((state) => state.loginReducer.user);
     const chatContainerRef = useRef(null);
     const TitleRef = useRef(null);
@@ -411,7 +411,7 @@ const MafiaGameRoom = () => {
             console.log(users);
             setUserList([...users]); // 배열을 복사해서 업데이트
             setIsRoomOwner(users[0] === loginUser.id);
-            setIsRoomFull(users.length >= 1);
+            setIsRoomFull(users.length >= 8);
         });
         newSocket.on("job", (data) => {
             const { job, mafiaList } = data;
@@ -455,7 +455,7 @@ const MafiaGameRoom = () => {
             setIsRoomOwner(userIdList[0] === loginUser.id);
             setIsRoomFull(userIdList.length >= 1);
             setVoteSelect(false);
-            setGameStart(false)
+            setGameStart(false);
             if (winner === "mafia") {
                 console.log("마피아승리");
                 for (let user of victoryList) {
@@ -609,34 +609,39 @@ const MafiaGameRoom = () => {
         navigater(-1);
     };
     const out = () => {
-        console.log(gameStart)
+        console.log(gameStart);
         //직접 나갈시
-        if(gameStart){
-            if (window.confirm("게임이 진행 중입니다. 정말 나가시겠습니까?나가시면 재입장 불가능 합니다.")) {    
-                setGameStart(false)
+        if (gameStart) {
+            if (
+                window.confirm(
+                    "게임이 진행 중입니다. 정말 나가시겠습니까?나가시면 재입장 불가능 합니다."
+                )
+            ) {
+                setGameStart(false);
                 axiosUtils.patch(`/games/minus/${room}`);
                 if (socket) {
                     socket.disconnect();
                 }
                 navigater(-1);
-                }
-            }else{
-                axiosUtils.patch(`/games/minus/${room}`);
-                if (socket) {
-                    socket.disconnect();
-                }
-                navigater(-1);
-                
             }
+        } else {
+            axiosUtils.patch(`/games/minus/${room}`);
+            if (socket) {
+                socket.disconnect();
+            }
+            navigater(-1);
+        }
     };
 
-    const startGame = () => {
-        setGameStart(true)
+    const startGame = async () => {
+        setGameStart(true);
         if (socket) {
             // 게임 시작
             console.log("시작");
             console.log(room, "룸번호");
             socket.emit("startGame", { roomId: room, isDaytime: isDaytime });
+            const res = await axiosUtils.patch(`/games/state/${room}`, { type: "start" });
+            console.log(res.data, "게임시작햇어 트루니?");
             setIsGameStarted(true); // 펄스 일때만 시작버튼이 보인다.
         }
     };
@@ -795,6 +800,9 @@ const MafiaGameRoom = () => {
                     </div>
                     <div className="chat_box">
                         <div className="chat_main" ref={chatContainerRef}>
+                            <div className="notice">
+                                방인원이 8명이 되어야 방장이 게임을 시작할수 있습니다.
+                            </div>
                             {messages.map((msg, index) => (
                                 <div
                                     key={index}

@@ -196,11 +196,13 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     }, [showPasswordModal]);
 
     const joinRoom = async (room) => {
+        console.log("룸값은?",room)
         if (type!="Mafia") {
             await axiosUtils.patch(`/games/plus/${room.g_seq}`);
             setRoom(room);
             setGameStart(type);
         } else {
+            await axiosUtils.patch(`/games/plus/${room.g_seq}`);
             window.location.href = `/games/list/${type}/${room.g_seq}`;
 
         }
