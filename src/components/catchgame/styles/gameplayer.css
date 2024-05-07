@@ -1,7 +1,7 @@
 .player {
     /* border: solid 1px black; */
-
     height: 14%;
+    background-color: #b0bdd3;
 }
 
 .player.first {

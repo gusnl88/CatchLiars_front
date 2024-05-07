@@ -10,7 +10,7 @@ import { useLocation } from "react-router-dom";
 const RoomListContainer = styled.div`
     /* width: 90%;
     height: 90%; */
-    width: ${(props) => (props.pathname === "/games/list/Catchliars" ? "80%" : "90%")};
+    width: ${(props) => (props.pathname === "/games/list/Catchliars" ? "75%" : "90%")};
     height: ${(props) => (props.pathname === "/games/list/Catchliars" ? "97%" : "90%")};
     max-width: 100%;
     max-height: 100%;
@@ -18,6 +18,7 @@ const RoomListContainer = styled.div`
     .game_table {
         border-collapse: collapse;
         width: 100%;
+        opacity: ${(props) => (props.pathname === "/games/list/Catchliars" ? "1" : "")};
         button {
             background-color: #4caf50;
             border: none;
@@ -34,7 +35,7 @@ const RoomListContainer = styled.div`
             border: 1px solid #fffcfc;
 
             background-color: ${(props) =>
-                props.pathname === "/games/list/Catchliars" ? "#c6e2e8" : ""};
+                props.pathname === "/games/list/Catchliars" ? "#b2e4ef" : ""};
             padding: 8px;
             text-align: center;
         }

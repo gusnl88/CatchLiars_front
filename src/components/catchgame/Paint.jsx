@@ -6,9 +6,17 @@ import socketIOClient from "socket.io-client";
 import "./styles/style.css";
 import "./styles/gameplayer.css";
 
-function Canvas({ players, gameStarted, loginUser, room, timer }) {
-    const [ctx, setCtx] = useState(null);
-    const [painting, setPainting] = useState(false);
+function Canvas({
+    players,
+    gameStarted,
+    loginUser,
+    room,
+    timer,
+    ctx,
+    setCtx,
+    painting,
+    setPainting,
+}) {
     const [tool, setTool] = useState("auto");
     const [socket, setSocket] = useState(null);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0); // 현재 플레이어 인덱스 상태 추가
@@ -106,6 +114,7 @@ function Canvas({ players, gameStarted, loginUser, room, timer }) {
             if (!gameStarted) currentPlayer.style.border = "";
             if (!timer) {
                 currentPlayer.style.border = "";
+                setCurrentGamePlayer(false);
             }
         }
 
