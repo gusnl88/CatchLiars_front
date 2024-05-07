@@ -361,7 +361,6 @@ export default function Header() {
                 console.error("Error fetching invitations:", error);
             }
         };
-
         // 최초 마운트 시 초대 목록 가져오기
         fetchInvitations();
         // 30초 간격으로 초대 목록 갱신하기
