@@ -352,7 +352,7 @@ const RoomContainer = styled.div`
     }
 `;
 const MafiaGameRoom = ({ room }) => {
-    room = useParams();
+    const { roomId } = useParams();
     const [socket, setSocket] = useState(null);
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
@@ -668,18 +668,18 @@ const MafiaGameRoom = ({ room }) => {
         InvitaionBox.current.style.display = "none";
     };
     const invitationBtn = async (u_seq) => {
-        console.log(u_seq);
         const data = {
             u_seq: u_seq,
-            type: 1,
-            g_seq: room,
+            type: 1, // 1은 게임 초대를 의미
+            g_seq: roomId, // roomId를 사용
         };
 
         try {
             const res = await axiosUtils.post("/invites", data);
-            console.log(res.data, "현재데이터는???");
             if (res.data === true) {
                 alert("초대하였습니다");
+            } else {
+                alert("초대 요청 실패: " + res.data);
             }
         } catch (error) {
             console.error("초대 요청 실패:", error);
