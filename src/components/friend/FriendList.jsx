@@ -70,16 +70,20 @@ export default function FriendList() {
     const [showModal, setShowModal] = useState(true); // 모달 상태 변수 추가
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchFriends = async () => {
             try {
+
                 const res = await axiosUtils.get("/friends");
                 setFriends(res.data);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.error("Error fetching friends:", error);
             }
         };
 
-        fetchData();
+        fetchFriends();
+        const intervalId = setInterval(fetchFriends, 1000); // 30초마다 친구 목록 갱신
+
+        return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 해제
     }, []);
 
     const deleteFriend = async (u_seq) => {
