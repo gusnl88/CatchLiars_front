@@ -3,17 +3,30 @@ import io from "socket.io-client";
 import styled from "styled-components";
 import axiosUtils from "../../utils/axiosUtils";
 import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 
 const SOCKET_SERVER_URL = process.env.REACT_APP_API_SERVER;
 
 const RoomContainer = styled.div`
-    background-color: white;
-    border-radius: 10px;
-    width: 100%;
-    height: 100%;
-    color: black;
     display: flex;
-    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 85%;
+    background-color: #00154b;
+    background-size: cover;
+    background-position: center;
+    color: white;
+    box-sizing: border-box;
+    .main_container {
+        background-color: white;
+        border-radius: 10px;
+        width: 90%;
+        height: 90%;
+        color: black;
+        display: flex;
+        position: relative;
+    }
 
     .side_zone {
         width: 20%;
@@ -36,7 +49,7 @@ const RoomContainer = styled.div`
                     align-items: center;
                     border-radius: 10px;
                     background-color: #cac9c9;
-                    margin: 3px auto;
+                    margin: 3px;
                     .game_img {
                         width: 100%;
                         img {
@@ -329,9 +342,17 @@ const RoomContainer = styled.div`
                 padding: 5px !important;
             }
         }
+        .event_zone {
+            .invitation {
+                width: 160px;
+                height: 320px;
+                left: 25%;
+            }
+        }
     }
 `;
 const MafiaGameRoom = ({ room }) => {
+    room = useParams();
     const [socket, setSocket] = useState(null);
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
@@ -351,6 +372,7 @@ const MafiaGameRoom = ({ room }) => {
     const VoreRef = useRef(null);
     const VoteBtnRef = useRef(null);
     const InvitaionBox = useRef(null);
+    const navigater = useNavigate();
     useEffect(() => {
         if (gameTime === 0) {
             VoteBtnRef.current.style.display = "block"; // 투표 버튼을 보이게 설정
@@ -522,7 +544,7 @@ const MafiaGameRoom = ({ room }) => {
             }
         });
 
-        newSocket.emit("joinRoom", { roomId: room.g_seq, userId: loginUser.id });
+        newSocket.emit("joinRoom", { roomId: room, userId: loginUser.id });
 
         const handleKeyDown = (event) => {
             if (event.key === "F5" || ((event.ctrlKey || event.metaKey) && event.key === "r")) {
@@ -541,7 +563,7 @@ const MafiaGameRoom = ({ room }) => {
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("beforeunload", outBtn);
             if (!newSocket.connected) {
-                axiosUtils.patch(`/games/minus/${room.g_seq}`);
+                axiosUtils.patch(`/games/minus/${room}`);
             }
         };
     }, [room, loginUser]);
@@ -565,7 +587,7 @@ const MafiaGameRoom = ({ room }) => {
     const sendMessage = () => {
         if (socket && message.trim() !== "") {
             const sendData = {
-                roomId: room.g_seq,
+                roomId: room,
                 dm: dmTo, //all or socket.id
                 msg: message,
             };
@@ -576,15 +598,15 @@ const MafiaGameRoom = ({ room }) => {
 
     const outBtn = () => {
         //직접 나갈시
-        axiosUtils.patch(`/games/minus/${room.g_seq}`);
+        axiosUtils.patch(`/games/minus/${room}`);
         if (socket) {
             socket.disconnect();
         }
-        window.location.reload();
+        navigater(-1);
     };
     const vitctory = () => {
         console.log(loginUser.u_seq);
-        axiosUtils.patch(`/games/minus/${room.g_seq}`);
+        axiosUtils.patch(`/games/minus/${room}`);
         if (socket) {
             socket.disconnect();
         }
@@ -594,8 +616,8 @@ const MafiaGameRoom = ({ room }) => {
         if (socket) {
             // 게임 시작
             console.log("시작");
-            console.log(room.g_seq, "룸번호");
-            socket.emit("startGame", { roomId: room.g_seq, isDaytime: isDaytime });
+            console.log(room, "룸번호");
+            socket.emit("startGame", { roomId: room, isDaytime: isDaytime });
             setIsGameStarted(true); // 펄스 일때만 시작버튼이 보인다.
         }
     };
@@ -610,10 +632,10 @@ const MafiaGameRoom = ({ room }) => {
     };
     const vote = (user) => {
         if (!voteSelect) {
-            console.log("투표", user, room.g_seq);
+            console.log("투표", user, room);
             setVoteSelect(true);
             // 투표 처리 로직 추가
-            socket.emit("vote", { userId: user, roomId: room.g_seq, isDaytime });
+            socket.emit("vote", { userId: user, roomId: room, isDaytime });
             VoreRef.current.style.display = "none";
         } else {
             alert("투표를 할 수 없습니다..");
@@ -646,10 +668,11 @@ const MafiaGameRoom = ({ room }) => {
         InvitaionBox.current.style.display = "none";
     };
     const invitationBtn = async (u_seq) => {
+        console.log(u_seq);
         const data = {
             u_seq: u_seq,
             type: 1,
-            g_seq: room.g_seq,
+            g_seq: room,
         };
 
         try {
@@ -666,150 +689,156 @@ const MafiaGameRoom = ({ room }) => {
 
     return (
         <RoomContainer>
-            <div className="side_zone">
-                <div className="side_box">
-                    <div className="user_box">
-                        {userList
-                            ?.map((item, index) => (
-                                <div key={index} className="user_profile">
-                                    <div className="game_img">
-                                        <img src="/images/profile.png" alt="" />
+            <div className="main_container">
+                <div className="side_zone">
+                    <div className="side_box">
+                        <div className="user_box">
+                            {userList
+                                ?.map((item, index) => (
+                                    <div key={index} className="user_profile">
+                                        <div className="game_img">
+                                            <img src="/images/profile.png" alt="" />
+                                        </div>
+                                        <div className="profile_box">
+                                            <img src="/images/profile.png" alt="" />
+                                            <span>
+                                                <p>
+                                                    게임아이디: {item}
+                                                    {index === 0 && <span> (방장)</span>}
+                                                </p>
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="profile_box">
-                                        <img src="/images/profile.png" alt="" />
-                                        <span>
-                                            <p>
-                                                게임아이디: {item}
-                                                {index === 0 && <span> (방장)</span>}
-                                            </p>
-                                        </span>
+                                ))
+                                .slice(0, 4)}
+                        </div>
+                        <div className="event_zone">
+                            <div className="btn_box">
+                                {isRoomOwner && isRoomFull && !isGameStarted && (
+                                    <button onClick={startGame}>게임 시작</button>
+                                )}
+                                <button onClick={() => inviBtn()}>초대</button>
+                                <div ref={InvitaionBox} className="invitation">
+                                    <div className="close_btn">
+                                        <a onClick={inviOutBtn}>x</a>
                                     </div>
-                                </div>
-                            ))
-                            .slice(0, 4)}
-                    </div>
-                    <div className="event_zone">
-                        <div className="btn_box">
-                            {isRoomOwner && isRoomFull && !isGameStarted && (
-                                <button onClick={startGame}>게임 시작</button>
-                            )}
-                            <button onClick={() => inviBtn()}>초대</button>
-                            <div ref={InvitaionBox} className="invitation">
-                                <div className="close_btn">
-                                    <a onClick={inviOutBtn}>x</a>
-                                </div>
-                                <span>접속중이 유저</span>
-                                {friendList.map((item, index) => (
-                                    <div key={index} className="friend_box">
-                                        <span>{item.id}</span>
-                                        <button onClick={() => invitationBtn(item.u_seq)}>
-                                            초대
-                                        </button>
-                                    </div>
-                                ))}
-                                {/* <div className="friend_box">
+                                    <span>접속중이 유저</span>
+                                    {friendList.map((item, index) => (
+                                        <div key={index} className="friend_box">
+                                            <span>{item.id}</span>
+                                            <button onClick={() => invitationBtn(item.u_seq)}>
+                                                초대
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {/* <div className="friend_box">
                                     <span>친구아이디</span>
                                     <button>초대</button>
-                                </div>
-                                <div className="friend_box">
+                                    </div>
+                                    <div className="friend_box">
                                     <span>친구아이디</span>
                                     <button>초대</button>
-                                </div>
-                                <div className="friend_box">
+                                    </div>
+                                    <div className="friend_box">
                                     <span>친구아이디</span>
                                     <button>초대</button>
                                 </div> */}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="play_zone">
-                <div className="title_box">
-                    <h1>{room.g_title}</h1>
-                    {mafiaList.includes(loginUser.id) && (
-                        <span>마피아는: {mafiaList.join(", ")}</span>
-                    )}{" "}
-                </div>
-                <div className="ment_box">
-                    <span>
-                        게임시간: {formatTime(gameTime)}
-                        {isDaytime ? (
-                            <img className="img_box" src="/images/daytime.gif" alt="" />
-                        ) : (
-                            <img className="img_box" src="/images/night.gif" alt="" />
-                        )}
-                    </span>
-                    <div className="overlay">게임시간: {formatTime(gameTime)}</div>
-                    <div ref={TitleRef} className="job_title"></div>
-                    <div ref={VoreRef} className="vote_box">
-                        {userList.map((item, index) => (
-                            <button key={index} onClick={() => vote(item)}>
-                                {item} 투표
-                            </button>
-                        ))}
+                <div className="play_zone">
+                    <div className="title_box">
+                        <h1>마피아게임방!!</h1>
+                        {mafiaList.includes(loginUser.id) && (
+                            <span>마피아는: {mafiaList.join(", ")}</span>
+                        )}{" "}
                     </div>
-                </div>
-                <div className="chat_box">
-                    <div className="chat_main" ref={chatContainerRef}>
-                        {messages.map((msg, index) => (
-                            <div
-                                key={index}
-                                className={
-                                    msg.isDm === "dm" ? "dm" : msg.isDm === "notice" ? "notice" : ""
-                                }
-                            >
-                                {msg.message ? msg.message : msg}
-                            </div>
-                        ))}
+                    <div className="ment_box">
+                        <span>
+                            게임시간: {formatTime(gameTime)}
+                            {isDaytime ? (
+                                <img className="img_box" src="/images/daytime.gif" alt="" />
+                            ) : (
+                                <img className="img_box" src="/images/night.gif" alt="" />
+                            )}
+                        </span>
+                        <div className="overlay">게임시간: {formatTime(gameTime)}</div>
+                        <div ref={TitleRef} className="job_title"></div>
+                        <div ref={VoreRef} className="vote_box">
+                            {userList.map((item, index) => (
+                                <button key={index} onClick={() => vote(item)}>
+                                    {item} 투표
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                    <div className="chat_input">
-                        <select
-                            id="dm-select"
-                            value={dmTo}
-                            onChange={(e) => setDmTo(e.target.value)}
-                        >
-                            <option value="all">전체</option>
-                            {userOptions}
-                        </select>
-                        <input
-                            type="text"
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            onKeyDown={(e) => (e.key === "Enter" ? sendMessage() : "")}
-                        />
-                        <button onClick={sendMessage}>전송</button>
-                    </div>
-                </div>
-            </div>
-            <div className="side_zone">
-                <div className="side_box">
-                    <div className="user_box">
-                        {userList
-                            ?.map((item, index) => (
-                                <div key={index} className="user_profile">
-                                    <div className="game_img">
-                                        <img src="/images/profile.png" alt="" />
-                                    </div>
-                                    <div className="profile_box">
-                                        <img src="/images/profile.png" alt="" />
-                                        <span>
-                                            <p>
-                                                게임아이디: {item}
-                                                {index === 0 && <span> (방장)</span>}
-                                            </p>
-                                        </span>
-                                    </div>
+                    <div className="chat_box">
+                        <div className="chat_main" ref={chatContainerRef}>
+                            {messages.map((msg, index) => (
+                                <div
+                                    key={index}
+                                    className={
+                                        msg.isDm === "dm"
+                                            ? "dm"
+                                            : msg.isDm === "notice"
+                                            ? "notice"
+                                            : ""
+                                    }
+                                >
+                                    {msg.message ? msg.message : msg}
                                 </div>
-                            ))
-                            .slice(4, 8)}
+                            ))}
+                        </div>
+                        <div className="chat_input">
+                            <select
+                                id="dm-select"
+                                value={dmTo}
+                                onChange={(e) => setDmTo(e.target.value)}
+                            >
+                                <option value="all">전체</option>
+                                {userOptions}
+                            </select>
+                            <input
+                                type="text"
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                onKeyDown={(e) => (e.key === "Enter" ? sendMessage() : "")}
+                            />
+                            <button onClick={sendMessage}>전송</button>
+                        </div>
                     </div>
-                    <div className="event_zone">
-                        <div className="btn_box">
-                            <button ref={VoteBtnRef} className="vote_btn" onClick={voteBtn}>
-                                투표하기
-                            </button>
-                            <button onClick={outBtn}>나가기</button>
+                </div>
+                <div className="side_zone">
+                    <div className="side_box">
+                        <div className="user_box">
+                            {userList
+                                ?.map((item, index) => (
+                                    <div key={index} className="user_profile">
+                                        <div className="game_img">
+                                            <img src="/images/profile.png" alt="" />
+                                        </div>
+                                        <div className="profile_box">
+                                            <img src="/images/profile.png" alt="" />
+                                            <span>
+                                                <p>
+                                                    게임아이디: {item}
+                                                    {index === 0 && <span> (방장)</span>}
+                                                </p>
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))
+                                .slice(4, 8)}
+                        </div>
+                        <div className="event_zone">
+                            <div className="btn_box">
+                                <button ref={VoteBtnRef} className="vote_btn" onClick={voteBtn}>
+                                    투표하기
+                                </button>
+                                <button onClick={outBtn}>나가기</button>
+                            </div>
                         </div>
                     </div>
                 </div>

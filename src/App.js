@@ -12,6 +12,7 @@ import LankingPage from "./pages/LankingPage";
 import FriendInvitationPage from "./pages/FriendInvitationPage";
 import DmPage from "./pages/DmPage";
 import SessionCheck from "./components/main/SessionCheck";
+import MafiaGameRoom from "./components/games/MafiaGameRoom";
 
 function App() {
     const loginUser = useSelector((state) => state.loginReducer.user);
@@ -25,6 +26,10 @@ function App() {
                 <Route
                     path="/games/list/:type"
                     element={LoginUser(loginUser, <GameWaitngList />)}
+                />
+                <Route
+                    path="/games/list/Mafia/:roomId"
+                    element={LoginUser(loginUser, <MafiaGameRoom />)}
                 />
                 <Route path="/users/mypage" element={LoginUser(loginUser, <Mypage />)} />
                 <Route

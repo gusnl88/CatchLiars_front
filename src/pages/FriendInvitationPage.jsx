@@ -135,6 +135,7 @@ export default function FriendInvitationPage() {
     };
 
     const acceptInvitation = async (f_seq, i_seq, i_type) => {
+        console.log("진입",f_seq,i_type)
         try {
             const response = await axiosUtils.post(`/invites/accept`, { f_seq, i_type });
             if (response.data) {
@@ -182,9 +183,9 @@ export default function FriendInvitationPage() {
                         {invitations.length > 0 ? (
                             invitations.map((invite, index) => (
                                 <InvitationItem key={invite.i_seq}>
-                                    {invite.i_type === 0
+                                    {invite.i_type == 0
                                         ? `${nickname[index]} 님이 친구 요청을 보냈습니다.`
-                                        : `${nickname[index]} 님이 게임 초대를 보냈습니다.`}
+                                        : `${nickname[index]} 님이${invite.g_seq}방에 게임 초대를 보냈습니다.`}
                                     <div>
                                         <Nbutton
                                             onClick={() =>
