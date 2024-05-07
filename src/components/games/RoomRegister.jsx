@@ -64,14 +64,11 @@ const RoomRegister = ({ RoomRef, type, setNewRoom, TitleInput }) => {
 
         const res = await axiosUtils.post(`/games`, { title, pw, type });
         if (res.data) {
-            // ocket.emit("join_room", { title, pw, type }); // 방 정보를 소켓으로 전달
-            // window.location.href = "/"; // 홈페이지로 이동
-            // window.location.reload();
             setNewRoom(res.data);
             closeBtn();
             setTitle("");
             setIsPrivate(false);
-            // setGameStart(true);
+            window.location.href = `/games/list/${type?"Mafia":"Catchliars"}/${res.data.g_seq}`;
         }
     };
     const closeBtn = () => {

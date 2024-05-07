@@ -8,9 +8,7 @@ import axiosUtils from "../../utils/axiosUtils";
 import { useLocation } from "react-router-dom";
 
 const RoomListContainer = styled.div`
-    /* width: 90%;
-    height: 90%; */
-    width: ${(props) => (props.pathname === "/games/list/Catchliars" ? "75%" : "90%")};
+    width: ${(props) => (props.pathname === "/games/list/Catchliars" ? "80%" : "90%")};
     height: ${(props) => (props.pathname === "/games/list/Catchliars" ? "97%" : "90%")};
     max-width: 100%;
     max-height: 100%;
@@ -18,7 +16,6 @@ const RoomListContainer = styled.div`
     .game_table {
         border-collapse: collapse;
         width: 100%;
-        opacity: ${(props) => (props.pathname === "/games/list/Catchliars" ? "1" : "")};
         button {
             background-color: #4caf50;
             border: none;
@@ -33,14 +30,12 @@ const RoomListContainer = styled.div`
         th,
         td {
             border: 1px solid #fffcfc;
-
             background-color: ${(props) =>
-                props.pathname === "/games/list/Catchliars" ? "#b2e4ef" : ""};
+                props.pathname === "/games/list/Catchliars" ? "#c6e2e8" : ""};
             padding: 8px;
             text-align: center;
         }
         th {
-            /* background-color: #b15151; */
             background-color: ${(props) =>
                 props.pathname === "/games/list/Catchliars" ? "#5ea3ce" : "#b15151"};
             color: black;
@@ -161,54 +156,51 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     }, [roomLists, pageSize]);
 
     useEffect(() => {
-        if (newRoom != "") {
+        if (newRoom !== "") {
             setRoom(newRoom);
-            setGameStart(type); //새로운 방을 만들었을떄. (인원수는 디폴트1)
+            setGameStart(type); // 새로운 방을 만들었을 때. (인원수는 디폴트 1)
         }
     }, [newRoom]);
 
     const handleJoinRoom = async (room) => {
-        let flag = 1; // 방 입장 가능여부를 의미
-        console.log("room", room);
         if (room.g_pw !== null) {
-            await setSelectedRoom(room);
+            setSelectedRoom(room);
             setShowPasswordModal(true);
         } else {
             if (room.g_type) {
                 // 마피아
                 if (room.g_total >= 8) {
                     alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
-                    flag = 0;
+                    return;
                 }
             } else {
                 // 캐치라이어
                 if (room.g_total >= 6) {
                     alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
-                    flag = 0;
+                    return;
                 }
             }
-            if (flag) {
-                try {
-                    await joinRoom(room);
-                    await setSelectedRoom(room);
-                } catch (error) {
-                    alert("해당 방은 존재하지 않습니다.");
-                    window.location.reload();
-                }
+            try {
+                await joinRoom(room);
+            } catch (error) {
+                alert("해당 방은 존재하지 않습니다.");
+                window.location.reload();
             }
         }
     };
+
     useEffect(() => {
         if (showPasswordModal && InputRef.current) {
             InputRef.current.focus();
         }
     }, [showPasswordModal]);
+
     const joinRoom = async (room) => {
-        // 비밀번호 검사 로직을 통과한 후 입장 처리
         if (room.g_total < 8) {
             await axiosUtils.patch(`/games/plus/${room.g_seq}`);
             setRoom(room);
             setGameStart(type);
+            window.location.href = `/games/list/${type}/${room.g_seq}`;
         } else {
             alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
         }
@@ -216,7 +208,7 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
 
     const handlePasswordSubmit = () => {
         if (password === selectedRoom.g_pw) {
-            joinRoom(selectedRoom.g_seq);
+            joinRoom(selectedRoom);
             setShowPasswordModal(false);
         } else {
             alert("비밀번호가 일치하지 않습니다.");
@@ -225,112 +217,107 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     };
 
     const { pathname } = useLocation();
-    console.log(pathname);
-    return (
-        <>
-            <RoomListContainer pathname={pathname}>
-                {gameStart ? (
-                    gameStart === "Mafia" ? (
-                        <MafiaGameRoom room={room} />
-                    ) : (
-                        <CatchLiarInGame room={room} />
-                    )
-                ) : (
-                    <div>
-                        <div className="header_font">
-                            <h1>{type} Room List</h1>
-                        </div>
-                        <table className="game_table">
-                            <thead>
-                                <tr>
-                                    <th>방 번호</th>
-                                    <th>방 제목</th>
-                                    <th>공개 여부</th>
-                                    <th>인원</th>
-                                    <th>상태</th>
-                                    <th>공백</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {selectedRoomList.map((item) => (
-                                    <tr key={item.g_seq}>
-                                        <td>{item.g_seq}</td>
-                                        <td>{item.g_title}</td>
-                                        <td>{item.g_pw === null ? "공개" : "비공개"}</td>
-                                        <td>
-                                            {item.g_type
-                                                ? `${item.g_total}/8`
-                                                : `${item.g_total}/6`}
-                                        </td>
-                                        <td>
-                                            <span style={{ color: item.g_state ? "green" : "red" }}>
-                                                {item.g_state ? "대기중" : "게임중"}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            {item.g_state ? (
-                                                <button onClick={() => handleJoinRoom(item)}>
-                                                    입장
-                                                </button>
-                                            ) : (
-                                                <span style={{ color: "red" }}>입장불가</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <RoomRegister
-                            RoomRef={RoomRef}
-                            TitleInput={TitleInput}
-                            type={type === "Mafia" ? 1 : 0}
-                            setNewRoom={setNewRoom}
-                        />
 
-                        <div className="room_box">
-                            <button onClick={roomOpenBtn}>방 만들기</button>
-                        </div>
-                        <div className="paging_box">
-                            {pageNumbers.map((number) => (
-                                <button
-                                    key={number}
-                                    onClick={() => handleBtn(number)}
-                                    className={selectedPage === number ? "active" : ""}
-                                >
-                                    {number}
-                                </button>
-                            ))}
-                        </div>
-                        {/* 비밀번호 입력 모달 */}
-                        {showPasswordModal && (
-                            <div className="modal">
-                                <div className="modal-content">
-                                    <button
-                                        onClick={() => {
-                                            setShowPasswordModal(false);
-                                            setPassword("");
-                                        }}
-                                    >
-                                        x
-                                    </button>
-                                    <h2>비밀번호 입력</h2>
-                                    <input
-                                        ref={InputRef}
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        onKeyDown={(e) =>
-                                            e.key === "Enter" ? handlePasswordSubmit() : ""
-                                        }
-                                    />
-                                    <button onClick={handlePasswordSubmit}>확인</button>
-                                </div>
-                            </div>
-                        )}
+    return (
+        <RoomListContainer pathname={pathname}>
+            {gameStart ? (
+                gameStart === "Mafia" ? (
+                    <MafiaGameRoom room={room} />
+                ) : (
+                    <CatchLiarInGame room={room} />
+                )
+            ) : (
+                <div>
+                    <div className="header_font">
+                        <h1>{type} Room List</h1>
                     </div>
-                )}
-            </RoomListContainer>
-        </>
+                    <table className="game_table">
+                        <thead>
+                            <tr>
+                                <th>방 번호</th>
+                                <th>방 제목</th>
+                                <th>공개 여부</th>
+                                <th>인원</th>
+                                <th>상태</th>
+                                <th>공백</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {selectedRoomList.map((item) => (
+                                <tr key={item.g_seq}>
+                                    <td>{item.g_seq}</td>
+                                    <td>{item.g_title}</td>
+                                    <td>{item.g_pw === null ? "공개" : "비공개"}</td>
+                                    <td>
+                                        {item.g_type ? `${item.g_total}/8` : `${item.g_total}/6`}
+                                    </td>
+                                    <td>
+                                        <span style={{ color: item.g_state ? "green" : "red" }}>
+                                            {item.g_state ? "대기중" : "게임중"}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {item.g_state ? (
+                                            <button onClick={() => handleJoinRoom(item)}>
+                                                입장
+                                            </button>
+                                        ) : (
+                                            <span style={{ color: "red" }}>입장불가</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <RoomRegister
+                        RoomRef={RoomRef}
+                        TitleInput={TitleInput}
+                        type={type === "Mafia" ? 1 : 0}
+                        setNewRoom={setNewRoom}
+                    />
+                    <div className="room_box">
+                        <button onClick={roomOpenBtn}>방 만들기</button>
+                    </div>
+                    <div className="paging_box">
+                        {pageNumbers.map((number) => (
+                            <button
+                                key={number}
+                                onClick={() => handleBtn(number)}
+                                className={selectedPage === number ? "active" : ""}
+                            >
+                                {number}
+                            </button>
+                        ))}
+                    </div>
+                    {/* 비밀번호 입력 모달 */}
+                    {showPasswordModal && (
+                        <div className="modal">
+                            <div className="modal-content">
+                                <button
+                                    onClick={() => {
+                                        setShowPasswordModal(false);
+                                        setPassword("");
+                                    }}
+                                >
+                                    x
+                                </button>
+                                <h2>비밀번호 입력</h2>
+                                <input
+                                    ref={InputRef}
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    onKeyDown={(e) =>
+                                        e.key === "Enter" ? handlePasswordSubmit() : ""
+                                    }
+                                />
+                                <button onClick={handlePasswordSubmit}>확인</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+        </RoomListContainer>
     );
 };
 

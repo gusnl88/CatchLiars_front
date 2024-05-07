@@ -134,7 +134,10 @@ export default function FriendInvitationPage() {
         }
     };
 
+
     const acceptInvitation = async (f_seq, i_seq, i_type, g_seq) => {
+
+    
         try {
             const response = await axiosUtils.post(`/invites/accept`, {
                 f_seq: f_seq,
@@ -196,9 +199,11 @@ export default function FriendInvitationPage() {
                         {invitations.length > 0 ? (
                             invitations.map((invite, index) => (
                                 <InvitationItem key={invite.i_seq}>
+
                                     {invite.i_type
                                         ? `${nickname[index]} 님이 게임 초대를 보냈습니다.`
                                         : `${nickname[index]} 님이 친구 요청을 보냈습니다.`}
+
                                     <div>
                                         <Nbutton
                                             onClick={() =>
