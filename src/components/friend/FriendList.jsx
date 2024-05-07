@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import axiosUtils from "../../utils/axiosUtils";
 import { useEffect } from "react";
+import ChattingRoom from "./ChattingRoom";
 
 const MainContainer = styled.div`
     width: 500px;
@@ -67,7 +68,9 @@ const StyledLink = styled.div`
 export default function FriendList() {
     const [friends, setFriends] = useState([]);
     const [expandedIndex, setExpandedIndex] = useState(null);
-    const [showModal, setShowModal] = useState(true); // 모달 상태 변수 추가
+    const [showModal, setShowModal] = useState(true);
+    const [showChattingRoom, setShowChattingRoom] = useState(false); // 채팅방 표시 여부
+    const [currentRoomId, setCurrentRoomId] = useState(null); // 현재 채팅방 ID
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -84,6 +87,13 @@ export default function FriendList() {
 
         return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 해제
     }, []);
+
+    const sendMessage = (roomId) => {
+        setCurrentRoomId(roomId); // 현재 채팅방 ID 설정
+        setShowChattingRoom(true); // 채팅방을 보여줍니다.
+    };
+
+    const closeModal = () => setShowModal(false);
 
     const deleteFriend = async (u_seq) => {
         try {
@@ -114,9 +124,9 @@ export default function FriendList() {
         setExpandedIndex(index === expandedIndex ? null : index);
     };
 
-    const closeModal = () => {
-        setShowModal(false); // showModal 상태 변경
-    };
+    if (showChattingRoom) {
+        return <ChattingRoom roomId={currentRoomId} setShowChattingRoom={setShowChattingRoom} />;
+    }
 
     return (
         showModal && (
@@ -138,13 +148,11 @@ export default function FriendList() {
 
                                 {expandedIndex === index && (
                                     <Buttondiv>
-                                        <StyledLink>
-                                            <a>메시지 전송</a>
+                                        <StyledLink onClick={() => sendMessage(item.roomId)}>
+                                            메시지 전송
                                         </StyledLink>
-                                        <StyledLink>
-                                            <a onClick={() => deleteFriend(item.u_seq)}>
-                                                친구 삭제
-                                            </a>
+                                        <StyledLink onClick={() => deleteFriend(item.u_seq)}>
+                                            친구 삭제
                                         </StyledLink>
                                     </Buttondiv>
                                 )}

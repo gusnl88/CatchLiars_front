@@ -134,22 +134,36 @@ export default function FriendInvitationPage() {
         }
     };
 
-    const acceptInvitation = async (f_seq, i_seq, i_type) => {
+    const acceptInvitation = async (f_seq, i_seq, i_type, g_seq) => {
         try {
-            const response = await axiosUtils.post(`/invites/accept`, { f_seq, i_type });
-            if (response.data) {
-                if (i_type === 1) {
-                    // 게임 초대 수락 시, 게임 방으로 이동
-                    // 게임 방 경로에 따라 수정 필요
-                } else {
-                    // 일반 친구 요청 수락
-                    setModalMessage("친구가 추가되었습니다.");
-                    setModalOpen(true);
+            const response = await axiosUtils.post(`/invites/accept`, {
+                f_seq: f_seq,
+                type: i_type, // 'type'으로 명확하게 서버에 전달
+                g_seq: g_seq,
+            });
+
+            if (response.data === true) {
+                // 성공적으로 초대를 수락했다면,
+                if (i_type === 0) {
+                    // 친구 초대인 경우
+                    alert("친구가 추가되었습니다.");
+                } else if (i_type === 1) {
+                    // 게임 초대인 경우
+                    alert("게임 방으로 이동합니다.");
+                    window.location.href = `/games/list/${i_type}/${g_seq}`;
+                    // 예를 들어, 게임 방 페이지로 리다이렉트
+                    // window.location.href = `/game-room/${someRoomId}`;
                 }
-                deleteInvitation(i_seq); // 초대 수락 후 삭제
+                // 초대를 데이터베이스에서 삭제
+                deleteInvitation(i_seq);
+            } else {
+                // 서버에서 초대 수락을 처리하지 못한 경우
+                alert(response.data);
+                setModalOpen(true);
             }
-        } catch (err) {
-            setModalMessage("초대 수락에 실패했습니다.");
+        } catch (error) {
+            console.error("초대 수락에 실패했습니다:", error);
+            alert("초대 수락에 실패했습니다.");
             setModalOpen(true);
         }
     };
@@ -182,9 +196,9 @@ export default function FriendInvitationPage() {
                         {invitations.length > 0 ? (
                             invitations.map((invite, index) => (
                                 <InvitationItem key={invite.i_seq}>
-                                    {invite.i_type === 0
-                                        ? `${nickname[index]} 님이 친구 요청을 보냈습니다.`
-                                        : `${nickname[index]} 님이 게임 초대를 보냈습니다.`}
+                                    {invite.i_type
+                                        ? `${nickname[index]} 님이 게임 초대를 보냈습니다.`
+                                        : `${nickname[index]} 님이 친구 요청을 보냈습니다.`}
                                     <div>
                                         <Nbutton
                                             onClick={() =>
