@@ -62,6 +62,15 @@ function CatchLiarInGame({ room }) {
     };
 
     useEffect(() => {
+        if (!gameStarted) {
+            setTimerCount(20);
+            setRound(1);
+            setCurrentPlayer(1);
+        }
+        setTimer(true);
+    }, [gameStarted]);
+
+    useEffect(() => {
         let interval;
         if (!timer) {
             interval = setInterval(() => {
@@ -151,6 +160,7 @@ function CatchLiarInGame({ room }) {
     useEffect(() => {
         if (gameStarted) {
             // 타이머 시작
+            // setTimer(true);
             let interval;
             if (gameStarted && remainTime > 0 && currentPlayer <= players.length && round <= 2) {
                 interval = setInterval(() => {
