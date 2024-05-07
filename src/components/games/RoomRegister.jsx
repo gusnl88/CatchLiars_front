@@ -31,7 +31,7 @@ const RoomRegisterContainer = styled.div`
         align-items: center;
         justify-content: center;
         height: 100%;
-        input {
+        .formInput {
             margin: 5px;
             padding: 5px;
             border-radius: 5px;
@@ -45,6 +45,11 @@ const RoomRegisterContainer = styled.div`
             background-color: #4caf50;
             color: white;
             cursor: pointer;
+        }
+    }
+    @media (max-width: 768px) {
+        .formInput {
+            width: 5rem;
         }
     }
 `;
@@ -83,6 +88,7 @@ const RoomRegister = ({ RoomRef, type, setNewRoom, TitleInput }) => {
                 </div>
                 <form onSubmit={handleSubmit}>
                     <input
+                        className="formInput"
                         type="text"
                         placeholder="방 제목"
                         ref={TitleInput}
@@ -91,21 +97,20 @@ const RoomRegister = ({ RoomRef, type, setNewRoom, TitleInput }) => {
                         required
                         maxLength={20}
                     />
-                    <label>
-                        비공개
-                        <input
-                            type="checkbox"
-                            checked={isPrivate}
-                            onChange={(e) => {
-                                setIsPrivate(e.target.checked);
-                                if (!e.target.checked) {
-                                    setPw(null); // 비공개 체크 해제 시, 비밀번호 초기화
-                                }
-                            }}
-                        />
-                    </label>
+                    <p>비공개</p>
+                    <input
+                        type="checkbox"
+                        checked={isPrivate}
+                        onChange={(e) => {
+                            setIsPrivate(e.target.checked);
+                            if (!e.target.checked) {
+                                setPw(null); // 비공개 체크 해제 시, 비밀번호 초기화
+                            }
+                        }}
+                    />
                     {isPrivate && (
                         <input
+                            className="formInput"
                             type="password"
                             placeholder="비밀번호"
                             value={pw}

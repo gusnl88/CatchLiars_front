@@ -200,6 +200,11 @@ const HeaderPage = styled.header`
         padding: 20px;
         border: 1px solid black;
     }
+    @media (max-width: 768px) {
+        .link_btn {
+            font-size: 9px;
+        }
+    }
 `;
 
 const DeleteButton = styled.button`

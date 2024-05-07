@@ -14,7 +14,7 @@ const Maincontainer = styled.div`
     .chatting_container {
         width: 95%;
         height: 95%;
-        background: #9298a6f5;
+        background: #9298a6ba;
         border-radius: 10px;
         display: flex;
         flex-direction: column;

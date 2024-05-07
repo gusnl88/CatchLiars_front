@@ -111,6 +111,27 @@ const RoomListContainer = styled.div`
             margin: 15px;
         }
     }
+    @media (max-width: 768px) {
+        .game_table {
+            font-size: 9px;
+            button {
+                width: 1rem;
+            }
+        }
+        .room_box {
+            button {
+                padding: 5px;
+                font-size: 10px;
+                margin: 5px;
+            }
+        }
+        .paging_box {
+            button {
+                padding: 5px;
+                margin: 5px;
+            }
+        }
+    }
 `;
 
 const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSize, type }) => {
