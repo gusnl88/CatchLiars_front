@@ -60,17 +60,19 @@ export default function FriendList() {
     const [expandedIndex, setExpandedIndex] = useState(null); // State to track expanded friend item index
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchFriends = async () => {
             try {
-                const res = await axiosUtils.get("/friends"); // Fetch friends data
-                console.log(res.data);
-                setFriends(res.data); // Store the data in state
+                const response = await axiosUtils.get("/friends");
+                setFriends(response.data);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.error("Error fetching friends:", error);
             }
         };
 
-        fetchData();
+        fetchFriends();
+        const intervalId = setInterval(fetchFriends, 1000); // 30초마다 친구 목록 갱신
+
+        return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 해제
     }, []);
 
     const deleteFriend = async (u_seq) => {

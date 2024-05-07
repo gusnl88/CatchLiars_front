@@ -281,7 +281,53 @@ const ButtonDiv = styled.div`
         align-items: center; // 센터 정렬로 버튼 정렬
     }
 `;
+
+const PasswordModalOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+`;
+
+const PasswordModalContent = styled.div`
+    width: 500px;
+    height: 200px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex; // Flexbox 레이아웃 활성화
+    flex-direction: column; // 요소들을 수직으로 정렬
+    justify-content: center; // 내부 요소들을 수직 방향 중앙으로 정렬
+    align-items: center; // 내부 요소들을 수평 방향 중앙으로 정렬
+    border: 5px solid #00154b; // 테두리 추가
+`;
+
+const ModalBody = styled.div`
+    width: 100%; // 바디의 너비를 모달과 동일하게 설정
+    padding: 20px; // 내부 패딩
+    display: flex; // Flexbox 레이아웃 활성화
+    flex-direction: column; // 요소들을 수직으로 정렬
+    justify-content: center; // 내부 요소들을 수직 방향 중앙으로 정렬
+    align-items: center; // 내부 요소들을 수평 방향 중앙으로 정렬
+`;
+
+const ModalBody2 = styled.div`
+    width: 100%; // 바디의 너비를 모달과 동일하게 설정
+    padding: 20px; // 내부 패딩
+    display: flex; // Flexbox 레이아웃 활성화
+    /* flex-direction: column; // 요소들을 수직으로 정렬 */
+    justify-content: center; // 내부 요소들을 수직 방향 중앙으로 정렬
+    align-items: center; // 내부 요소들을 수평 방향 중앙으로 정렬
+`;
 export default function Header() {
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [invitateCheck, setInvitateCheck] = useState(false);
     const [errors, setErrors] = useState({});
     const dispatch = useDispatch();
@@ -298,6 +344,13 @@ export default function Header() {
     const [invitations, setInvitations] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageUrl, setImageUrl] = useState(""); // 업로드된 이미지 URL을 상태로 관리
+    const [updateModalOpen, setUpdateModalOpen] = useState(false);
+    const [updateMessage, setUpdateMessage] = useState("");
+
+    const handleFileChange = (event) => {
+        console.log(event.target.files[0]); // 로그로 선택된 파일 표시
+        // 파일 처리 로직 추가
+    };
 
     useEffect(() => {
         const fetchInvitations = async () => {
@@ -309,7 +362,13 @@ export default function Header() {
             }
         };
 
+        // 최초 마운트 시 초대 목록 가져오기
         fetchInvitations();
+        // 30초 간격으로 초대 목록 갱신하기
+        const intervalId = setInterval(fetchInvitations, 1000); // 30초마다 초대 목록 갱신
+
+        // 컴포넌트 언마운트 시 인터벌 해제
+        return () => clearInterval(intervalId);
     }, []);
 
     const invitateBtn = () => {
@@ -356,18 +415,26 @@ export default function Header() {
             });
 
             if (response.data === true) {
-                alert("프로필이 업데이트되었습니다.");
-                setIsEditing(false); // Editing mode off
-                setUser({ ...user, nickname: updatedNickname }); // Update local state
-                setNewPassword(""); // 폼에서 비밀번호 필드 초기화
+                setUser({
+                    ...user,
+                    nickname: updatedNickname,
+                    image: response.data.imageUrl || user.image,
+                });
+                setImageUrl(response.data.imageUrl || imageUrl);
+                setUpdateMessage("프로필이 업데이트되었습니다.");
+                setUpdateModalOpen(true);
+                setIsEditing(false);
+                setNewPassword("");
                 setPassword("");
                 setNewNickname(updatedNickname);
             } else {
-                alert("업데이트 실패: " + response.data.message);
+                setUpdateMessage("업데이트 실패: " + response.data.message);
+                setUpdateModalOpen(true);
             }
         } catch (error) {
             console.error("Error updating profile:", error);
-            alert("프로필 업데이트 중 에러가 발생했습니다.");
+            setUpdateMessage("프로필 업데이트 중 에러가 발생했습니다.");
+            setUpdateModalOpen(true);
         }
     };
 
@@ -384,6 +451,17 @@ export default function Header() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    const UpdateModal = () => (
+        <PasswordModalOverlay onClick={() => setUpdateModalOpen(false)}>
+            <PasswordModalContent onClick={(e) => e.stopPropagation()}>
+                <ModalBody>
+                    <p>{updateMessage}</p>
+                    <button onClick={() => setUpdateModalOpen(false)}>확인</button>
+                </ModalBody>
+            </PasswordModalContent>
+        </PasswordModalOverlay>
+    );
 
     const handleLogout = () => {
         axiosUtils.patch(`/users/stateFalse`, { withCredentials: true });
@@ -435,40 +513,53 @@ export default function Header() {
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
+        if (!isModalOpen) {
+            // 모달을 다시 열 때 상태를 갱신하여 변경사항을 반영
+        }
         setIsEditing(false); // Reset editing state
     };
 
     const startEditing = () => {
-        setIsEditing(true);
+        setIsEditing(true); // 편집 모드를 활성화
+        setIsPasswordModalOpen(false); // 비밀번호 확인 모달은 닫기
     };
 
     const handleImageChange = (event) => {
         setSelectedImage(event.target.files[0]);
     };
 
-    // 서버로 이미지 파일을 전송하고 업데이트하는 함수
     const handleImageUpload = async () => {
+        if (!selectedImage) {
+            alert("이미지를 선택하세요.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("id", user.id);
+        formData.append("fileInput", selectedImage);
+
         try {
-            if (!selectedImage) {
-                console.error("이미지를 선택하세요.");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append("id", user.id);
-            formData.append("fileInput", selectedImage);
-
-            await axiosUtils.patch("/users/myPage/image", formData, {
+            const response = await axiosUtils.patch("/users/mypage/image", formData, {
                 withCredentials: true,
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
 
-            console.log("프로필 이미지가 업데이트되었습니다.");
-            // 프로필 이미지 업데이트 후 필요한 작업을 수행할 수 있습니다.
+            if (response.status === 200) {
+                // 서버로부터 받은 응답에서 이미지 URL을 추출
+                const newImageUrl = `${user.image}`; // 예: response.data.imageUrl
+                // console.log(newImageUrl);
+                console.log("프로필 이미지가 업데이트되었습니다.");
+                setImageUrl(newImageUrl); // 이미지 URL 상태 업데이트
+                setUser({ ...user, image: newImageUrl }); // 사용자 객체 업데이트
+                toggleModal(); // 모달 창 닫기
+            } else {
+                alert("이미지 업데이트에 실패했습니다.");
+            }
         } catch (error) {
             console.error("프로필 이미지 업데이트 실패:", error);
+            alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");
         }
     };
 
@@ -500,8 +591,43 @@ export default function Header() {
         }
     };
 
+    const togglePasswordModal = () => {
+        setIsPasswordModalOpen(!isPasswordModalOpen);
+    };
+
+    const handlePasswordSubmit = async (event) => {
+        event.preventDefault();
+
+        const updatedPassword = password.trim();
+
+        try {
+            const payload = {
+                id: user.id,
+                currentPassword: updatedPassword,
+            };
+
+            // 서버에 비밀번호 확인 요청 보내기
+            const response = await axiosUtils.patch("/users/myPage", payload, {
+                withCredentials: true,
+            });
+
+            // 비밀번호 일치 확인
+            if (response.status === 200) {
+                startEditing(); // 비밀번호 일치 시 편집 모드 시작
+            } else {
+                throw new Error("비밀번호가 일치하지 않습니다.");
+            }
+        } catch (error) {
+            // 서버 응답에서 제공하는 오류 메시지를 통해 사용자에게 구체적 정보 제공
+            const errorMessage = error.response?.data || "비밀번호 확인 중 문제가 발생했습니다.";
+            alert(errorMessage);
+            console.error("비밀번호 확인 중 에러 발생:", error);
+        }
+    };
+
     return (
         <HeaderPage>
+            {updateModalOpen && <UpdateModal />}
             <div className="img_box">
                 <Link to="/">
                     <img src="/images/logo.png" alt="" />
@@ -529,14 +655,12 @@ export default function Header() {
                                 <Container>마이페이지</Container>
                                 <Box>
                                     <Emptydiv></Emptydiv>
-                                    {imageUrl ? (
-                                        <ProfileImage src={imageUrl} alt="Profile Image" />
-                                    ) : (
-                                        <ProfileImage
-                                            src="/images/userprofile.jpg"
-                                            alt="Profile Image"
-                                        />
-                                    )}
+
+                                    <ProfileImage
+                                        src={`${process.env.REACT_APP_API_SERVER}/${user.image}`}
+                                        alt="Profile Image"
+                                    />
+
                                     {!isEditing ? (
                                         <InfoDiv>
                                             <div>아이디: {user.id}</div>
@@ -544,9 +668,40 @@ export default function Header() {
                                             <div>이메일: {user.email}</div>
                                             <div>점수: {user.score}</div>
                                             <ButtonDiv>
-                                                <SaveButton onClick={startEditing}>
+                                                <SaveButton onClick={togglePasswordModal}>
                                                     수정하기
                                                 </SaveButton>
+                                                {isPasswordModalOpen && (
+                                                    <PasswordModalOverlay>
+                                                        <PasswordModalContent>
+                                                            <form onSubmit={handlePasswordSubmit}>
+                                                                <label htmlFor="password">
+                                                                    현재 비밀번호:
+                                                                </label>
+                                                                <input
+                                                                    id="password"
+                                                                    type="password"
+                                                                    onChange={(e) =>
+                                                                        setPassword(e.target.value)
+                                                                    }
+                                                                    required
+                                                                />
+                                                                <ModalBody2>
+                                                                    <button type="submit">
+                                                                        확인
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={
+                                                                            togglePasswordModal
+                                                                        }
+                                                                    >
+                                                                        취소
+                                                                    </button>
+                                                                </ModalBody2>
+                                                            </form>
+                                                        </PasswordModalContent>
+                                                    </PasswordModalOverlay>
+                                                )}
                                                 {isAuthenticated ? (
                                                     <DeleteButton onClick={handleDeleteUser}>
                                                         회원 탈퇴
@@ -568,8 +723,8 @@ export default function Header() {
                                                     {"닉네임 :"}
                                                     <Input
                                                         type="text"
-                                                        placeholder="새 닉네임"
-                                                        // value={newNickname}
+                                                        placeholder={user.nickname}
+                                                        // value={user.nickname}
                                                         onChange={(e) =>
                                                             setNewNickname(e.target.value)
                                                         }
@@ -584,22 +739,9 @@ export default function Header() {
                                                     </CheckButton>
                                                     <span>{availabilityMessages.nickname}</span>
                                                 </div>
+
                                                 <div>
-                                                    {"현재 비밀번호 :"}
-                                                    <Input
-                                                        type="password"
-                                                        placeholder="현재 비밀번호"
-                                                        value={password}
-                                                        onChange={(e) =>
-                                                            setPassword(e.target.value)
-                                                        }
-                                                        required
-                                                        maxLength={10}
-                                                    />
-                                                    {/* <span>{availabilityMessages.pw}</span> */}
-                                                </div>
-                                                <div>
-                                                    {"새 비밀번호  :"}
+                                                    {"비밀번호  :"}
                                                     <Input
                                                         type="password"
                                                         placeholder="새 비밀번호"
@@ -635,15 +777,26 @@ export default function Header() {
                                                     />
                                                     <span>{availabilityMessages.pw}</span>
                                                 </div>
-                                                <SaveButton type="submit">저장하기</SaveButton>
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleImageChange}
-                                                />
-                                                <button onClick={handleImageUpload}>
-                                                    이미지 변경
-                                                </button>
+                                                <div>
+                                                    {"프로필 이미지 수정  :"}
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={handleImageChange}
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <SaveButton onClick={handleImageUpload}>
+                                                        저장하기
+                                                    </SaveButton>
+                                                    {/* <SaveButton type="submit">저장하기</SaveButton> */}
+                                                    <DeleteButton
+                                                        onClick={() => setIsEditing(false)}
+                                                    >
+                                                        뒤로가기
+                                                    </DeleteButton>
+                                                </div>
                                             </form>
                                         </InfoDiv>
                                     )}
