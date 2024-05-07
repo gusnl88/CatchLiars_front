@@ -2,6 +2,44 @@ import React, { useEffect, useState } from "react";
 import axiosUtils from "../utils/axiosUtils";
 import styled from "styled-components";
 
+const Modal = ({ isOpen, message, onClose }) => {
+    if (!isOpen) return null;
+
+    return (
+        <ModalOverlay onClick={onClose}>
+            <ModalContent onClick={(e) => e.stopPropagation()}>
+                <p>{message}</p>
+                <button onClick={onClose}>확인</button>
+            </ModalContent>
+        </ModalOverlay>
+    );
+};
+
+const ModalOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+`;
+
+const ModalContent = styled.div`
+    width: 300px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+`;
+
 const InvitationItem = styled.li`
     margin-bottom: 10px;
     display: flex;
@@ -74,6 +112,8 @@ export default function FriendInvitationPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(true);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
 
     useEffect(() => {
         fetchInvitations();
@@ -94,15 +134,23 @@ export default function FriendInvitationPage() {
         }
     };
 
-    const acceptInvitation = async (f_seq, i_seq) => {
+    const acceptInvitation = async (f_seq, i_seq, i_type) => {
         try {
-            const response = await axiosUtils.post(`/invites/accept`, { f_seq, type: 0 });
+            const response = await axiosUtils.post(`/invites/accept`, { f_seq, i_type });
             if (response.data) {
-                alert("친구가 추가되었습니다.");
+                if (i_type === 1) {
+                    // 게임 초대 수락 시, 게임 방으로 이동
+                    // 게임 방 경로에 따라 수정 필요
+                } else {
+                    // 일반 친구 요청 수락
+                    setModalMessage("친구가 추가되었습니다.");
+                    setModalOpen(true);
+                }
                 deleteInvitation(i_seq); // 초대 수락 후 삭제
             }
         } catch (err) {
-            alert("초대 수락에 실패했습니다.");
+            setModalMessage("초대 수락에 실패했습니다.");
+            setModalOpen(true);
         }
     };
 
@@ -134,11 +182,17 @@ export default function FriendInvitationPage() {
                         {invitations.length > 0 ? (
                             invitations.map((invite, index) => (
                                 <InvitationItem key={invite.i_seq}>
-                                    {nickname[index]} 님이 친구 요청을 보냈습니다.
+                                    {invite.i_type === 0
+                                        ? `${nickname[index]} 님이 친구 요청을 보냈습니다.`
+                                        : `${nickname[index]} 님이 게임 초대를 보냈습니다.`}
                                     <div>
                                         <Nbutton
                                             onClick={() =>
-                                                acceptInvitation(invite.f_seq, invite.i_seq)
+                                                acceptInvitation(
+                                                    invite.f_seq,
+                                                    invite.i_seq,
+                                                    invite.i_type
+                                                )
                                             }
                                         >
                                             수락

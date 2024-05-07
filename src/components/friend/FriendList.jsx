@@ -72,7 +72,6 @@ export default function FriendList() {
     useEffect(() => {
         const fetchFriends = async () => {
             try {
-
                 const res = await axiosUtils.get("/friends");
                 setFriends(res.data);
             } catch (error) {
@@ -104,7 +103,7 @@ export default function FriendList() {
 
     const fetchFriends = async () => {
         try {
-            const res = await axiosUtils.get("/friends");
+            const res = await axiosUtils.get("/friends/list");
             setFriends(res.data);
         } catch (error) {
             console.error("Error fetching friends:", error);
