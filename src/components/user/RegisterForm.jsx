@@ -6,9 +6,9 @@ import styled, { css } from "styled-components";
 
 const responsiveContainer = css`
     width: 100%; // 기본으로 90% 사용
-    @media (min-width: 768px) {
+    @media (max-width: 768px) {
         // 태블릿
-        width: 70%;
+        width: 80%;
     }
     @media (min-width: 1024px) {
         // 데스크탑
@@ -16,6 +16,15 @@ const responsiveContainer = css`
     }
 `;
 
+const Label = styled.label`
+    @media (max-width: 768px) {
+        font-size: 0.8em;
+    }
+
+    @media (min-width: 1024px) {
+        font-size: 1em;
+    }
+`;
 const MainContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -47,8 +56,16 @@ const Text = styled.div`
     font-size: 1em;
     color: #666;
     line-height: 1.5;
-    text-align: justify; // 양쪽 정렬
-    margin: 0 20px; // 좌우 여백
+    text-align: justify;
+    margin: 0 20px;
+
+    @media (max-width: 768px) {
+        font-size: 0.4em;
+    }
+
+    @media (min-width: 1024px) {
+        font-size: 1.2em;
+    }
 `;
 const IdContainer = styled.div`
     display: flex; // 이 줄을 추가하여 flexbox 레이아웃을 활용
@@ -70,14 +87,22 @@ const Inputid = styled.input`
 `;
 
 const CheckButton = styled.button`
-    padding: 8px 10px; // Inputid와 동일한 패딩을 적용
-    /* margin-top: 5px; */
-    margin-left: 5px;
-    cursor: pointer; // 버튼에 마우스 오버시 커서 변경
-    background-color: #007bff; // 배경 색상 설정
-    color: white; // 텍스트 색상 설정
+    padding: 8px 10px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
     border: none;
-    border-radius: 4px; // 테두리 둥글게 처리
+    border-radius: 4px;
+
+    @media (max-width: 768px) {
+        padding: 6px 8px;
+        font-size: 0.8em;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 10px 12px;
+        font-size: 1em;
+    }
 `;
 const PwContainer = styled.div`
     display: flex; // 이 줄을 추가하여 flexbox 레이아웃을 활용
@@ -325,7 +350,7 @@ function RegisterForm() {
                 <form onSubmit={handleSubmit}>
                     <IdContainer>
                         <DivId>
-                            <label htmlFor="id">ID:</label>
+                            <Label htmlFor="id">ID:</Label>
                         </DivId>
                         <Inputid
                             type="text"
@@ -337,13 +362,13 @@ function RegisterForm() {
                             maxLength={12}
                         />
                         <CheckButton type="button" onClick={() => checkDuplicate("id")}>
-                            Check ID
+                            Check
                         </CheckButton>
                         <span>{availabilityMessages.id}</span>
                     </IdContainer>
                     <PwContainer>
                         <DivPw>
-                            <label htmlFor="pw">Password:</label>
+                            <Label htmlFor="pw">Password:</Label>
                         </DivPw>
                         <Inputpw
                             type="password"
@@ -358,7 +383,7 @@ function RegisterForm() {
                     </PwContainer>
                     <NmContainer>
                         <DivNm>
-                            <label htmlFor="nickname">Nickname:</label>
+                            <Label htmlFor="nickname">Nickname:</Label>
                         </DivNm>
                         <Inputnm
                             type="text"
@@ -369,13 +394,13 @@ function RegisterForm() {
                             required
                         />
                         <CheckButton type="button" onClick={() => checkDuplicate("nickname")}>
-                            Check nickname
+                            Check
                         </CheckButton>
                         <span>{availabilityMessages.nickname}</span>
                     </NmContainer>
                     <EmContainer>
                         <DivEm>
-                            <label htmlFor="email">Email:</label>
+                            <Label htmlFor="email">Email:</Label>
                         </DivEm>
                         <Inputem
                             type="email"
@@ -386,7 +411,7 @@ function RegisterForm() {
                             required
                         />
                         <CheckButton type="button" onClick={() => checkDuplicate("email")}>
-                            Check Email
+                            Check
                         </CheckButton>
                         <span>{availabilityMessages.email}</span>
                     </EmContainer>

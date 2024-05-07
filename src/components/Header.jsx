@@ -25,6 +25,12 @@ const ProfileImage = styled.img`
     border-radius: 50%; // 원형으로 만들기
     margin-bottom: 20px; // 이미지 아래 마진 추가
     object-fit: cover; // 이미지 비율 유지하면서 요소에 꽉 차게 채우기
+
+    @media (max-width: 768px) {
+        width: 100px; // 작은 화면에서 이미지 크기 축소
+        height: 100px;
+        margin-bottom: 10px; // 작은 화면에서 이미지 마진 축소
+    }
 `;
 
 const InfoDiv = styled.div`
@@ -106,6 +112,16 @@ const CheckButton = styled.button`
     color: white; // 텍스트 색상 설정
     border: none;
     border-radius: 4px; // 테두리 둥글게 처리
+
+    @media (max-width: 768px) {
+        padding: 6px 8px;
+        font-size: 0.8em;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 10px 12px;
+        font-size: 1em;
+    }
 `;
 
 const ModalContent = styled.div`
@@ -206,7 +222,15 @@ const HeaderPage = styled.header`
         }
     }
 `;
+const Label = styled.label`
+    @media (max-width: 768px) {
+        font-size: 0.8em;
+    }
 
+    @media (min-width: 1024px) {
+        font-size: 1em;
+    }
+`;
 const DeleteButton = styled.button`
     padding: 10px 20px;
     background-color: #f44336; // 빨간색
@@ -229,6 +253,16 @@ const DeleteButton = styled.button`
     &:focus {
         outline: none; // 포커스 시 외곽선 제거
         box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.5); // 포커스 시 그림자 효과
+    }
+
+    @media (max-width: 768px) {
+        padding: 6px 8px;
+        font-size: 0.8em;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 10px 12px;
+        font-size: 1em;
     }
 `;
 
@@ -260,6 +294,16 @@ const SaveButton = styled.button`
         background-color: #ccc;
         cursor: not-allowed;
     }
+
+    @media (max-width: 768px) {
+        padding: 6px 8px;
+        font-size: 0.8em;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 10px 12px;
+        font-size: 1em;
+    }
 `;
 const ErrorSpan = styled.span`
     color: red;
@@ -282,7 +326,7 @@ const ButtonDiv = styled.div`
 
     @media (max-width: 768px) {
         // 태블릿 및 모바일 화면에서
-        flex-direction: column; // 버튼을 세로로 배치
+
         align-items: center; // 센터 정렬로 버튼 정렬
     }
 `;
@@ -431,6 +475,7 @@ export default function Header() {
                 setNewPassword("");
                 setPassword("");
                 setNewNickname(updatedNickname);
+                setIsModalOpen(false);
             } else {
                 setUpdateMessage("업데이트 실패: " + response.data.message);
                 setUpdateModalOpen(true);
@@ -550,20 +595,19 @@ export default function Header() {
                 },
             });
 
+            console.log("서버 응답:", response.data); // 응답 전체를 로그로 출력
+
             if (response.status === 200) {
-                // 서버로부터 받은 응답에서 이미지 URL을 추출
-                const newImageUrl = `${user.image}`; // 예: response.data.imageUrl
-                // console.log(newImageUrl);
-                console.log("프로필 이미지가 업데이트되었습니다.");
-                setImageUrl(newImageUrl); // 이미지 URL 상태 업데이트
-                setUser({ ...user, image: newImageUrl }); // 사용자 객체 업데이트
-                toggleModal(); // 모달 창 닫기
+                const newImageUrl = response.data.imageUrl; // 응답 구조에 따라 경로 조정 필요
+                console.log("새로운 이미지 URL:", newImageUrl);
+                setImageUrl(newImageUrl);
+                setUser({ ...user, image: newImageUrl });
             } else {
                 alert("이미지 업데이트에 실패했습니다.");
             }
         } catch (error) {
             console.error("프로필 이미지 업데이트 실패:", error);
-            alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");
+            // alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");
         }
     };
 
@@ -667,10 +711,10 @@ export default function Header() {
 
                                     {!isEditing ? (
                                         <InfoDiv>
-                                            <div>아이디: {user.id}</div>
-                                            <div>닉네임: {user.nickname}</div>
-                                            <div>이메일: {user.email}</div>
-                                            <div>점수: {user.score}</div>
+                                            <Label>아이디: {user.id}</Label>
+                                            <Label>닉네임: {user.nickname}</Label>
+                                            <Label>이메일: {user.email}</Label>
+                                            <Label>점수: {user.score}</Label>
                                             <ButtonDiv>
                                                 <SaveButton onClick={togglePasswordModal}>
                                                     수정하기
@@ -679,9 +723,9 @@ export default function Header() {
                                                     <PasswordModalOverlay>
                                                         <PasswordModalContent>
                                                             <form onSubmit={handlePasswordSubmit}>
-                                                                <label htmlFor="password">
+                                                                <Label htmlFor="password">
                                                                     현재 비밀번호:
-                                                                </label>
+                                                                </Label>
                                                                 <input
                                                                     id="password"
                                                                     type="password"
@@ -708,7 +752,7 @@ export default function Header() {
                                                 )}
                                                 {isAuthenticated ? (
                                                     <DeleteButton onClick={handleDeleteUser}>
-                                                        회원 탈퇴
+                                                        회원탈퇴
                                                     </DeleteButton>
                                                 ) : (
                                                     <Link onClick={handleLogout}></Link> // 로그인 링크로 변경
@@ -720,11 +764,11 @@ export default function Header() {
                                             {" "}
                                             <form onSubmit={handleUpdateProfile}>
                                                 <div>
-                                                    {"아이디 :"}
+                                                    <Label>아이디 :</Label>
                                                     <Input type="text" value={user.id} disabled />
                                                 </div>
                                                 <div>
-                                                    {"닉네임 :"}
+                                                    <Label>닉네임 :</Label>
                                                     <Input
                                                         type="text"
                                                         placeholder={user.nickname}
@@ -745,7 +789,7 @@ export default function Header() {
                                                 </div>
 
                                                 <div>
-                                                    {"비밀번호  :"}
+                                                    <Label>비밀번호 :</Label>
                                                     <Input
                                                         type="password"
                                                         placeholder="새 비밀번호"
@@ -782,7 +826,7 @@ export default function Header() {
                                                     <span>{availabilityMessages.pw}</span>
                                                 </div>
                                                 <div>
-                                                    {"프로필 이미지 수정  :"}
+                                                    <Label>프로필 이미지 수정 :</Label>
                                                     <input
                                                         type="file"
                                                         accept="image/*"

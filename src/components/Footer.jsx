@@ -53,28 +53,15 @@ export default function Footer() {
             setChattingCheck(false);
         }
     };
-    const chattingBtn = () => {
-        chattingCheck ? setChattingCheck(false) : setChattingCheck(true);
-        if (friendCheck) {
-            setFriendCheck(false);
-        }
-    };
-
     const { pathname } = useLocation();
     console.log(pathname);
     return (
         <Footers pathname={pathname}>
             <StyledLink>
-                <a onClick={chattingBtn}>채팅</a>
-            </StyledLink>
-            {chattingCheck ? <ChattingList /> : ""}
-            {/* <StyledLink to="/users/friends">친구목록</StyledLink> */}
-            <StyledLink>
                 <a onClick={friendBtn}>친구목록</a>
             </StyledLink>
             {friendCheck ? <FriendList /> : ""}
 
-            {/* <StyledLink to="/users/friends/accept">초대</StyledLink> */}
         </Footers>
     );
 }

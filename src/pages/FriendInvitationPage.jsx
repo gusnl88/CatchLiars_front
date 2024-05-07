@@ -66,6 +66,14 @@ const Notisbox = styled.div`
     overflow-y: auto;
 
     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+
+    @media (max-width: 768px) {
+        width: 100%;
+        width: 200px;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 20px;
+    }
 `;
 
 const Nbutton = styled.button`
@@ -137,11 +145,16 @@ export default function FriendInvitationPage() {
     const acceptInvitation = async (f_seq, i_seq, i_type, g_seq) => {
         try {
             if (i_type) {
-                window.location.href = `/games/list/Mafia/${g_seq}`;
+                if (g_seq) {
+                    window.location.href = `/games/list/Mafia/${g_seq}`;
+                } else {
+                    alert("해당 방이 존재하지 않습니다.");
+                }
             }
             const response = await axiosUtils.post(`/invites/accept`, {
                 f_seq: f_seq,
                 type: i_type, // 'type'으로 명확하게 서버에 전달
+                g_seq: g_seq,
             });
             if (response.data === true) {
                 // 성공적으로 초대를 수락했다면,

@@ -8,9 +8,9 @@ import styled, { css } from "styled-components";
 
 const responsiveWidth = css`
     width: 100%;
-    @media (min-width: 768px) {
+    @media (max-width: 768px) {
         /* 태블릿 */
-        width: 500px;
+        width: 70%;
     }
     @media (min-width: 1024px) {
         /* 데스크탑 */
@@ -58,8 +58,16 @@ const Text = styled.div`
     font-size: 1em;
     color: #666;
     line-height: 1.5;
-    text-align: justify; // 양쪽 정렬
-    margin: 0 20px; // 좌우 여백
+    text-align: justify;
+    margin: 0 20px;
+
+    @media (max-width: 768px) {
+        font-size: 0.8em;
+    }
+
+    @media (min-width: 1024px) {
+        font-size: 1.2em;
+    }
 `;
 const IdContainer = styled.div`
     display: flex; // 이 줄을 추가하여 flexbox 레이아웃을 활용

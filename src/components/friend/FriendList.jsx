@@ -3,6 +3,7 @@ import styled from "styled-components";
 import axiosUtils from "../../utils/axiosUtils";
 import { useEffect } from "react";
 import ChattingRoom from "./ChattingRoom";
+import { useSelector } from "react-redux";
 
 const MainContainer = styled.div`
     width: 500px;
@@ -14,6 +15,14 @@ const MainContainer = styled.div`
     border-radius: 10px;
     padding: 20px;
     overflow-y: auto;
+
+    @media (max-width: 768px) {
+        width: 200px;
+        height: 400px;
+        left: 70%;
+        transform: translateX(-50%);
+        top: 350px;
+    }
 `;
 
 const CloseButton = styled.span`
@@ -30,6 +39,12 @@ const FriendItem = styled.li`
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    @media screen and (max-width: 600px) {
+        /* 화면 너비가 600px 이하일 때 적용되는 스타일 */
+        flex-direction: column;
+        align-items: flex-start;
+    }
 `;
 
 const ArrowIcon = styled.span`
@@ -42,11 +57,21 @@ const ArrowIcon = styled.span`
     transition: transform 0.3s ease;
     transform: ${(props) => (props.expanded ? "rotate(0deg)" : "rotate(180deg)")};
     margin-left: auto;
+
+    @media screen and (max-width: 600px) {
+        /* 화면 너비가 600px 이하일 때 적용되는 스타일 */
+        margin-left: 0; /* 추가된 스타일 */
+        display: none;
+    }
 `;
 
 const FriendInfo = styled.div`
     display: flex;
     align-items: center;
+
+    @media screen and (max-width: 600px) {
+        font-size: 12px;
+    }
 `;
 
 const Divtitle = styled.div`
@@ -56,6 +81,12 @@ const Divtitle = styled.div`
 const Buttondiv = styled.div`
     display: flex;
     flex-direction: row;
+
+    @media screen and (max-width: 600px) {
+        /* 화면 너비가 600px 이하일 때 적용되는 스타일 */
+        flex-direction: column;
+        align-items: flex-start;
+    }
 `;
 const StyledLink = styled.div`
     padding: 10px 15px;
@@ -63,6 +94,13 @@ const StyledLink = styled.div`
     color: black;
     text-decoration: none;
     cursor: pointer;
+
+    @media screen and (max-width: 600px) {
+        /* 화면 너비가 600px 이하일 때 적용되는 스타일 */
+        font-size: 14px;
+        margin-right: 0px;
+        padding: 5px;
+    }
 `;
 
 export default function FriendList() {
@@ -71,7 +109,7 @@ export default function FriendList() {
     const [showModal, setShowModal] = useState(true);
     const [showChattingRoom, setShowChattingRoom] = useState(false); // 채팅방 표시 여부
     const [currentRoomId, setCurrentRoomId] = useState(null); // 현재 채팅방 ID
-
+    const loginUser = useSelector((state) => state.loginReducer.user);
     useEffect(() => {
         const fetchFriends = async () => {
             try {
@@ -88,8 +126,12 @@ export default function FriendList() {
         return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 해제
     }, []);
 
-    const sendMessage = (roomId) => {
-        setCurrentRoomId(roomId); // 현재 채팅방 ID 설정
+    const sendMessage = async (f_seq) => {
+        const res = await axiosUtils.post("/dms", {
+            firstUser: loginUser.u_seq,
+            secondUser: f_seq,
+        });
+        setCurrentRoomId(res.data.d_seq); // 현재 채팅방 ID 설정
         setShowChattingRoom(true); // 채팅방을 보여줍니다.
     };
 
@@ -148,7 +190,7 @@ export default function FriendList() {
 
                                 {expandedIndex === index && (
                                     <Buttondiv>
-                                        <StyledLink onClick={() => sendMessage(item.roomId)}>
+                                        <StyledLink onClick={() => sendMessage(item.u_seq)}>
                                             메시지 전송
                                         </StyledLink>
                                         <StyledLink onClick={() => deleteFriend(item.u_seq)}>
