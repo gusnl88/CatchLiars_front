@@ -28,18 +28,15 @@ const RoomContainer = styled.div`
                 flex: 1;
                 display: flex;
                 flex-direction: column;
-                padding: 10px;
-
+                padding: 3px;
                 .user_profile {
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
                     align-items: center;
                     border-radius: 10px;
-                    padding: 5px;
-                    margin-bottom: 10px;
                     background-color: #cac9c9;
-
+                    margin: 3px auto;
                     .game_img {
                         width: 100%;
                         img {
@@ -216,7 +213,6 @@ const RoomContainer = styled.div`
         }
     }
     .vote_box {
-        width: 300px;
         max-height: 150px; /* 최대 높이 지정 */
         overflow-y: auto; /* 내용이 넘칠 때 스크롤 표시 */
         background-color: #a0a0a0;
@@ -281,6 +277,56 @@ const RoomContainer = styled.div`
             cursor: pointer;
             a:hover {
                 background-color: white;
+            }
+        }
+    }
+    @media (max-width: 768px) {
+        .side_zone {
+            font-size: 10px;
+            .btn_box {
+                flex-direction: column;
+            }
+            .btn_box button {
+                width: 50px !important;
+            }
+        }
+        .chat_main {
+            font-size: 10px;
+        }
+        .chat_input {
+            button {
+                display: none;
+            }
+        }
+        .title_box {
+            h1 {
+                font-size: 10px;
+            }
+            span {
+                font-size: 8px;
+                padding: 0;
+            }
+        }
+        .user_profile {
+            width: 100%;
+            height: 25%;
+            .profile_box {
+                flex-direction: column;
+                .img {
+                    width: 30px;
+                    height: 30px;
+                }
+            }
+        }
+        .game_img {
+            display: none;
+        }
+        .play_zone {
+            .job_title {
+                width: 180px;
+            }
+            .chat_main {
+                padding: 5px !important;
             }
         }
     }
