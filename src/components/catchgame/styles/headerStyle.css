@@ -4,9 +4,13 @@
     text-align: center;
     padding: 20px;
     justify-content: center;
-    width: 90.3%;
+    width: 77%;
 }
 
+.logo {
+    border: solid 1px black;
+    width: 13%;
+}
 .bar {
     display: flex;
 }

@@ -32,11 +32,16 @@ const RoomListContainer = styled.div`
         th,
         td {
             border: 1px solid #fffcfc;
+
+            background-color: ${(props) =>
+                props.pathname === "/games/list/Catchliars" ? "#c6e2e8" : ""};
             padding: 8px;
             text-align: center;
         }
         th {
-            background-color: #b15151;
+            /* background-color: #b15151; */
+            background-color: ${(props) =>
+                props.pathname === "/games/list/Catchliars" ? "#5ea3ce" : "#b15151"};
             color: black;
         }
         a {

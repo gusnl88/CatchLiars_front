@@ -6,7 +6,7 @@ import socketIOClient from "socket.io-client";
 import "./styles/style.css";
 import "./styles/gameplayer.css";
 
-function Canvas({ players, gameStarted, loginUser, room }) {
+function Canvas({ players, gameStarted, loginUser, room, timer }) {
     const [ctx, setCtx] = useState(null);
     const [painting, setPainting] = useState(false);
     const [tool, setTool] = useState("auto");
@@ -90,7 +90,7 @@ function Canvas({ players, gameStarted, loginUser, room }) {
         const paintingTimer = setInterval(() => {
             const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
             setCurrentPlayerIndex(nextPlayerIndex);
-        }, 6000);
+        }, 5000);
 
         return () => clearInterval(paintingTimer);
     }, [gameStarted, players, currentPlayerIndex]);
@@ -104,6 +104,9 @@ function Canvas({ players, gameStarted, loginUser, room }) {
                 setCurrentGamePlayer(true);
             else setCurrentGamePlayer(false);
             if (!gameStarted) currentPlayer.style.border = "";
+            if (!timer) {
+                currentPlayer.style.border = "";
+            }
         }
 
         return () => {

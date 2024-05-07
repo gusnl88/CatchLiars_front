@@ -13,8 +13,10 @@ const Container = styled.div`
     height: 85%;
     /* background-color: #00154b; */
     background-color: ${(props) =>
-        props.pathname === "/games/list/Catchliars" ? "gray" : "#00154b"};
-    color: white;
+        props.pathname === "/games/list/Catchliars" ? "#aee1ea" : "#00154b"};
+
+    color: ${(props) => (props.pathname === "/games/list/Catchliars" ? "black" : "white")};
+    /* color: white; */
     box-sizing: border-box;
     .header_font {
         h1 {

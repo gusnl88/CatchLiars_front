@@ -1,6 +1,6 @@
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import axiosUtills from "../../utils/axiosUtils";
-import { useEffect, useState } from "react";
+import axiosUtils from "../../utils/axiosUtils";
 import ChattingRoom from "./ChattingRoom";
 
 const MainContainer = styled.div`
@@ -58,15 +58,24 @@ const MainContainer = styled.div`
     }
 `;
 
+const CloseButton = styled.span`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+`;
+
 export default function FriendList() {
     const [chattingList, setChattingList] = useState([]);
     const [selectedRoomId, setSelectedRoomId] = useState("");
     const [showChattingRoom, setShowChattingRoom] = useState(false);
+    const [showModal, setShowModal] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axiosUtills.get("/dms");
+                const res = await axiosUtils.get("/dms");
                 console.log(res);
                 setChattingList(res.data.dmInfo);
             } catch (error) {
@@ -81,27 +90,34 @@ export default function FriendList() {
         setShowChattingRoom(true);
     };
 
+    const closeModal = () => {
+        setShowModal(false); // showModal 상태 변경
+    };
+
     return (
-        <MainContainer>
-            <div className="chatting_box">
-                <h3>채팅방 리스트</h3>
-                {chattingList.map((item, index) => (
-                    <div
-                        className="chatting_list"
-                        key={index}
-                        onClick={() => handleRoomSelect(item.d_seq)}
-                    >
-                        <div>{item.counterInfo.id}</div>
-                        <button>채팅</button>
-                    </div>
-                ))}
-                {showChattingRoom && (
-                    <ChattingRoom
-                        setShowChattingRoom={setShowChattingRoom}
-                        roomId={selectedRoomId}
-                    />
-                )}
-            </div>
-        </MainContainer>
+        showModal && (
+            <MainContainer>
+                <CloseButton onClick={closeModal}>x</CloseButton>
+                <div className="chatting_box">
+                    <h3>채팅방 리스트</h3>
+                    {chattingList.map((item, index) => (
+                        <div
+                            className="chatting_list"
+                            key={index}
+                            onClick={() => handleRoomSelect(item.d_seq)}
+                        >
+                            <div>{item.counterInfo.id}</div>
+                            <button>채팅</button>
+                        </div>
+                    ))}
+                    {showChattingRoom && (
+                        <ChattingRoom
+                            setShowChattingRoom={setShowChattingRoom}
+                            roomId={selectedRoomId}
+                        />
+                    )}
+                </div>
+            </MainContainer>
+        )
     );
 }
