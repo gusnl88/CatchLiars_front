@@ -291,10 +291,6 @@ function Canvas({
         }
     };
 
-    const goBack = () => {
-        window.history.back();
-    };
-
     // console.log(loginUser);
     // console.log(players.id);
     // console.log(players);
