@@ -196,13 +196,13 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     }, [showPasswordModal]);
 
     const joinRoom = async (room) => {
-        if (room.g_total < 8) {
+        if (type!="Mafia") {
             await axiosUtils.patch(`/games/plus/${room.g_seq}`);
             setRoom(room);
             setGameStart(type);
-            window.location.href = `/games/list/${type}/${room.g_seq}`;
         } else {
-            alert("방이 꽉 찼습니다. 다른 방을 선택해주세요.");
+            window.location.href = `/games/list/${type}/${room.g_seq}`;
+
         }
     };
 
