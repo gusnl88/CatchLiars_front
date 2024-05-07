@@ -54,6 +54,8 @@ function CatchLiarInGame({ room }) {
     const [timerCount, setTimerCount] = useState(20);
     const [resultModal, setResultModal] = useState(false);
     const [restartBtn, setRestartBtn] = useState(false);
+    const [ctx, setCtx] = useState(null);
+    const [painting, setPainting] = useState(false);
 
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
@@ -277,6 +279,10 @@ function CatchLiarInGame({ room }) {
                     gameStarted={gameStarted}
                     loginUser={loginUser}
                     timer={timer}
+                    ctx={ctx}
+                    setCtx={setCtx}
+                    painting={painting}
+                    setPainting={setPainting}
                 ></Canvas>
 
                 <Chat
@@ -293,6 +299,15 @@ function CatchLiarInGame({ room }) {
                     setRestartBtn={setRestartBtn}
                     liarIdx={liarIdx}
                     players={players}
+                    ctx={ctx}
+                    setCtx={setCtx}
+                    painting={painting}
+                    setPainting={setPainting}
+                    round={round}
+                    setRound={setRound}
+                    setTimerCount={setTimerCount}
+                    setCurrentPlayer={setCurrentPlayer}
+                    currentPlayer={currentPlayer}
                 ></Chat>
             </div>
 

@@ -11,9 +11,14 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     height: 85%;
-    /* background-color: #00154b; */
-    background-color: ${(props) =>
-        props.pathname === "/games/list/Catchliars" ? "#aee1ea" : "#00154b"};
+    background-color: #00154b;
+    /* background-color: ${(props) =>
+        props.pathname === "/games/list/Catchliars" ? "#aee1ea" : "#00154b"}; */
+
+    background-image: ${(props) =>
+        props.pathname === "/games/list/Catchliars" ? "url('/images/candy0.jpg')" : ""};
+    background-size: cover;
+    background-position: center;
 
     color: ${(props) => (props.pathname === "/games/list/Catchliars" ? "black" : "white")};
     /* color: white; */

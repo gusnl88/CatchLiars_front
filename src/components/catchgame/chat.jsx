@@ -3,6 +3,8 @@ import io from "socket.io-client";
 import Notice from "./Notice";
 import "./styles/chat.css";
 import "./styles/voteBtn.scss";
+import left from "./images/pang2.png";
+import right from "./images/pang.png";
 
 const socket = io.connect("http://localhost:8089", {
     autoConnect: false,
@@ -22,6 +24,15 @@ export default function Chat({
     setRestartBtn,
     liarIdx,
     players,
+    ctx,
+    setCtx,
+    painting,
+    setPainting,
+    setRound,
+    setTimerCount,
+    setCurrentPlayer,
+    round,
+    currentPlayer,
 }) {
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
@@ -34,7 +45,7 @@ export default function Chat({
     const [hasVoted, setHasVoted] = useState(false);
     const [modalResult, setModalResult] = useState(false);
     const [winner, setWinner] = useState("");
-    const [maxUser, setMaxUser] = useState("");
+    // const [maxUser, setMaxUser] = useState("");
 
     useEffect(() => {
         initSocketConnect();
@@ -55,6 +66,18 @@ export default function Chat({
 
         socket.on("updateNickname", (nickInfo) => {
             setUserList(nickInfo);
+        });
+
+        socket.on("ctx", (data) => {
+            setCtx(data);
+        });
+
+        socket.on("round", (data) => {
+            setRound(data);
+        });
+
+        socket.on("current", (data) => {
+            setCurrentPlayer(data);
         });
 
         socket.on("voteUpdate", (votedUser) => {
@@ -109,6 +132,14 @@ export default function Chat({
     const restart = () => {
         setGameStarted(false);
         setRestartBtn(false);
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, 850, 458);
+        setTimerCount(20);
+        setRound(1);
+        setCurrentPlayer(1);
+        socket.emit("ctx", ctx);
+        socket.emit("round", round);
+        socket.emit("current", currentPlayer);
     };
 
     const closeModal = () => {
@@ -138,7 +169,7 @@ export default function Chat({
         const maxVotes = Math.max(...voteCounts);
         const maxVoteUser = Object.keys(userVotes).filter((user) => userVotes[user] === maxVotes);
         console.log("maxVoteUser:", maxVoteUser);
-        setMaxUser(maxVoteUser);
+        // setMaxUser(maxVoteUser);
         setModalResult(true);
 
         if (maxVoteUser.includes(players[liarIdx].nickName) && maxVoteUser.length === 1) {
@@ -167,6 +198,7 @@ export default function Chat({
     useEffect(() => {
         if (!timer) {
             setShowModal(true);
+            setPainting(false);
         }
     }, [timer, setShowModal]);
 
@@ -233,17 +265,39 @@ export default function Chat({
             {/* 결과 모달창 */}
             {modalResult && (
                 <div className="modal">
-                    <div className="modal-content" style={{ width: "500px", height: "300px" }}>
+                    <div
+                        className="modal-content"
+                        style={{
+                            width: "500px",
+                            height: "200px",
+                            textAlign: "center",
+                        }}
+                    >
                         <span className="close" onClick={closeModal}>
                             &times;
                         </span>
-                        {winner === "라이어" ? (
-                            <h1>라이어가 승리했습니다!</h1>
-                        ) : winner === "무승부" ? (
-                            <h1>무승부 입니다!</h1>
-                        ) : (
-                            <h1>시민팀이 승리했습니다!</h1>
-                        )}
+
+                        <div>
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <img
+                                    src={left}
+                                    alt="Left Image"
+                                    style={{ width: "100px", height: "100px" }}
+                                />
+                                <img
+                                    src={right}
+                                    alt="Right Image"
+                                    style={{ width: "100px", height: "100px" }}
+                                />
+                            </div>
+                            {winner === "라이어" ? (
+                                <h1>라이어가 승리했습니다!</h1>
+                            ) : winner === "무승부" ? (
+                                <h1>무승부 입니다!</h1>
+                            ) : (
+                                <h1>시민팀이 승리했습니다!</h1>
+                            )}
+                        </div>
 
                         <br />
                     </div>
@@ -253,12 +307,12 @@ export default function Chat({
             {/* 모달창 */}
             {showModal && (
                 <div className="modal">
-                    <div className="modal-content">
+                    <div className="modal-content" style={{ width: "400px" }}>
                         <span className="close" onClick={closeModal}>
                             &times;
                         </span>
-                        {!timer && <span>{timerCount}초후 게임이 종료됩니다...</span>}
-                        <p>투표 대상 선택</p>
+                        {!timer && <h2>{timerCount}초후 게임이 종료됩니다...</h2>}
+                        <h2>투표 대상 선택</h2>
                         <br />
                         <div className="user-list">
                             <div className="grid-container">

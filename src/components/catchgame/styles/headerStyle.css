@@ -5,11 +5,13 @@
     padding: 20px;
     justify-content: center;
     width: 77%;
+    /* background-color: #8d6088; */
 }
 
 .logo {
     border: solid 1px black;
     width: 13%;
+    /* background-color: #8a4a69; */
 }
 .bar {
     display: flex;
@@ -49,6 +51,7 @@
     padding: 40px;
     justify-content: center;
     width: 75%;
+    /* background-color: #9cadbc; */
 }
 
 .modal {
