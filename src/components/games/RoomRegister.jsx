@@ -10,7 +10,8 @@ const RoomRegisterContainer = styled.div`
     border: 1px solid black;
     border-radius: 10px;
     width: 40%;
-    background-color: #8b8585ff;
+    background-color: #8b8585e0;
+    z-index: 2;
     display: none;
     .close_btn {
         text-align: end;
@@ -20,7 +21,7 @@ const RoomRegisterContainer = styled.div`
             font-size: 15px;
             cursor: pointer;
             &:hover {
-                background-color: #8b8585ff;
+                background-color: #8b8585e0;
             }
         }
     }
