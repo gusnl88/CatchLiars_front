@@ -172,6 +172,11 @@ function RegisterForm() {
     const [isRegistered, setIsRegistered] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
     const [availabilityMessages, setAvailabilityMessages] = useState({});
+    const [validations, setValidations] = useState({
+        id: null,
+        nickname: null,
+        email: null,
+    });
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -234,12 +239,14 @@ function RegisterForm() {
                     ...availabilityMessages,
                     [field]: <ErrorSpan>이미 사용중입니다.</ErrorSpan>,
                 }); // 메시지 초기화
+                setValidations({ ...validations, [field]: false });
             } else {
                 setErrors({ ...errors, [field]: "" }); // 에러 메시지 초기화
                 setAvailabilityMessages({
                     ...availabilityMessages,
                     [field]: <Span>사용 가능합니다.</Span>,
                 }); // 성공 메시지 설정
+                setValidations({ ...validations, [field]: true });
             }
         } catch (error) {
             console.error("Failed to check duplicate:", error);
@@ -263,6 +270,14 @@ function RegisterForm() {
             console.log(Object.values(errors));
             console.log(Object.values(errors).some((error) => error));
             alert("Please resolve the errors before submitting.");
+            return;
+        }
+
+        if (
+            Object.values(validations).includes(null) ||
+            Object.values(validations).includes(false)
+        ) {
+            alert("Please complete all checks before submitting.");
             return;
         }
 
