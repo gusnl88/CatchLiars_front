@@ -277,7 +277,7 @@ function RegisterForm() {
             Object.values(validations).includes(null) ||
             Object.values(validations).includes(false)
         ) {
-            alert("Please complete all checks before submitting.");
+            alert("제출 전 모든 유효성 검사를 진행해주세요");
             return;
         }
 

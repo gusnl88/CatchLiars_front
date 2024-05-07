@@ -477,7 +477,7 @@ export default function Header() {
                 dispatch(logout());
                 setIsAuthenticated(false);
 
-                // window.location.reload();
+                window.location.href = "/";
             })
             .catch((error) => {
                 console.error("Error:", error);
