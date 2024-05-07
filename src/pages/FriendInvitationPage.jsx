@@ -134,17 +134,15 @@ export default function FriendInvitationPage() {
         }
     };
 
-
     const acceptInvitation = async (f_seq, i_seq, i_type, g_seq) => {
-
-    
         try {
+            if (i_type) {
+                window.location.href = `/games/list/Mafia/${g_seq}`;
+            }
             const response = await axiosUtils.post(`/invites/accept`, {
                 f_seq: f_seq,
                 type: i_type, // 'type'으로 명확하게 서버에 전달
-                g_seq: g_seq,
             });
-
             if (response.data === true) {
                 // 성공적으로 초대를 수락했다면,
                 if (i_type === 0) {
@@ -153,7 +151,7 @@ export default function FriendInvitationPage() {
                 } else if (i_type === 1) {
                     // 게임 초대인 경우
                     alert("게임 방으로 이동합니다.");
-                    window.location.href = `/games/list/${i_type}/${g_seq}`;
+
                     // 예를 들어, 게임 방 페이지로 리다이렉트
                     // window.location.href = `/game-room/${someRoomId}`;
                 }
@@ -199,7 +197,6 @@ export default function FriendInvitationPage() {
                         {invitations.length > 0 ? (
                             invitations.map((invite, index) => (
                                 <InvitationItem key={invite.i_seq}>
-
                                     {invite.i_type
                                         ? `${nickname[index]} 님이 게임 초대를 보냈습니다.`
                                         : `${nickname[index]} 님이 친구 요청을 보냈습니다.`}
@@ -210,7 +207,8 @@ export default function FriendInvitationPage() {
                                                 acceptInvitation(
                                                     invite.f_seq,
                                                     invite.i_seq,
-                                                    invite.i_type
+                                                    invite.i_type,
+                                                    invite.g_seq
                                                 )
                                             }
                                         >
