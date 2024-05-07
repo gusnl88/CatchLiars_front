@@ -6,8 +6,8 @@ import { useSelector } from "react-redux";
 const Maincontainer = styled.div`
     width: 300px;
     height: 600px;
+    bottom: 30px;
     position: absolute;
-    background: #ffffff92;
     display: flex;
     justify-content: center;
     align-items: center;
