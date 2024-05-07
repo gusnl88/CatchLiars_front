@@ -82,10 +82,10 @@ function CatchLiarInGame({ room }) {
     }, [timer]);
 
     const startGame = () => {
-        if (players.length < 3) {
-            alert("3명 이상의 플레이어가 모여야 시작됩니다");
-            return;
-        }
+        // if (players.length < 3) {
+        //     alert("3명 이상의 플레이어가 모여야 시작됩니다");
+        //     return;
+        // }
         setModalTime(5);
         setModalOpen(true);
 
@@ -166,8 +166,8 @@ function CatchLiarInGame({ room }) {
                     if (round === 2) {
                         clearInterval(interval); // 타이머 종료
                         setTimer(false);
-                        setGameStarted(false);
-                        socket.emit("gamestart", false, room.g_seq);
+                        // setGameStarted(false);
+                        // socket.emit("gamestart", false, room.g_seq);
                     } else {
                         setRound((prevRound) => prevRound + 1); // 라운드 증가
                         setCurrentPlayer(1); // 플레이어 인덱스 초기화
@@ -315,6 +315,7 @@ function CatchLiarInGame({ room }) {
                     setTimerCount={setTimerCount}
                     setCurrentPlayer={setCurrentPlayer}
                     currentPlayer={currentPlayer}
+                    room={room}
                 ></Chat>
             </div>
 

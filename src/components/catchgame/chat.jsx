@@ -33,6 +33,7 @@ export default function Chat({
     setCurrentPlayer,
     round,
     currentPlayer,
+    room,
 }) {
     const initSocketConnect = () => {
         if (!socket.connected) socket.connect();
@@ -92,7 +93,7 @@ export default function Chat({
         // return () => {
         //     socket.disconnect();
         // };
-    }, [loginUser]);
+    }, [loginUser, setCtx, setCurrentPlayer, setRound]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -131,6 +132,7 @@ export default function Chat({
 
     const restart = () => {
         setGameStarted(false);
+
         setRestartBtn(false);
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, 850, 458);
@@ -171,6 +173,8 @@ export default function Chat({
         console.log("maxVoteUser:", maxVoteUser);
         // setMaxUser(maxVoteUser);
         setModalResult(true);
+        setGameStarted(false);
+        socket.emit("gamestart", false, room.g_seq);
 
         if (maxVoteUser.includes(players[liarIdx].nickName) && maxVoteUser.length === 1) {
             console.log("라이어가 패배했습니다!");
@@ -200,7 +204,7 @@ export default function Chat({
             setShowModal(true);
             setPainting(false);
         }
-    }, [timer, setShowModal]);
+    }, [timer, setShowModal, setPainting]);
 
     useEffect(() => {
         if (resultModal) {
@@ -281,12 +285,12 @@ export default function Chat({
                             <div style={{ display: "flex", justifyContent: "space-between" }}>
                                 <img
                                     src={left}
-                                    alt="Left Image"
+                                    alt=""
                                     style={{ width: "100px", height: "100px" }}
                                 />
                                 <img
                                     src={right}
-                                    alt="Right Image"
+                                    alt=""
                                     style={{ width: "100px", height: "100px" }}
                                 />
                             </div>
