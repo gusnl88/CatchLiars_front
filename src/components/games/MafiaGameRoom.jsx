@@ -411,7 +411,7 @@ const MafiaGameRoom = () => {
             console.log(users);
             setUserList([...users]); // 배열을 복사해서 업데이트
             setIsRoomOwner(users[0] === loginUser.id);
-            setIsRoomFull(users.length >= 8);
+            setIsRoomFull(users.length >= 1);
         });
         newSocket.on("job", (data) => {
             const { job, mafiaList } = data;
