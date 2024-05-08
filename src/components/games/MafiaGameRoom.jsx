@@ -453,7 +453,7 @@ const MafiaGameRoom = () => {
             // 여기에 남은 유저들의 상태 초기화 로직 추가
             setUserList([...userIdList]);
             setIsRoomOwner(userIdList[0] === loginUser.id);
-            setIsRoomFull(userIdList.length >= 8);
+            setIsRoomFull(userIdList.length >= 1);
             setVoteSelect(false);
             setGameStart(false);
             if (winner === "mafia") {
@@ -463,6 +463,7 @@ const MafiaGameRoom = () => {
                         const res = await axiosUtils.patch("/users/score", {
                             u_seq: loginUser.u_seq,
                         });
+
                         if (res) {
                             alert("마피아가 승리하셧습니다!!!. 스코어점수가 올라갑니다.");
                         }
@@ -482,6 +483,8 @@ const MafiaGameRoom = () => {
                     }
                 }
             }
+            axiosUtils.patch(`/games/state/${room}`, { type: "stop" });
+
 
             // setTimeout(() => {
             //     outBtn();
