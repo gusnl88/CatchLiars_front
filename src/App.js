@@ -11,7 +11,7 @@ import CatchLiarInGame from "./pages/CatchLiarInGame";
 import LankingPage from "./pages/LankingPage";
 import FriendInvitationPage from "./pages/FriendInvitationPage";
 import DmPage from "./pages/DmPage";
-import SessionCheck from "./components/main/SessionCheck";
+// import SessionCheck from "./components/main/SessionCheck";
 import MafiaGameRoom from "./components/games/MafiaGameRoom";
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
     console.log(loginUser);
     return (
         <>
-            {loginUser && <SessionCheck />}
+            {/* {loginUser && <SessionCheck />} */}
             <Routes>
                 <Route path="/" element={LoginUser(loginUser, <MainPage />)} />
                 <Route path="/games" element={LoginUser(loginUser, <MainPage />)} />
