@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axiosUtils from "../../utils/axiosUtils";
 import ChattingRoom from "./ChattingRoom";
+import { useSelector } from "react-redux";
 
 const MainContainer = styled.div`
     width: 300px;
     height: 600px;
     position: absolute;
     background: #ffffff92;
-    top: 100px;
+    right: 10px;
+    top: 165px;
     border-radius: 10px;
     .chatting_box {
         width: 100%;
@@ -54,7 +56,19 @@ const MainContainer = styled.div`
                     background-color: #45a049;
                 }
             }
+            .unreadcnt {
+                text-align: center;
+                width: 20px;
+                align-content: center;
+                height: 20px;
+                background-color: yellow;
+                border-radius: 50%;
+            }
         }
+    }
+    @media (max-width: 768px) {
+        width: 210px;
+        height: 500px;
     }
 `;
 
@@ -71,6 +85,7 @@ export default function FriendList() {
     const [selectedRoomId, setSelectedRoomId] = useState("");
     const [showChattingRoom, setShowChattingRoom] = useState(false);
     const [showModal, setShowModal] = useState(true);
+    const loginUser = useSelector((state) => state.loginReducer.user);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -107,6 +122,9 @@ export default function FriendList() {
                             onClick={() => handleRoomSelect(item.d_seq)}
                         >
                             <div>{item.counterInfo.id}</div>
+                            {item.last_seq !== loginUser.u_seq && item.unreadcnt && (
+                                <span className="unreadcnt">{item.unreadcnt}</span>
+                            )}{" "}
                             <button>채팅</button>
                         </div>
                     ))}

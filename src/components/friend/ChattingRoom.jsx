@@ -17,10 +17,9 @@ const ChatTitle = styled.div`
     padding: 10px; // 내부 여백
     background-color: rgba(0, 21, 75, 0.7);
     text-align: center; // 텍스트 중앙 정렬
-    width: 100%; // 너비
 `;
 const Maincontainer = styled.div`
-    width: 500px;
+    width: 300px;
     height: 550px;
     bottom: 20px;
     position: absolute;
