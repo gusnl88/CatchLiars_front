@@ -1,6 +1,6 @@
 .player {
     /* border: solid 1px black; */
-    height: 17%;
+    height: 12%;
     background-color: #b0bdd3;
 }
 
@@ -10,12 +10,14 @@
 
 .profileImage {
     width: 40%;
+    height: 100%;
 }
 
 .playerInfo {
     /* border: solid 1px black; */
     /* height: 80px; */
     width: 60%;
+    height: 100%;
 }
 
 .playerNum {
