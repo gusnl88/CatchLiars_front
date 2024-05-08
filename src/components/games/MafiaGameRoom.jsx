@@ -453,7 +453,7 @@ const MafiaGameRoom = () => {
             // 여기에 남은 유저들의 상태 초기화 로직 추가
             setUserList([...userIdList]);
             setIsRoomOwner(userIdList[0] === loginUser.id);
-            setIsRoomFull(userIdList.length >= 1);
+            setIsRoomFull(userIdList.length >= 8);
             setVoteSelect(false);
             setGameStart(false);
             if (winner === "mafia") {
