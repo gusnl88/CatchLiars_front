@@ -104,8 +104,7 @@ const StyledLink = styled.div`
         border-radius: 10px;
         color: white;
         margin: 1px;
-        font-size: 14px;
-        margin-right: 0px;
+        font-size: 10px;
         padding: 5px;
     }
 `;

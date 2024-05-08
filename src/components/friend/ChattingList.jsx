@@ -17,6 +17,7 @@ const MainContainer = styled.div`
         height: 100%;
         display: flex;
         flex-direction: column;
+        overflow-y: scroll;
         h3 {
             margin: 0 0 10px 0;
             font-size: 18px;
@@ -58,9 +59,8 @@ const MainContainer = styled.div`
             }
             .unreadcnt {
                 text-align: center;
-                width: 20px;
                 align-content: center;
-                height: 20px;
+                font-size: 10px;
                 background-color: yellow;
                 border-radius: 50%;
             }

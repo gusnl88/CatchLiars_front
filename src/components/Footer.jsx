@@ -55,8 +55,18 @@ export default function Footer() {
     };
     const { pathname } = useLocation();
     console.log(pathname);
+    const chattingBtn = () => {
+        chattingCheck ? setChattingCheck(false) : setChattingCheck(true);
+        if (friendCheck) {
+            setFriendCheck(false);
+        }
+    };
     return (
         <Footers pathname={pathname}>
+             <StyledLink>
+                <a onClick={chattingBtn}>채팅</a>
+            </StyledLink>
+            {chattingCheck ? <ChattingList /> : ""}
             <StyledLink>
                 <a onClick={friendBtn}>친구목록</a>
             </StyledLink>

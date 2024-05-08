@@ -30,7 +30,10 @@ const Maincontainer = styled.div`
     @media (max-width: 768px) {
         width: 300px; // 작은 화면에서 이미지 크기 축소
         height: 500px;
+        right: 0;
+        bottom: 0;
         margin-bottom: 10px; // 작은 화면에서 이미지 마진 축소
+    
     }
     .chatting_container {
         width: 85%;
