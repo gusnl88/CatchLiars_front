@@ -11,16 +11,15 @@ function SessionCheck() {
 
     // 서버에 세션 상태를 확인
     const checkSession = () => {
-        axios
-            .get(`${process.env.REACT_APP_API_SERVER}/users/check`, { withCredentials: true })
-            .then((response) => {
-                if (!response.data.id) {
-                    axios.patch("/users/stateFalse", { withCredentials: true });
-                }
-            })
-            .catch((error) => {
-                console.error("세션 상태 확인 실패:", error);
-            });
+        axios.get(`${process.env.REACT_APP_API_SERVER}/users/check`, { withCredentials: true });
+        // .then((response) => {
+        //     if (!response.data.id) {
+        //         axios.patch("/users/stateFalse", { withCredentials: true });
+        //     }
+        // })
+        // .catch((error) => {
+        //     console.error("세션 상태 확인 실패:", error);
+        // });
     };
 
     return <></>;
