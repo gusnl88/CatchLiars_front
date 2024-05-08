@@ -147,6 +147,7 @@ export default function FriendInvitationPage() {
             if (i_type) {
                 if (g_seq) {
                     window.location.href = `/games/list/Mafia/${g_seq}`;
+                    deleteInvitation(i_seq);
                 } else {
                     alert("해당 방이 존재하지 않습니다.");
                 }

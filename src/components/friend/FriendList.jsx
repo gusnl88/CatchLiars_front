@@ -6,11 +6,11 @@ import ChattingRoom from "./ChattingRoom";
 import { useSelector } from "react-redux";
 
 const MainContainer = styled.div`
-    width: 500px;
-    height: 600px;
+    width: 400px;
+    height: 500px;
     position: absolute;
     background: #ffffffaf;
-    top: 80px;
+    top: 150px;
     transform: translateX(-5%);
     border-radius: 10px;
     padding: 20px;
@@ -19,9 +19,9 @@ const MainContainer = styled.div`
     @media (max-width: 768px) {
         width: 200px;
         height: 400px;
-        left: 70%;
+        left: 75%;
         transform: translateX(-50%);
-        top: 350px;
+        top: 250px;
     }
 `;
 

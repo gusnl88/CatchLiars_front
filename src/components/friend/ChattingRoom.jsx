@@ -3,16 +3,38 @@ import { io } from "socket.io-client";
 import { useEffect, useState, useRef } from "react"; // useRef 추가
 import { useSelector } from "react-redux";
 
+const UserId = styled.div`
+    color: black; // 여기서 색깔을 변경할 수 있습니다.
+    font-weight: bold;
+    margin-bottom: 5px; // 메시지와의 간격을 조정합니다.
+    margin-left: 5px;
+`;
+
+const ChatTitle = styled.div`
+    font-size: 20px; // 글자 크기
+    color: #ececec; // 글자 색상
+    font-weight: bold; // 글자 굵기
+    padding: 10px; // 내부 여백
+    background-color: rgba(0, 21, 75, 0.7);
+    text-align: center; // 텍스트 중앙 정렬
+    width: 100%; // 너비
+`;
 const Maincontainer = styled.div`
-    width: 300px;
-    height: 600px;
-    bottom: 30px;
+    width: 500px;
+    height: 550px;
+    bottom: 20px;
     position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
+
+    @media (max-width: 768px) {
+        width: 300px; // 작은 화면에서 이미지 크기 축소
+        height: 500px;
+        margin-bottom: 10px; // 작은 화면에서 이미지 마진 축소
+    }
     .chatting_container {
-        width: 95%;
+        width: 85%;
         height: 95%;
         background: #9298a6ba;
         border-radius: 10px;
@@ -57,8 +79,8 @@ const Maincontainer = styled.div`
             }
             .message {
                 display: flex;
-                flex-direction: column;
-
+                flex-direction: row; /* 메시지 내용과 시간을 가로로 배열 */
+                align-items: center; /* 가운데 정렬로 변경 */
                 background-color: yellow;
                 color: black;
                 border-radius: 10px;
@@ -67,7 +89,7 @@ const Maincontainer = styled.div`
 
                 .time {
                     font-size: 8px;
-                    margin: 5px;
+                    margin-right: 10px; /* 시간 레이블과 메시지 내용 사이 간격 조정 */
                 }
                 word-break: break-word; /* 긴 단어가 있을 경우 줄바꿈 처리 */
             }
@@ -87,10 +109,32 @@ const Maincontainer = styled.div`
     }
 `;
 
+const BottomDiv = styled.div`
+    justify-content: center; // 수평 중앙 정렬
+    align-items: center; // 수직 중앙 정렬
+    height: 50%; // 높이 설정
+    width: 100%; // 너비 설정
+`;
+
+const CloseButton = styled.button`
+    left: 3%;
+    width: 90%;
+`;
+
+const SendButton = styled.button`
+    right: 3%;
+    width: 20%;
+`;
+
+const MessageInput = styled.input`
+    width: 65%;
+`;
+
 export default function ChattingRoom({ roomId, setShowChattingRoom }) {
     const [socket, setSocket] = useState(null);
     const [inputdata, setInputData] = useState("");
     const [msgList, setMsgList] = useState([]);
+    const [chatPartner, setChatPartner] = useState(""); // 상대방 닉네임을 저장할 상태
     const loginUser = useSelector((state) => state.loginReducer.user);
     const chatContainerRef = useRef(null); // Ref 추가
 
@@ -121,15 +165,18 @@ export default function ChattingRoom({ roomId, setShowChattingRoom }) {
                     User: { id: data.sendUser },
                 };
             }
+            if (newMessage.type === "other" && newMessage.User && newMessage.User.id) {
+                setChatPartner(newMessage.User.id); // 상대방 ID를 닉네임으로 사용
+            }
             setMsgList((prevMessages) => [...prevMessages, newMessage]);
         });
 
-        socket.on("msgList", (data) => {
-            console.log(data); // 전체 데이터를 확인합니다.
-            setMsgList(data);
-            data.forEach((msg) => {
-                console.log(msg.User); // 각 메시지의 유저 정보를 확인합니다.
-            });
+        socket.on("msgList", (messages) => {
+            setMsgList(messages);
+            const otherUserMessage = messages.find((m) => m.User && m.User.id !== loginUser.id);
+            if (otherUserMessage) {
+                setChatPartner(otherUserMessage.User.id); // 상대방 ID를 닉네임으로 사용
+            }
         });
 
         return () => {
@@ -166,7 +213,8 @@ export default function ChattingRoom({ roomId, setShowChattingRoom }) {
     return (
         <Maincontainer>
             <div className="chatting_container">
-                <button onClick={() => setShowChattingRoom(false)}>나가기</button>
+                <ChatTitle>{chatPartner}</ChatTitle>
+
                 <div ref={chatContainerRef} className="chatting_main">
                     {msgList.map((msg, index) => (
                         <div
@@ -182,29 +230,37 @@ export default function ChattingRoom({ roomId, setShowChattingRoom }) {
                             {msg.type !== "notice" && !msg.is_read && (
                                 <span className="read">1</span>
                             )}
-                            <div className="message">
-                                {msg.create_at ? (
-                                    <span className="time">{formatDate(msg.create_at)}</span>
-                                ) : (
-                                    ""
-                                )}
+                            <div>
                                 {msg.type !== "notice" &&
                                     msg.User.id &&
-                                    msg.User.id !== loginUser.id && <span>{msg.User.id} </span>}
-                                {msg.content}
+                                    msg.User.id !== loginUser.id && <UserId>{msg.User.id} </UserId>}
+                                <div className="message">
+                                    {msg.create_at ? (
+                                        <span className="time">{formatDate(msg.create_at)}</span>
+                                    ) : (
+                                        ""
+                                    )}
+                                    {/* {msg.type !== "notice" &&
+                                    msg.User.id &&
+                                    msg.User.id !== loginUser.id && <span>{msg.User.id} </span>} */}
+                                    {msg.content}
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
-                <div className="chatting_input">
-                    <input
-                        type="text"
-                        value={inputdata}
-                        onKeyDown={(e) => (e.key === "Enter" ? sendMessage() : "")}
-                        onChange={(e) => setInputData(e.target.value)}
-                    />
-                    <button onClick={sendMessage}>전송</button>
-                </div>
+                <BottomDiv>
+                    <div className="chatting_input">
+                        <MessageInput
+                            type="text"
+                            value={inputdata}
+                            onKeyDown={(e) => (e.key === "Enter" ? sendMessage() : "")}
+                            onChange={(e) => setInputData(e.target.value)}
+                        />
+                        <SendButton onClick={sendMessage}>전송</SendButton>
+                    </div>
+                    <CloseButton onClick={() => setShowChattingRoom(false)}>나가기</CloseButton>
+                </BottomDiv>
             </div>
         </Maincontainer>
     );

@@ -34,7 +34,7 @@ const Main = styled.div`
                 filter: brightness(80%);
             }
             @media (max-width: 768px) {
-                width: 90%; /* 모바일 화면에서는 한 열에 하나씩 표시 */
+                width: 70%; /* 모바일 화면에서는 한 열에 하나씩 표시 */
             }
         }
     }
