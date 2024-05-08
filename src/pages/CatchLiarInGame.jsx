@@ -82,6 +82,7 @@ function CatchLiarInGame({ room }) {
                         setShowModal(false);
                         setResultModal(true);
                         setRestartBtn(true);
+                        console.log("여기까지 왔다!");
                     }
                 });
             }, 1000);
@@ -288,9 +289,8 @@ function CatchLiarInGame({ room }) {
                 </nav>
             </header>
 
-            <div style={{ display: "flex" }}>
+            <div style={{ display: "flex", width: "100%" }}>
                 <Canvas
-                    style={{ width: "100%", height: "100%", flex: "1" }}
                     players={players}
                     gameStarted={gameStarted}
                     loginUser={loginUser}
