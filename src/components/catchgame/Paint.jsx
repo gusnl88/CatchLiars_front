@@ -331,7 +331,7 @@ function Canvas({
     // console.log(players.id);
     // console.log(players);
     return (
-        <>
+        <div style={{ display: "flex" }}>
             <div className="box">
                 {ctx &&
                     players.length > 0 &&
@@ -370,6 +370,7 @@ function Canvas({
                         onMouseDown={onMouseDown}
                         onMouseUp={onMouseUp}
                         onMouseLeave={onMouseLeave}
+                        style={{ width: "100%", height: "100%", flex: "1" }}
                     />
 
                     <div className="controls">
@@ -412,7 +413,7 @@ function Canvas({
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 
