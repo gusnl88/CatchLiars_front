@@ -152,10 +152,10 @@ export default function Chat({
         setHasVoted(true);
     };
 
+    const voteCounts = Object.values(userVotes);
+    const maxVotes = Math.max(...voteCounts);
+    const maxVoteUser = Object.keys(userVotes).filter((user) => userVotes[user] === maxVotes);
     const checkWinner = () => {
-        const voteCounts = Object.values(userVotes);
-        const maxVotes = Math.max(...voteCounts);
-        const maxVoteUser = Object.keys(userVotes).filter((user) => userVotes[user] === maxVotes);
         console.log("maxVoteUser:", maxVoteUser);
         // setMaxUser(maxVoteUser);
         setModalResult(true);
@@ -178,14 +178,15 @@ export default function Chat({
         setGameStarted(false);
         socket.emit("gamestart", false, room.g_seq);
         setUserVotes({});
+        setHasVoted(false);
     };
 
     useEffect(() => {
         socket.on("winner", (data) => {
-            console.log("게임 결과:", data);
             setWinner(data);
+            console.log("게임 결과:", data);
         });
-    }, []);
+    }, [winner]);
 
     useEffect(() => {
         if (!timer) {
@@ -197,6 +198,7 @@ export default function Chat({
     useEffect(() => {
         if (resultModal) {
             checkWinner();
+            // setModalResult(true);
         }
     }, [resultModal]);
 
@@ -206,7 +208,7 @@ export default function Chat({
     // console.log("userVotes", userVotes);
 
     return (
-        <div className="container">
+        <div className="container" style={{ width: "20%" }}>
             <header>CatchLiar🐛</header>
 
             <section>
@@ -243,13 +245,12 @@ export default function Chat({
                 />
                 <button>전송</button>
             </form>
-            {gameStarted ? (
-                !restartBtn ? (
-                    <button className="vote" onClick={handleVoteClick}>
-                        투표하기
-                    </button>
-                ) : null
-            ) : null}
+            {gameStarted && (
+                <button className="vote" onClick={handleVoteClick}>
+                    투표하기
+                </button>
+            )}
+
             {/* 결과 모달창 */}
             {modalResult && (
                 <div className="modal">

@@ -1,6 +1,6 @@
 .player {
     /* border: solid 1px black; */
-    height: 14%;
+    height: 17%;
     background-color: #b0bdd3;
 }
 
@@ -14,7 +14,7 @@
 
 .playerInfo {
     /* border: solid 1px black; */
-    height: 80px;
+    /* height: 80px; */
     width: 60%;
 }
 
