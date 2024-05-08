@@ -2,6 +2,7 @@ import styled from "styled-components";
 import axiosUtils from "../utils/axiosUtils";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+
 const Container = styled.div`
     display: flex;
     flex-direction: column;
@@ -131,6 +132,19 @@ export default function LankingPage() {
         }
     };
 
+    const renderRank = (index) => {
+        switch (index) {
+            case 0:
+                return "🥇";
+            case 1:
+                return "🥈";
+            case 2:
+                return "🥉";
+            default:
+                return index + 1; // 4위 이상은 숫자로 표시
+        }
+    };
+
     return (
         <>
             <Container>Rank</Container>
@@ -157,8 +171,20 @@ export default function LankingPage() {
                     </thead>
                     <tbody>
                         {userList.map((item, index) => (
-                            <StyledTr key={item.index} isSelf={loginUser.id === item.id}>
-                                <td>{index + 1}</td>
+                            <StyledTr
+                                key={item.index}
+                                isSelf={loginUser.id === item.id}
+                                className={
+                                    index === 0
+                                        ? "first-rank"
+                                        : index === 1
+                                        ? "second-rank"
+                                        : index === 2
+                                        ? "third-rank"
+                                        : ""
+                                }
+                            >
+                                <td>{renderRank(index)}</td>
                                 <td>{item.id}</td>
                                 <td>{item.nickname}</td>
                                 <td>{item.score}</td>
