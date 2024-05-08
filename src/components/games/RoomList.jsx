@@ -164,8 +164,9 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     }, [newRoom]);
 
     const handleJoinRoom = async (room) => {
-        const res = await axiosUtils.get(`/games/list/${1}`);
+        const res = await axiosUtils.get(`/games/list/${type==="Mafia"?1:0}`);
         const result = res.data.filter((item) => item.g_seq === room.g_seq);
+        console.log(result,"리절트")
         if (!result[0].g_state) {
             alert("게임이 시작되엇습니다 진입불가");
             window.location.reload();
@@ -175,6 +176,7 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
             setSelectedRoom(room);
             setShowPasswordModal(true);
         } else {
+            console.log("진입햇어")
             if (room.g_type) {
                 // 마피아
                 if (room.g_total >= 8) {
@@ -204,6 +206,7 @@ const RoomList = ({ roomLists, selectedRoomList, selectedPage, handleBtn, pageSi
     }, [showPasswordModal]);
 
     const joinRoom = async (room) => {
+        console.log(room)
         if (type != "Mafia") {
             await axiosUtils.patch(`/games/plus/${room.g_seq}`);
             setRoom(room);
