@@ -1,5 +1,5 @@
 .player {
-    /* border: solid 1px black; */
+    border: solid 1px black;
     height: 12%;
     background-color: #b0bdd3;
 }
@@ -35,10 +35,10 @@
     height: 29%;
 }
 
-.Image {
+/* .Image {
     border: solid 1px black;
     height: 100%;
-}
+} */
 
 .box {
     width: 20%;
