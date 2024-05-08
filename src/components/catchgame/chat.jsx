@@ -208,7 +208,7 @@ export default function Chat({
     // console.log("userVotes", userVotes);
 
     return (
-        <div className="container" style={{ width: "20%" }}>
+        <div className="container">
             <header>CatchLiar🐛</header>
 
             <section>
