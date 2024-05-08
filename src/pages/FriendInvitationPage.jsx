@@ -150,6 +150,7 @@ export default function FriendInvitationPage() {
                     deleteInvitation(i_seq);
                 } else {
                     alert("해당 방이 존재하지 않습니다.");
+                    deleteInvitation(i_seq);
                 }
             }
             const response = await axiosUtils.post(`/invites/accept`, {
