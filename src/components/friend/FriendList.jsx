@@ -3,11 +3,12 @@ import styled from "styled-components";
 import axiosUtils from "../../utils/axiosUtils";
 import { useEffect } from "react";
 import ChattingRoom from "./ChattingRoom";
+import ChattingList from "./ChattingList";
 import { useSelector } from "react-redux";
 
 const MainContainer = styled.div`
-    width: 400px;
-    height: 500px;
+    width: 300px;
+    height: 550px;
     position: absolute;
     background: #ffffffaf;
     top: 150px;
@@ -19,8 +20,7 @@ const MainContainer = styled.div`
     @media (max-width: 768px) {
         width: 200px;
         height: 400px;
-        left: 75%;
-        transform: translateX(-50%);
+        /* left: 75%; */
         top: 250px;
     }
 `;
@@ -89,16 +89,22 @@ const Buttondiv = styled.div`
     }
 `;
 const StyledLink = styled.div`
-    padding: 10px 15px;
+    background-color: #00154b;
+    border-radius: 10px;
+    color: white;
+    padding: 2px;
+    margin-left: 10px;
     margin-right: 10px;
-    color: black;
     text-decoration: none;
     cursor: pointer;
 
     @media screen and (max-width: 600px) {
         /* 화면 너비가 600px 이하일 때 적용되는 스타일 */
-        font-size: 14px;
-        margin-right: 0px;
+        background-color: #00154b;
+        border-radius: 10px;
+        color: white;
+        margin: 1px;
+        font-size: 10px;
         padding: 5px;
     }
 `;
@@ -167,7 +173,7 @@ export default function FriendList() {
     };
 
     if (showChattingRoom) {
-        return <ChattingRoom roomId={currentRoomId} setShowChattingRoom={setShowChattingRoom} />;
+        return <ChattingList />;
     }
 
     return (
@@ -191,7 +197,7 @@ export default function FriendList() {
                                 {expandedIndex === index && (
                                     <Buttondiv>
                                         <StyledLink onClick={() => sendMessage(item.u_seq)}>
-                                            메시지 전송
+                                            채팅
                                         </StyledLink>
                                         <StyledLink onClick={() => deleteFriend(item.u_seq)}>
                                             친구 삭제

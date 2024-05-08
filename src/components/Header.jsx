@@ -396,11 +396,6 @@ export default function Header() {
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
     const [updateMessage, setUpdateMessage] = useState("");
 
-    const handleFileChange = (event) => {
-        console.log(event.target.files[0]); // 로그로 선택된 파일 표시
-        // 파일 처리 로직 추가
-    };
-
     useEffect(() => {
         const fetchInvitations = async () => {
             try {
@@ -588,26 +583,28 @@ export default function Header() {
         formData.append("fileInput", selectedImage);
 
         try {
-            const response = await axiosUtils.patch("/users/mypage/image", formData, {
+            const response = await axiosUtils.patch(`/users/mypage/image`, formData, {
                 withCredentials: true,
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
 
-            console.log("서버 응답:", response.data); // 응답 전체를 로그로 출력
-
             if (response.status === 200) {
-                const newImageUrl = response.data.imageUrl; // 응답 구조에 따라 경로 조정 필요
-                console.log("새로운 이미지 URL:", newImageUrl);
-                setImageUrl(newImageUrl);
-                setUser({ ...user, image: newImageUrl });
+                if (response.data.imageUrl) {
+                    const newImageUrl = response.data.imageUrl; // 응답 구조에 따라 경로 조정 필요
+                    console.log("새로운 이미지 URL:", newImageUrl);
+                    setImageUrl(newImageUrl);
+                    setUser({ ...user, image: newImageUrl });
+                } else {
+                    alert("이미지 URL을 받지 못했습니다.");
+                }
             } else {
                 alert("이미지 업데이트에 실패했습니다.");
             }
         } catch (error) {
             console.error("프로필 이미지 업데이트 실패:", error);
-            // alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");
+            alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");
         }
     };
 
