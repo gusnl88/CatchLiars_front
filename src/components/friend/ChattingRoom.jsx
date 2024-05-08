@@ -46,6 +46,7 @@ const Maincontainer = styled.div`
         .chatting_main {
             overflow-y: auto; /* 스크롤이 필요할 때만 나타나도록 수정 */
             padding: 10px;
+            height: 100%;
             max-height: calc(100% - 100px);
             &::-webkit-scrollbar {
                 width: 8px;
@@ -114,8 +115,6 @@ const Maincontainer = styled.div`
 const BottomDiv = styled.div`
     justify-content: center; // 수평 중앙 정렬
     align-items: center; // 수직 중앙 정렬
-    height: 50%; // 높이 설정
-    width: 100%; // 너비 설정
 `;
 
 const CloseButton = styled.button`
