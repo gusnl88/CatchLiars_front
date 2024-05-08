@@ -8,7 +8,9 @@ import axiosUtils from "../../utils/axiosUtils";
 import { useLocation } from "react-router-dom";
 
 const RoomListContainer = styled.div`
+
     width: ${(props) => (props.pathname === "/games/list/Catchliars" ? "80%" : "90%")};
+
     height: ${(props) => (props.pathname === "/games/list/Catchliars" ? "97%" : "90%")};
     max-width: 100%;
     max-height: 100%;
