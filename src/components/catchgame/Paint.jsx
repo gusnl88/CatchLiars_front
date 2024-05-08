@@ -343,7 +343,7 @@ function Canvas({
                         >
                             <div style={{ display: "flex" }}>
                                 <div className="profileImage">
-                                    <div className="Image">프로필 사진</div>
+                                    <div className="Image">프로필사진</div>
                                 </div>
                                 <div className="playerInfo">
                                     <div className="playerNum">#{player.nickName}</div>
