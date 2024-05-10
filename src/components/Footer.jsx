@@ -63,10 +63,12 @@ export default function Footer() {
     };
     return (
         <Footers pathname={pathname}>
-            <StyledLink>
-                <a onClick={chattingBtn}>채팅</a>
+
+             <StyledLink>
+                <a onClick={chattingBtn }>채팅</a>
+
             </StyledLink>
-            {chattingCheck ? <ChattingList /> : ""}
+            {chattingCheck ? <ChattingList setChattingCheck={setChattingCheck} /> : ""}
             <StyledLink>
                 <a onClick={friendBtn}>친구목록</a>
             </StyledLink>

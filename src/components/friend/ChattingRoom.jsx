@@ -45,6 +45,7 @@ const Maincontainer = styled.div`
         .chatting_main {
             overflow-y: auto;
             padding: 10px;
+            height: 100%;
             max-height: calc(100% - 100px);
             &::-webkit-scrollbar {
                 width: 8px;
@@ -111,10 +112,10 @@ const Maincontainer = styled.div`
 `;
 
 const BottomDiv = styled.div`
-    justify-content: center;
-    align-items: center;
-    height: 50%;
-    width: 100%;
+
+    justify-content: center; // 수평 중앙 정렬
+    align-items: center; // 수직 중앙 정렬
+
 `;
 
 const CloseButton = styled.button`

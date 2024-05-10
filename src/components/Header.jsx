@@ -586,14 +586,12 @@ export default function Header() {
                     setImageUrl(newImageUrl);
                     setUser({ ...user, image: newImageUrl });
                 } else {
-                    alert("이미지 URL을 받지 못했습니다.");
                 }
             } else {
-                alert("이미지 업데이트에 실패했습니다.");
             }
         } catch (error) {
             console.error("프로필 이미지 업데이트 실패:", error);
-            alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");
+            
         }
     };
 

@@ -458,6 +458,7 @@ const MafiaGameRoom = () => {
                         const res = await axiosUtils.patch("/users/score", {
                             u_seq: loginUser.u_seq,
                         });
+
                         if (res) {
                             alert("마피아가 승리하셧습니다!!!. 스코어점수가 올라갑니다.");
                         }
@@ -475,6 +476,14 @@ const MafiaGameRoom = () => {
                     }
                 }
             }
+
+            axiosUtils.patch(`/games/state/${room}`, { type: "stop" });
+
+
+            // setTimeout(() => {
+            //     outBtn();
+            // }, 10000);
+
         });
         newSocket.on("restart", (data) => {
             console.log(data.isDaytime ? "마피아시간" : "낮투표시간");
