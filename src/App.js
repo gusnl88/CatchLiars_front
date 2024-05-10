@@ -5,7 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import LoginUser from "./components/LoginUser";
 import GameWaitngList from "./pages/GameWaitingList";
-import Mypage from "./pages/Mypage";
+
 import CatchLiarInGame from "./pages/CatchLiarInGame";
 
 import LankingPage from "./pages/LankingPage";
@@ -31,7 +31,7 @@ function App() {
                     path="/games/list/Mafia/:roomId"
                     element={LoginUser(loginUser, <MafiaGameRoom />)}
                 />
-                <Route path="/users/mypage" element={LoginUser(loginUser, <Mypage />)} />
+
                 <Route
                     path="/games/list/:CatchLiar/Ingame"
                     element={LoginUser(loginUser, <CatchLiarInGame />)}
