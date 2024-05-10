@@ -6,7 +6,7 @@ import "./styles/voteBtn.scss";
 import left from "./images/pang2.png";
 import right from "./images/pang.png";
 
-const socket = io.connect("http://localhost:8089", {
+const socket = io.connect(process.env.REACT_APP_API_SERVER, {
     autoConnect: false,
 });
 
