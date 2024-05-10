@@ -12,8 +12,6 @@ const Container = styled.div`
     align-items: center;
     height: 85%;
     background-color: #00154b;
-    /* background-color: ${(props) =>
-        props.pathname === "/games/list/Catchliars" ? "#aee1ea" : "#00154b"}; */
 
     background-image: ${(props) =>
         props.pathname === "/games/list/Catchliars" ? "url('/images/candy0.jpg')" : ""};
@@ -21,7 +19,6 @@ const Container = styled.div`
     background-position: center;
 
     color: ${(props) => (props.pathname === "/games/list/Catchliars" ? "black" : "white")};
-    /* color: white; */
     box-sizing: border-box;
     .header_font {
         h1 {
@@ -32,23 +29,14 @@ const Container = styled.div`
 `;
 
 export default function GameWaitingList() {
-    const [roomLists, setRoomList] = useState([]); // 전체 룸리스트
+    const [roomLists, setRoomList] = useState([]);
     const [selectedRoomList, setSelectedRoomList] = useState([]);
     const [selectedPage, setSelectedPage] = useState(1);
-    const pageSize = 10; // 10으로 설정 할것.
+    const pageSize = 10;
     const { type } = useParams();
     const socketRef = useRef();
 
     let types = type === "Mafia" ? 1 : 0;
-
-    // useEffect(() => {
-    //     socketRef.current = io("http://localhost:8089");
-    //     socketRef.current.on("updateRoomList", (data) => {
-    //         setRoomList(data);
-    //     });
-
-    //     return () => socketRef.current.disconnect();
-    // }, []);
 
     useEffect(() => {
         const fetchRoomList = async () => {
@@ -61,7 +49,7 @@ export default function GameWaitingList() {
         };
 
         fetchRoomList();
-    }, [type, types]); // roomList가 변경될 때만 useEffect가 실행됩니다.
+    }, [type, types]);
 
     useEffect(() => {
         const start = (selectedPage - 1) * pageSize;

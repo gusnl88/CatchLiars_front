@@ -106,7 +106,7 @@ export default function FriendList() {
     };
 
     const closeModal = () => {
-        setShowModal(false); // showModal 상태 변경
+        setShowModal(false);
     };
     console.log(chattingList)
     return (
@@ -122,9 +122,11 @@ export default function FriendList() {
                             onClick={() => handleRoomSelect(item.d_seq)}
                         >
                             <div>{item.counterInfo.id}</div>
+
                             {Number(item.last_seq) != Number(loginUser.u_seq)?
                                 <span className="unreadcnt">{item.unreadcnt?item.unreadcnt:""}</span>:""}
                             <button>채팅</button>
+
                         </div>
                     ))}
                     {showChattingRoom && (

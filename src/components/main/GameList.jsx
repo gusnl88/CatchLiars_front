@@ -16,15 +16,15 @@ const Main = styled.div`
         .game1,
         .game2 {
             width: 50%;
-            max-width: 350px; /* 최대 너비 지정 */
+            max-width: 350px;
             margin-bottom: 20px;
             border-radius: 20px;
             overflow: hidden;
             position: relative;
             .game_image {
                 width: 100%;
-                height: 100%; /* 부모 div에 맞게 이미지 높이 설정 */
-                object-fit: cover; /* 이미지가 부모 요소에 맞춰져서 잘리지 않고 확대/축소됨 */
+                height: 100%;
+                object-fit: cover;
                 border-radius: 20px;
                 transition: transform 0.6s, filter 0.6s;
             }
@@ -34,7 +34,7 @@ const Main = styled.div`
                 filter: brightness(80%);
             }
             @media (max-width: 768px) {
-                width: 70%; /* 모바일 화면에서는 한 열에 하나씩 표시 */
+                width: 70%;
             }
         }
     }
