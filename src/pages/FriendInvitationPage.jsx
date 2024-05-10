@@ -45,7 +45,7 @@ const InvitationItem = styled.li`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap; // 내용이 넘칠 경우 다음 줄로 이동
+    flex-wrap: wrap;
 
     div {
         display: flex;
@@ -77,9 +77,9 @@ const Notisbox = styled.div`
 `;
 
 const Nbutton = styled.button`
-    padding: 5px 10px; // 패딩 감소
+    padding: 5px 10px;
     margin-left: 2px;
-    font-size: 12px; // 글자 크기 증가
+    font-size: 12px;
     font-weight: bold;
     color: white;
     background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
@@ -154,25 +154,18 @@ export default function FriendInvitationPage() {
             }
             const response = await axiosUtils.post(`/invites/accept`, {
                 f_seq: f_seq,
-                type: i_type, // 'type'으로 명확하게 서버에 전달
+                type: i_type,
                 g_seq: g_seq,
             });
             if (response.data === true) {
-                // 성공적으로 초대를 수락했다면,
                 if (i_type === 0) {
-                    // 친구 초대인 경우
                     alert("친구가 추가되었습니다.");
                 } else if (i_type === 1) {
-                    // 게임 초대인 경우
                     alert("게임 방으로 이동합니다.");
-
-                    // 예를 들어, 게임 방 페이지로 리다이렉트
-                    // window.location.href = `/game-room/${someRoomId}`;
                 }
-                // 초대를 데이터베이스에서 삭제
+
                 deleteInvitation(i_seq);
             } else {
-                // 서버에서 초대 수락을 처리하지 못한 경우
                 alert(response.data);
                 setModalOpen(true);
             }
@@ -189,7 +182,7 @@ export default function FriendInvitationPage() {
             const response = await axiosUtils.delete(`/invites`, { data: { i_seq } });
             console.log(response.data);
             if (response.data) {
-                fetchInvitations(); // 초대 삭제 후 목록 다시 불러오기
+                fetchInvitations();
             } else {
                 alert("삭제 실패: 이미 처리된 초대일 수 있습니다.");
             }
@@ -199,12 +192,12 @@ export default function FriendInvitationPage() {
     };
 
     const closeModal = () => {
-        setShowModal(false); // showModal 상태 변경
+        setShowModal(false);
     };
 
     return (
         <>
-            {showModal && ( // showModal 상태에 따라 모달 표시 여부 결정
+            {showModal && (
                 <Notisbox>
                     <CloseButton onClick={closeModal}>x</CloseButton>
                     <ul>

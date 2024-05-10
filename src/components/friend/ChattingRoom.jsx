@@ -1,22 +1,22 @@
 import styled from "styled-components";
 import { io } from "socket.io-client";
-import { useEffect, useState, useRef } from "react"; // useRef 추가
+import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 
 const UserId = styled.div`
-    color: black; // 여기서 색깔을 변경할 수 있습니다.
+    color: black;
     font-weight: bold;
-    margin-bottom: 5px; // 메시지와의 간격을 조정합니다.
+    margin-bottom: 5px;
     margin-left: 5px;
 `;
 
 const ChatTitle = styled.div`
-    font-size: 20px; // 글자 크기
-    color: #ececec; // 글자 색상
-    font-weight: bold; // 글자 굵기
-    padding: 10px; // 내부 여백
+    font-size: 20px;
+    color: #ececec;
+    font-weight: bold;
+    padding: 10px;
     background-color: rgba(0, 21, 75, 0.7);
-    text-align: center; // 텍스트 중앙 정렬
+    text-align: center;
 `;
 const Maincontainer = styled.div`
     width: 300px;
@@ -28,12 +28,11 @@ const Maincontainer = styled.div`
     align-items: center;
 
     @media (max-width: 768px) {
-        width: 300px; // 작은 화면에서 이미지 크기 축소
+        width: 300px;
         height: 500px;
         right: 0;
         bottom: 0;
-        margin-bottom: 10px; // 작은 화면에서 이미지 마진 축소
-    
+        margin-bottom: 10px;
     }
     .chatting_container {
         width: 85%;
@@ -44,7 +43,7 @@ const Maincontainer = styled.div`
         flex-direction: column;
         justify-content: space-between;
         .chatting_main {
-            overflow-y: auto; /* 스크롤이 필요할 때만 나타나도록 수정 */
+            overflow-y: auto;
             padding: 10px;
             max-height: calc(100% - 100px);
             &::-webkit-scrollbar {
@@ -75,14 +74,14 @@ const Maincontainer = styled.div`
             .read {
                 color: blue;
                 font-size: 6px;
-                margin: 5px; /* 읽음 표시의 위치 조정 */
+                margin: 5px;
                 align-items: end;
                 display: flex;
             }
             .message {
                 display: flex;
-                flex-direction: row; /* 메시지 내용과 시간을 가로로 배열 */
-                align-items: center; /* 가운데 정렬로 변경 */
+                flex-direction: row;
+                align-items: center;
                 background-color: yellow;
                 color: black;
                 border-radius: 10px;
@@ -91,9 +90,9 @@ const Maincontainer = styled.div`
 
                 .time {
                     font-size: 8px;
-                    margin-right: 10px; /* 시간 레이블과 메시지 내용 사이 간격 조정 */
+                    margin-right: 10px;
                 }
-                word-break: break-word; /* 긴 단어가 있을 경우 줄바꿈 처리 */
+                word-break: break-word;
             }
         }
         .received .message {
@@ -112,10 +111,10 @@ const Maincontainer = styled.div`
 `;
 
 const BottomDiv = styled.div`
-    justify-content: center; // 수평 중앙 정렬
-    align-items: center; // 수직 중앙 정렬
-    height: 50%; // 높이 설정
-    width: 100%; // 너비 설정
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+    width: 100%;
 `;
 
 const CloseButton = styled.button`
@@ -136,9 +135,9 @@ export default function ChattingRoom({ roomId, setShowChattingRoom }) {
     const [socket, setSocket] = useState(null);
     const [inputdata, setInputData] = useState("");
     const [msgList, setMsgList] = useState([]);
-    const [chatPartner, setChatPartner] = useState(""); // 상대방 닉네임을 저장할 상태
+    const [chatPartner, setChatPartner] = useState("");
     const loginUser = useSelector((state) => state.loginReducer.user);
-    const chatContainerRef = useRef(null); // Ref 추가
+    const chatContainerRef = useRef(null);
 
     useEffect(() => {
         console.log(roomId);
@@ -150,12 +149,10 @@ export default function ChattingRoom({ roomId, setShowChattingRoom }) {
             console.log(data);
             let newMessage;
             if (data.sendUser === undefined) {
-                console.log("진입");
                 newMessage = {
                     content: data.message,
                     type: "notice",
-                    is_read: true, // 공지사항은 읽음 상태로 표시
-                    // create_at: new Date(),
+                    is_read: true,
                 };
             } else {
                 const type = data.sendUser === loginUser.id ? "me" : "other";
@@ -168,7 +165,7 @@ export default function ChattingRoom({ roomId, setShowChattingRoom }) {
                 };
             }
             if (newMessage.type === "other" && newMessage.User && newMessage.User.id) {
-                setChatPartner(newMessage.User.id); // 상대방 ID를 닉네임으로 사용
+                setChatPartner(newMessage.User.id);
             }
             setMsgList((prevMessages) => [...prevMessages, newMessage]);
         });
@@ -177,7 +174,7 @@ export default function ChattingRoom({ roomId, setShowChattingRoom }) {
             setMsgList(messages);
             const otherUserMessage = messages.find((m) => m.User && m.User.id !== loginUser.id);
             if (otherUserMessage) {
-                setChatPartner(otherUserMessage.User.id); // 상대방 ID를 닉네임으로 사용
+                setChatPartner(otherUserMessage.User.id);
             }
         });
 
@@ -209,7 +206,7 @@ export default function ChattingRoom({ roomId, setShowChattingRoom }) {
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? "오후" : "오전";
         hours = hours % 12;
-        hours = hours ? hours : 12; // 0시를 12시로 변경
+        hours = hours ? hours : 12;
         return `${ampm} ${hours}:${minutes < 10 ? "0" : ""}${minutes}`;
     }
     return (
@@ -242,9 +239,7 @@ export default function ChattingRoom({ roomId, setShowChattingRoom }) {
                                     ) : (
                                         ""
                                     )}
-                                    {/* {msg.type !== "notice" &&
-                                    msg.User.id &&
-                                    msg.User.id !== loginUser.id && <span>{msg.User.id} </span>} */}
+
                                     {msg.content}
                                 </div>
                             </div>

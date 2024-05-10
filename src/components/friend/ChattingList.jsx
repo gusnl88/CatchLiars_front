@@ -106,7 +106,7 @@ export default function FriendList() {
     };
 
     const closeModal = () => {
-        setShowModal(false); // showModal 상태 변경
+        setShowModal(false);
     };
 
     return (
@@ -122,10 +122,17 @@ export default function FriendList() {
                             onClick={() => handleRoomSelect(item.d_seq)}
                         >
                             <div>{item.counterInfo.id}</div>
-                            {item.last_seq !== loginUser.u_seq && item.unreadcnt && (
+                            {item.last_seq !== loginUser.u_seq && item.unreadcnt > 0 && (
                                 <span className="unreadcnt">{item.unreadcnt}</span>
-                            )}{" "}
-                            <button>채팅</button>
+                            )}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRoomSelect(item.d_seq);
+                                }}
+                            >
+                                채팅
+                            </button>
                         </div>
                     ))}
                     {showChattingRoom && (

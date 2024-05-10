@@ -1,18 +1,15 @@
 import React, { useState } from "react";
 import LoginForm from "./LoginForm";
 import axiosUtils from "../../utils/axiosUtils";
-import axios from "axios";
 import styled, { css } from "styled-components";
 
 const responsiveContainer = css`
-    width: 100%; // 기본으로 90% 사용
+    width: 100%;
     @media (max-width: 768px) {
-        // 태블릿
         width: 80%;
     }
     @media (min-width: 1024px) {
-        // 데스크탑
-        width: 1000px; // 데스크탑에서는 1000px 고정
+        width: 1000px;
     }
 `;
 
@@ -28,10 +25,10 @@ const Label = styled.label`
 const MainContainer = styled.div`
     display: flex;
     flex-direction: column;
-    align-items: center; // 센터 정렬을 원한다면 추가
-    justify-content: center; // 세로 방향으로 가운데 정렬을 원한다면 추가
-    width: 100%; // 전체 너비 사용
-    min-height: 100vh; // 뷰포트의 전체 높이 사용
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
 `;
 
 const Container = styled.div`
@@ -47,7 +44,7 @@ const Container = styled.div`
 const SubTitle = styled.h2`
     font-size: 1.5em;
     color: #333;
-    text-align: center; // 중앙 정렬
+    text-align: center;
     margin-top: 20px;
     margin-bottom: 10px;
 `;
@@ -68,22 +65,22 @@ const Text = styled.div`
     }
 `;
 const IdContainer = styled.div`
-    display: flex; // 이 줄을 추가하여 flexbox 레이아웃을 활용
-    align-items: center; // 세로 중앙 정렬
-    margin-bottom: 10px; // 요소 간 간격 추가
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 `;
 
 const DivId = styled.div`
     width: 10%;
     padding: 8px;
-    display: flex; // DivId 내부 요소도 flex로 정렬
-    justify-content: flex-end; // 라벨을 오른쪽 정렬
+    display: flex;
+    justify-content: flex-end;
 `;
 
 const Inputid = styled.input`
     width: 50%;
     padding: 8px;
-    margin-left: 10px; // 라벨과 입력 필드 사이의 간격
+    margin-left: 10px;
 `;
 
 const CheckButton = styled.button`
@@ -105,22 +102,22 @@ const CheckButton = styled.button`
     }
 `;
 const PwContainer = styled.div`
-    display: flex; // 이 줄을 추가하여 flexbox 레이아웃을 활용
-    align-items: center; // 세로 중앙 정렬
-    margin-bottom: 10px; // 요소 간 간격 추가
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 `;
 
 const DivPw = styled.div`
     width: 10%;
     padding: 8px;
-    display: flex; // DivId 내부 요소도 flex로 정렬
-    justify-content: flex-end; // 라벨을 오른쪽 정렬
+    display: flex;
+    justify-content: flex-end;
 `;
 
 const Inputpw = styled.input`
     width: 50%;
     padding: 8px;
-    margin-left: 10px; // 라벨과 입력 필드 사이의 간격
+    margin-left: 10px;
 `;
 const Title = styled.h1`
     text-align: center;
@@ -131,35 +128,35 @@ const Title = styled.h1`
 `;
 
 const NmContainer = styled.div`
-    display: flex; // 이 줄을 추가하여 flexbox 레이아웃을 활용
-    align-items: center; // 세로 중앙 정렬
-    margin-bottom: 10px; // 요소 간 간격 추가
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 `;
 
 const DivNm = styled.div`
     width: 10%;
     padding: 8px;
-    display: flex; // DivId 내부 요소도 flex로 정렬
-    justify-content: flex-end; // 라벨을 오른쪽 정렬
+    display: flex;
+    justify-content: flex-end;
 `;
 
 const Inputnm = styled.input`
     width: 50%;
     padding: 8px;
-    margin-left: 10px; // 라벨과 입력 필드 사이의 간격
+    margin-left: 10px;
 `;
 
 const EmContainer = styled.div`
-    display: flex; // 이 줄을 추가하여 flexbox 레이아웃을 활용
-    align-items: center; // 세로 중앙 정렬
-    margin-bottom: 10px; // 요소 간 간격 추가
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 `;
 
 const DivEm = styled.div`
     width: 10%;
     padding: 8px;
-    display: flex; // DivId 내부 요소도 flex로 정렬
-    justify-content: flex-end; // 라벨을 오른쪽 정렬
+    display: flex;
+    justify-content: flex-end;
 `;
 const Inputem = styled.input`
     width: 50%;
@@ -169,10 +166,10 @@ const Inputem = styled.input`
 
 const ButtonContainer = styled.div`
     display: flex;
-    justify-content: center; // 가로축 중앙 정렬
-    align-items: center; // 세로축 중앙 정렬
-    gap: 10px; // 버튼 사이의 간격
-    margin-top: 20px; // 상단 여백
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
 `;
 
 const ErrorSpan = styled.span`
@@ -195,7 +192,7 @@ function RegisterForm() {
     const [serverError, setServerError] = useState("");
     const [showRegister, setShowRegister] = useState(true);
     const [isRegistered, setIsRegistered] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [availabilityMessages, setAvailabilityMessages] = useState({});
     const [validations, setValidations] = useState({
         id: null,
@@ -205,16 +202,16 @@ function RegisterForm() {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        // ID 필드에 대한 검증 로직 추가
+
         if (e.target.name === "id") {
-            const validChars = /^[a-zA-Z0-9]+$/; // 영어와 숫자만 허용
+            const validChars = /^[a-zA-Z0-9]+$/;
             if (!validChars.test(e.target.value) && e.target.value !== "") {
                 setErrors({ ...errors, [e.target.name]: "ID는 영어와 숫자만 입력 가능합니다." });
                 setAvailabilityMessages({
                     ...availabilityMessages,
                     [e.target.name]: <ErrorSpan>ID는 영어와 숫자만 입력 가능합니다.</ErrorSpan>,
                 });
-                return; // 유효하지 않은 문자가 포함된 경우 업데이트하지 않음
+                return;
             }
             if (e.target.value.length < 5) {
                 setErrors({ ...errors, [e.target.name]: "5글자 이상 입력해주세요" });
@@ -227,8 +224,6 @@ function RegisterForm() {
                 setAvailabilityMessages({ ...availabilityMessages, [e.target.name]: "" });
             }
         }
-
-        // setErrors({ ...errors, [e.target.name]: "" });
         if (e.target.name === "pw") {
             if (e.target.value.length < 5) {
                 setErrors({ ...errors, [e.target.name]: "5글자 이상 입력해주세요" });
@@ -244,13 +239,13 @@ function RegisterForm() {
     };
 
     const handleBack = () => {
-        setShowRegister(false); // 뒤로 가기 버튼 클릭시 LoginForm 표시
+        setShowRegister(false);
     };
 
     const checkDuplicate = async (field) => {
         if (!formData[field]) {
             setErrors({ ...errors, [field]: "This field cannot be empty." });
-            setAvailabilityMessages({ ...availabilityMessages, [field]: "" }); // 메시지 초기화
+            setAvailabilityMessages({ ...availabilityMessages, [field]: "" });
             return;
         }
         try {
@@ -263,34 +258,33 @@ function RegisterForm() {
                 setAvailabilityMessages({
                     ...availabilityMessages,
                     [field]: <ErrorSpan>이미 사용중입니다.</ErrorSpan>,
-                }); // 메시지 초기화
+                });
                 setValidations({ ...validations, [field]: false });
             } else {
-                setErrors({ ...errors, [field]: "" }); // 에러 메시지 초기화
+                setErrors({ ...errors, [field]: "" });
                 setAvailabilityMessages({
                     ...availabilityMessages,
                     [field]: <Span>사용 가능합니다.</Span>,
-                }); // 성공 메시지 설정
+                });
                 setValidations({ ...validations, [field]: true });
             }
         } catch (error) {
             console.error("Failed to check duplicate:", error);
             setErrors({ ...errors, [field]: "Failed to check. Please try again." });
-            setAvailabilityMessages({ ...availabilityMessages, [field]: "" }); // 메시지 초기화
+            setAvailabilityMessages({ ...availabilityMessages, [field]: "" });
         }
     };
 
     if (!showRegister) {
-        return <LoginForm />; // 뒤로가기 버튼
+        return <LoginForm />;
     }
 
     if (isRegistered) {
-        return <LoginForm />; // 회원가입 성공 시 로그인 컴포넌트로 전환
+        return <LoginForm />;
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Check for any existing errors or duplicates before submitting
         if (Object.values(errors).some((error) => error)) {
             console.log(Object.values(errors));
             console.log(Object.values(errors).some((error) => error));
@@ -307,16 +301,11 @@ function RegisterForm() {
         }
 
         try {
-            const response = await axiosUtils.post(
-                // `${process.env.REACT_APP_API_SERVER}/users/signup`,
-                `/users/signup`,
-                formData
-            );
+            const response = await axiosUtils.post(`/users/signup`, formData);
             if (response.data === true) {
                 alert("회원가입이 성공적으로 완료 되었습니다.");
                 setIsRegistered(true);
             } else if (response.data.errors) {
-                // setErrors(response.data.errors);
             } else {
                 setServerError("오류가 발생했습니다. 다시 실행해주세요.");
             }

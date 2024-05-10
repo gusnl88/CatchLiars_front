@@ -7,7 +7,7 @@ import ChattingList from "./friend/ChattingList";
 const Footers = styled.footer`
     display: flex;
     justify-content: end;
-    /* background-color: #00154b; */
+
     background-color: ${(props) =>
         props.pathname === "/games/list/Catchliars" ? "pink" : "#00154b"};
     height: 5%;
@@ -38,9 +38,9 @@ const StyledLink = styled.div`
     padding: 10px 15px;
     margin: 5px;
 
-    color: white; /* 텍스트 색상 */
-    text-decoration: none; /* 밑줄 없앰 */
-    border-radius: 5px; /* 테두리 둥글게 */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
     cursor: pointer;
 `;
 
@@ -63,7 +63,7 @@ export default function Footer() {
     };
     return (
         <Footers pathname={pathname}>
-             <StyledLink>
+            <StyledLink>
                 <a onClick={chattingBtn}>채팅</a>
             </StyledLink>
             {chattingCheck ? <ChattingList /> : ""}
@@ -71,7 +71,6 @@ export default function Footer() {
                 <a onClick={friendBtn}>친구목록</a>
             </StyledLink>
             {friendCheck ? <FriendList /> : ""}
-
         </Footers>
     );
 }
