@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../../store/modules/login";
-import RegisterForm from "./RegisterForm"; // 회원가입 폼 컴포넌트 임포트
+import RegisterForm from "./RegisterForm";
 import { useNavigate } from "react-router-dom";
 import axiosUtils from "../../utils/axiosUtils";
 import styled, { css } from "styled-components";
@@ -9,11 +9,9 @@ import styled, { css } from "styled-components";
 const responsiveWidth = css`
     width: 100%;
     @media (max-width: 768px) {
-        /* 태블릿 */
         width: 70%;
     }
     @media (min-width: 1024px) {
-        /* 데스크탑 */
         width: 1000px;
     }
 `;
@@ -21,10 +19,10 @@ const responsiveWidth = css`
 const MainContainer = styled.div`
     display: flex;
     flex-direction: column;
-    align-items: center; // 센터 정렬을 원한다면 추가
-    justify-content: center; // 세로 방향으로 가운데 정렬을 원한다면 추가
-    width: 100%; // 전체 너비 사용
-    min-height: 100vh; // 뷰포트의 전체 높이 사용
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
 `;
 
 const Container1 = styled.div`
@@ -41,7 +39,7 @@ const Container2 = styled.div`
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
+
     align-items: center;
     ${responsiveWidth}
 `;
@@ -49,7 +47,7 @@ const Container2 = styled.div`
 const SubTitle = styled.h2`
     font-size: 1.5em;
     color: #333;
-    text-align: center; // 중앙 정렬
+    text-align: center;
     margin-top: 20px;
     margin-bottom: 10px;
 `;
@@ -70,41 +68,41 @@ const Text = styled.div`
     }
 `;
 const IdContainer = styled.div`
-    display: flex; // 이 줄을 추가하여 flexbox 레이아웃을 활용
-    align-items: center; // 세로 중앙 정렬
-    margin-bottom: 10px; // 요소 간 간격 추가
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 `;
 
 const DivId = styled.div`
     width: 50%;
     padding: 8px;
-    display: flex; // DivId 내부 요소도 flex로 정렬
-    justify-content: flex-start; // 라벨을 오른쪽 정렬
+    display: flex;
+    justify-content: flex-start;
 `;
 
 const Inputid = styled.input`
     width: 100%;
     padding: 8px;
-    margin-left: 10px; // 라벨과 입력 필드 사이의 간격
+    margin-left: 10px;
 `;
 
 const PwContainer = styled.div`
-    display: flex; // 이 줄을 추가하여 flexbox 레이아웃을 활용
-    align-items: center; // 세로 중앙 정렬
-    margin-bottom: 10px; // 요소 간 간격 추가
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 `;
 
 const DivPw = styled.div`
     width: 50%;
     padding: 8px;
-    display: flex; // DivId 내부 요소도 flex로 정렬
-    justify-content: flex-start; // 라벨을 오른쪽 정렬
+    display: flex;
+    justify-content: flex-start;
 `;
 
 const Inputpw = styled.input`
     width: 100%;
     padding: 8px;
-    margin-left: 10px; // 라벨과 입력 필드 사이의 간격
+    margin-left: 10px;
 `;
 const Title = styled.h1`
     text-align: center;
@@ -115,22 +113,22 @@ const Title = styled.h1`
 `;
 
 const CheckButton = styled.button`
-    padding: 8px 10px; // Inputid와 동일한 패딩을 적용
-    /* margin-top: 5px; */
+    padding: 8px 10px;
+
     margin-left: 5px;
-    cursor: pointer; // 버튼에 마우스 오버시 커서 변경
-    background-color: #007bff; // 배경 색상 설정
-    color: white; // 텍스트 색상 설정
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
     border: none;
-    border-radius: 4px; // 테두리 둥글게 처리
+    border-radius: 4px;
 `;
 
 const ButtonContainer = styled.div`
     display: flex;
-    justify-content: center; // 가로축 중앙 정렬
-    align-items: center; // 세로축 중앙 정렬
-    gap: 10px; // 버튼 사이의 간격
-    margin-top: 20px; // 상단 여백
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
 `;
 
 function LoginForm() {
@@ -141,7 +139,7 @@ function LoginForm() {
         inputPw: "",
     });
     const [showModal, setShowModal] = useState(false);
-    const [showRegister, setShowRegister] = useState(false); // 회원가입 폼 보여줄지 결정하는 상태
+    const [showRegister, setShowRegister] = useState(false);
     const dispatch = useDispatch();
 
     const handleChange = (e) => {
@@ -151,11 +149,7 @@ function LoginForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axiosUtils.post(
-                `/users/signin`,
-                formData
-                // { withCredentials: true }
-            );
+            const response = await axiosUtils.post(`/users/signin`, formData);
 
             if (response.data) {
                 setShowModal(true);
@@ -175,16 +169,15 @@ function LoginForm() {
     };
 
     const handleSignup = () => {
-        setShowRegister(true); // 회원가입 폼을 보여주는 상태를 true로 설정
+        setShowRegister(true);
     };
 
     const closeModalAndNavigate = () => {
         setShowModal(false);
-        // navigate("/GameWaitingList");
     };
 
     if (showRegister) {
-        return <RegisterForm />; // 회원가입 컴포넌트 렌더링
+        return <RegisterForm />;
     }
 
     return (

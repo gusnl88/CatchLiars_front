@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import axiosUtiils from '../../utils/axiosUtils'
+import axiosUtiils from "../../utils/axiosUtils";
 const FriendListContainer = styled.div`
     width: 90%;
     height: 90%;
@@ -98,15 +98,14 @@ const Friend = ({
                 withCredentials: true,
             })
             .then(() => {
-                // 친구 삭제 후에 첫 번째 페이지를 보여줌
-                onDeleteFriend(u_seq); // 삭제 버튼 클릭 시 상위 컴포넌트의 삭제 함수 호출
+                onDeleteFriend(u_seq);
             })
             .catch((error) => {
                 console.error("친구 삭제 오류:", error);
             });
     };
     useEffect(() => {
-        setFriends(selectedFriendList); // selectedFriendList가 변경될 때마다 friends 상태를 업데이트
+        setFriends(selectedFriendList);
     }, [selectedFriendList]);
 
     return (

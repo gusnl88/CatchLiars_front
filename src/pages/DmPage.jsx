@@ -13,12 +13,12 @@ const Container = styled.div`
 `;
 
 export default function DmPage() {
-    const [chatList, setChatList] = useState([]); // 채팅 목록
-    const [counterList, setCounterList] = useState([]); // 상대방 정보
-    const [selectedChatList, setSelectedChatList] = useState([]); // 한 번에 보여줄 채팅방 목록
-    const [selectedCounterList, setSelectedCounterList] = useState([]); // 한 번에 보여줄 상대방 목록
+    const [chatList, setChatList] = useState([]);
+    const [counterList, setCounterList] = useState([]);
+    const [selectedChatList, setSelectedChatList] = useState([]);
+    const [selectedCounterList, setSelectedCounterList] = useState([]);
     const [selectedPage, setSelectedPage] = useState(1);
-    const pageSize = 10; // 10으로 설정 할것.
+    const pageSize = 10;
 
     useEffect(() => {
         axiosUtils

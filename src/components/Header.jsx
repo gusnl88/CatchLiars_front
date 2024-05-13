@@ -7,29 +7,27 @@ import axiosUtils from "../utils/axiosUtils";
 import FriendInvitationPage from "../pages/FriendInvitationPage";
 
 const responsiveModal = css`
-    width: 100%; // 모바일 기본 너비
-    max-width: 500px; // 최대 너비 제한
+    width: 100%;
+    max-width: 500px;
     @media (min-width: 768px) {
-        // 태블릿 화면에서는
-        max-width: 700px; // 너비를 700px로
+        max-width: 700px;
     }
     @media (min-width: 1024px) {
-        // 데스크탑에서는
-        max-width: 1000px; // 1000px 너비 사용
+        max-width: 1000px;
     }
 `;
 
 const ProfileImage = styled.img`
-    width: 150px; // 이미지 너비 설정
-    height: 150px; // 이미지 높이 설정
-    border-radius: 50%; // 원형으로 만들기
-    margin-bottom: 20px; // 이미지 아래 마진 추가
-    object-fit: cover; // 이미지 비율 유지하면서 요소에 꽉 차게 채우기
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    object-fit: cover;
 
     @media (max-width: 768px) {
-        width: 100px; // 작은 화면에서 이미지 크기 축소
+        width: 100px;
         height: 100px;
-        margin-bottom: 10px; // 작은 화면에서 이미지 마진 축소
+        margin-bottom: 10px;
     }
 `;
 
@@ -38,10 +36,10 @@ const InfoDiv = styled.div`
     margin-bottom: 2rem;
     display: flex;
     flex-direction: column;
-    align-items: flex-start; // 요소들을 컨테이너의 시작점에 정렬
+    align-items: flex-start;
     justify-content: center;
-    width: calc(100% - 140px); // 이미지 너비와 일정 간격을 제외한 너비 사용
-    /* padding: 10px; */
+    width: calc(100% - 140px);
+
     font-size: 20px;
 `;
 
@@ -57,7 +55,7 @@ const Box = styled.div`
     justify-content: space-between;
     width: 100%;
     height: 600px;
-    /* margin: 50px auto; */
+
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -76,7 +74,7 @@ const Container = styled.div`
 const Input = styled.input`
     width: 30%;
     padding: 8px;
-    margin-left: 10px; // 라벨과 입력 필드 사이의 간격
+    margin-left: 10px;
 `;
 
 const ClossButton = styled.div`
@@ -84,10 +82,10 @@ const ClossButton = styled.div`
     background-color: #00154b;
     color: white;
     font-size: 15px;
-    text-align: center; // 텍스트 가로 중앙 정렬
-    display: flex; // Flexbox 레이아웃 사용
-    justify-content: center; // 요소들을 가로 방향으로 중앙 정렬
-    align-items: center; // 요소들을 세로 방향으로 중앙 정렬
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 50px;
 `;
 
@@ -97,21 +95,21 @@ const ModalOverlay = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 약간 투명한 검은 배경 */
-    z-index: 1000; /* 다른 요소들보다 앞에 오도록 설정 */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
 `;
 const CheckButton = styled.button`
-    padding: 7px 10px; // Inputid와 동일한 패딩을 적용
+    padding: 7px 10px;
     margin-top: 3px;
     margin-left: 5px;
-    cursor: pointer; // 버튼에 마우스 오버시 커서 변경
-    background-color: #00154b; // 배경 색상 설정
-    color: white; // 텍스트 색상 설정
+    cursor: pointer;
+    background-color: #00154b;
+    color: white;
     border: none;
-    border-radius: 4px; // 테두리 둥글게 처리
+    border-radius: 4px;
 
     @media (max-width: 768px) {
         padding: 6px 8px;
@@ -127,11 +125,11 @@ const CheckButton = styled.button`
 const ModalContent = styled.div`
     ${responsiveModal}
 
-    height: 500px; // 높이 설정
-    background-color: white; // 배경색
-    border-radius: 8px; // 모서리 둥글게
-    padding: 20px; // 내부 여백
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); // 그림자 효과
+    height: 500px;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -144,10 +142,10 @@ const HeaderPage = styled.header`
     height: 10%;
     .img_box {
         height: 100%;
-        overflow: hidden; /* 부모 요소를 벗어나는 이미지를 숨깁니다. */
+        overflow: hidden;
         img {
             height: 100%;
-            object-fit: cover; /* 이미지를 부모 요소에 꽉 채웁니다. */
+            object-fit: cover;
         }
     }
     .link_btn {
@@ -233,7 +231,7 @@ const Label = styled.label`
 `;
 const DeleteButton = styled.button`
     padding: 10px 20px;
-    background-color: #f44336; // 빨간색
+    background-color: #f44336;
     color: white;
     border: none;
     border-radius: 5px;
@@ -242,17 +240,17 @@ const DeleteButton = styled.button`
     transition: background-color 0.3s, transform 0.2s;
 
     &:hover {
-        background-color: #d32f2f; // 호버 시 색상 변경
-        transform: scale(1.05); // 호버 시 약간 확대
+        background-color: #d32f2f;
+        transform: scale(1.05);
     }
 
     &:active {
-        background-color: #b71c1c; // 클릭 시 색상 변경
+        background-color: #b71c1c;
     }
 
     &:focus {
-        outline: none; // 포커스 시 외곽선 제거
-        box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.5); // 포커스 시 그림자 효과
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.5);
     }
 
     @media (max-width: 768px) {
@@ -268,7 +266,7 @@ const DeleteButton = styled.button`
 
 const SaveButton = styled.button`
     padding: 10px 20px;
-    background-color: #4caf50; // 진한 녹색
+    background-color: #4caf50;
     color: white;
     border: none;
     border-radius: 5px;
@@ -277,17 +275,17 @@ const SaveButton = styled.button`
     transition: background-color 0.3s, transform 0.2s;
 
     &:hover {
-        background-color: #45a049; // 호버 시 색상 변경
-        transform: scale(1.05); // 호버 시 약간 확대
+        background-color: #45a049;
+        transform: scale(1.05);
     }
 
     &:active {
-        background-color: #397d3c; // 클릭 시 색상 변경
+        background-color: #397d3c;
     }
 
     &:focus {
-        outline: none; // 포커스 시 외곽선 제거
-        box-shadow: 0 0 0 3px rgba(71, 164, 71, 0.5); // 포커스 시 그림자 효과
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(71, 164, 71, 0.5);
     }
 
     &:disabled {
@@ -315,19 +313,17 @@ const Span = styled.span`
 `;
 
 const InvitationCount = styled.span`
-    color: red; // 텍스트 색상을 빨간색으로 설정
+    color: red;
 `;
 
 const ButtonDiv = styled.div`
     display: flex;
-    flex-direction: row; // 기본적으로 가로 배치
-    justify-content: space-around; // 버튼 사이 공간을 균등하게 분배
+    flex-direction: row;
+    justify-content: space-around;
     margin-top: 1rem;
 
     @media (max-width: 768px) {
-        // 태블릿 및 모바일 화면에서
-
-        align-items: center; // 센터 정렬로 버튼 정렬
+        align-items: center;
     }
 `;
 
@@ -351,35 +347,35 @@ const PasswordModalContent = styled.div`
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex; // Flexbox 레이아웃 활성화
-    flex-direction: column; // 요소들을 수직으로 정렬
-    justify-content: center; // 내부 요소들을 수직 방향 중앙으로 정렬
-    align-items: center; // 내부 요소들을 수평 방향 중앙으로 정렬
-    border: 5px solid #00154b; // 테두리 추가
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 5px solid #00154b;
 `;
 
 const ModalBody = styled.div`
-    width: 100%; // 바디의 너비를 모달과 동일하게 설정
-    padding: 20px; // 내부 패딩
-    display: flex; // Flexbox 레이아웃 활성화
-    flex-direction: column; // 요소들을 수직으로 정렬
-    justify-content: center; // 내부 요소들을 수직 방향 중앙으로 정렬
-    align-items: center; // 내부 요소들을 수평 방향 중앙으로 정렬
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 `;
 
 const ModalBody2 = styled.div`
-    width: 100%; // 바디의 너비를 모달과 동일하게 설정
-    padding: 20px; // 내부 패딩
-    display: flex; // Flexbox 레이아웃 활성화
-    /* flex-direction: column; // 요소들을 수직으로 정렬 */
-    justify-content: center; // 내부 요소들을 수직 방향 중앙으로 정렬
-    align-items: center; // 내부 요소들을 수평 방향 중앙으로 정렬
+    width: 100%;
+    padding: 20px;
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
 `;
 export default function Header() {
+    const dispatch = useDispatch();
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [invitateCheck, setInvitateCheck] = useState(false);
     const [errors, setErrors] = useState({});
-    const dispatch = useDispatch();
     const [isAuthenticated, setIsAuthenticated] = useState(true);
     const [showNotis, setShowNotis] = useState(false);
     const [user, setUser] = useState({ id: "", nickname: "", score: 0 });
@@ -392,7 +388,7 @@ export default function Header() {
     const [availabilityMessages, setAvailabilityMessages] = useState({});
     const [invitations, setInvitations] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
-    const [imageUrl, setImageUrl] = useState(""); // 업로드된 이미지 URL을 상태로 관리
+    const [imageUrl, setImageUrl] = useState("");
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
     const [updateMessage, setUpdateMessage] = useState("");
 
@@ -405,28 +401,23 @@ export default function Header() {
                 console.error("Error fetching invitations:", error);
             }
         };
-        // 최초 마운트 시 초대 목록 가져오기
-        fetchInvitations();
-        // 30초 간격으로 초대 목록 갱신하기
-        const intervalId = setInterval(fetchInvitations, 1000); // 30초마다 초대 목록 갱신
 
-        // 컴포넌트 언마운트 시 인터벌 해제
+        fetchInvitations();
+
+        const intervalId = setInterval(fetchInvitations, 1000);
+
         return () => clearInterval(intervalId);
     }, []);
 
     const invitateBtn = () => {
         setShowNotis(!showNotis);
         setInvitateCheck(!invitateCheck);
-        // setInvitateCheck ? setInvitateCheck(false) : setInvitateCheck(true);
-        // if (invitateCheck) {
-        //     setInvitateCheck(false);
-        // }
     };
 
     useEffect(() => {
         if (isModalOpen) {
             axiosUtils
-                .get(`/users/myPage`) // Update this URL based on your API
+                .get(`/users/myPage`)
                 .then((response) => {
                     setUser(response.data);
                 })
@@ -439,9 +430,8 @@ export default function Header() {
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
 
-        // 입력 필드에서 값이 제공되지 않은 경우 기존 값 사용
         const updatedNickname = newNickname.trim() !== "" ? newNickname : user.nickname;
-        const updatedNewPassword = newPassword.trim(); // 비밀번호는 빈 값일 수 있으므로 별도 처리
+        const updatedNewPassword = newPassword.trim();
         const updatedPassword = password.trim();
 
         try {
@@ -452,7 +442,6 @@ export default function Header() {
                 nickname: updatedNickname,
             };
 
-            // 서버 요청
             const response = await axiosUtils.patch("users/myPage", payload, {
                 withCredentials: true,
             });
@@ -596,10 +585,8 @@ export default function Header() {
                     setImageUrl(newImageUrl);
                     setUser({ ...user, image: newImageUrl });
                 } else {
-                    alert("이미지 URL을 받지 못했습니다.");
                 }
             } else {
-                alert("이미지 업데이트에 실패했습니다.");
             }
         } catch {
             alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");

@@ -9,7 +9,6 @@ import Chat from "../components/catchgame/chat";
 
 const Catch = styled.div`
     position: relative;
-    /* background-color: white; */
     background-image: url("/images/CatchLiar.gif");
     background-size: cover;
     background-repeat: no-repeat;
@@ -49,8 +48,8 @@ function CatchLiarInGame({ room }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalTime, setModalTime] = useState(5);
     const [liarIdx, setLiarIdx] = useState(null);
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
-    const [timer, setTimer] = useState(true); // 전체 타이머 상태
+    const [showModal, setShowModal] = useState(false);
+    const [timer, setTimer] = useState(true);
     const [timerCount, setTimerCount] = useState(20);
     const [resultModal, setResultModal] = useState(false);
     const [restartBtn, setRestartBtn] = useState(false);
@@ -92,15 +91,11 @@ function CatchLiarInGame({ room }) {
     }, [timer]);
 
     const startGame = () => {
-        // if (players.length < 3) {
-        //     alert("3명 이상의 플레이어가 모여야 시작됩니다");
-        //     return;
-        // }
         setModalTime(5);
         setModalOpen(true);
 
         const max_idx = players.length - 1;
-        const randomLiarIdx = Math.floor(Math.random() * (max_idx - 0 + 1)); // 라이어 인덱스 랜덤 추출
+        const randomLiarIdx = Math.floor(Math.random() * (max_idx - 0 + 1));
         setLiarIdx(randomLiarIdx);
 
         const randomWords = words.sort(() => 0.5 - Math.random()).slice(0, 1);
@@ -160,8 +155,6 @@ function CatchLiarInGame({ room }) {
 
     useEffect(() => {
         if (gameStarted) {
-            // 타이머 시작
-            // setTimer(true);
             let interval;
             if (gameStarted && remainTime > 0 && currentPlayer <= players.length && round <= 2) {
                 interval = setInterval(() => {
@@ -169,19 +162,16 @@ function CatchLiarInGame({ room }) {
                 }, 1000);
             }
 
-            // 0초에 도달하면 라운드 종료
             if (remainTime === 0) {
-                setRemainTime(5); // 초 초기화
-                setCurrentPlayer((prevIndex) => prevIndex + 1); // 다음 플레이어 인덱스로 이동
+                setRemainTime(5);
+                setCurrentPlayer((prevIndex) => prevIndex + 1);
                 if (currentPlayer === players.length) {
                     if (round === 2) {
-                        clearInterval(interval); // 타이머 종료
+                        clearInterval(interval);
                         setTimer(false);
-                        // setGameStarted(false);
-                        // socket.emit("gamestart", false, room.g_seq);
                     } else {
-                        setRound((prevRound) => prevRound + 1); // 라운드 증가
-                        setCurrentPlayer(1); // 플레이어 인덱스 초기화
+                        setRound((prevRound) => prevRound + 1);
+                        setCurrentPlayer(1);
                     }
                 }
             }
@@ -213,15 +203,9 @@ function CatchLiarInGame({ room }) {
     useEffect(() => {
         initSocketConnect();
 
-        socket.on("gameId", (data) => {
-            // console.log("socketId", data);
-        });
+        socket.on("gameId", (data) => {});
 
         socket.emit("loginUser", loginUser);
-
-        // socket.on("userError", (msg) => {
-        //     alert(msg);
-        // });
 
         socket.on("errorMsg", (msg) => {
             alert(msg);
@@ -230,9 +214,6 @@ function CatchLiarInGame({ room }) {
             setPlayers(players);
         });
     }, [players]);
-
-    // if (liarIdx) console.log("라이어", players[liarIdx].nickName);
-    // console.log("키워드", keywords[0]);
 
     return (
         <div style={{ backgroundColor: "white", color: "black" }}>

@@ -128,7 +128,7 @@ const RoomContainer = styled.div`
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border-radius: 10px; /* 테두리를 둥글게 설정 */
+            border-radius: 10px;
 
             .img_box {
                 position: absolute;
@@ -136,7 +136,7 @@ const RoomContainer = styled.div`
                 left: 0;
                 width: 100%;
                 height: 100%;
-                border-radius: 10px; /* 테두리를 둥글게 설정 */
+                border-radius: 10px;
             }
 
             .overlay {
@@ -165,8 +165,6 @@ const RoomContainer = styled.div`
                 flex-direction: column;
                 padding: 10px;
                 gap: 5px;
-
-                /* 채팅창이 자동으로 맨 아래로 스크롤되도록 */
                 scroll-behavior: smooth;
             }
 
@@ -226,8 +224,8 @@ const RoomContainer = styled.div`
         }
     }
     .vote_box {
-        max-height: 150px; /* 최대 높이 지정 */
-        overflow-y: auto; /* 내용이 넘칠 때 스크롤 표시 */
+        max-height: 150px;
+        overflow-y: auto;
         background-color: #a0a0a0;
         position: absolute;
         top: 50%;
@@ -243,8 +241,8 @@ const RoomContainer = styled.div`
     }
 
     .vote_box button {
-        width: 80px; /* 버튼 너비를 줄입니다. */
-        height: 30px; /* 버튼 높이를 줄입니다. */
+        width: 80px;
+        height: 30px;
         margin: 5px;
         border-radius: 5px;
         border: none;
@@ -362,7 +360,7 @@ const MafiaGameRoom = () => {
     const [isRoomOwner, setIsRoomOwner] = useState(false);
     const [isRoomFull, setIsRoomFull] = useState(false);
     const [isGameStarted, setIsGameStarted] = useState(false);
-    const [gameTime, setGameTime] = useState(5); // 초 단위로 설정
+    const [gameTime, setGameTime] = useState(5);
     const [voteSelect, setVoteSelect] = useState(false);
     const [isDaytime, setIsDaytime] = useState(true);
     const [dmTo, setDmTo] = useState("all");
@@ -378,11 +376,11 @@ const MafiaGameRoom = () => {
     const navigater = useNavigate();
     useEffect(() => {
         if (gameTime === 0) {
-            VoteBtnRef.current.style.display = "block"; // 투표 버튼을 보이게 설정
+            VoteBtnRef.current.style.display = "block";
         } else if (gameTime < 0) {
-            setGameTime(0); // 음수가 되는 것을 방지하기 위해 게임 시간을 0으로 설정
+            setGameTime(0);
         } else if (gameTime > 0) {
-            VoteBtnRef.current.style.display = "none"; // 투표 버튼을 보이게 설정
+            VoteBtnRef.current.style.display = "none";
         }
     }, [gameTime]);
     useEffect(() => {
@@ -409,14 +407,12 @@ const MafiaGameRoom = () => {
 
         newSocket.on("userList", (users) => {
             console.log(users);
-            setUserList([...users]); // 배열을 복사해서 업데이트
+            setUserList([...users]);
             setIsRoomOwner(users[0] === loginUser.id);
             setIsRoomFull(users.length >= 8);
         });
         newSocket.on("job", (data) => {
             const { job, mafiaList } = data;
-            // console.log('직업소개',job.mafiaList[0])
-            // 게임시작  직업을 전달하고
             if (job === "마피아") {
                 let mafiaMessage = "";
                 setIsGameStarted(true);
@@ -447,10 +443,9 @@ const MafiaGameRoom = () => {
             }
         });
         newSocket.on("victory", async (userIdList, victoryList, winner) => {
-            setIsGameStarted(false); // 게임 종료
-            setIsDaytime(true); // 낮으로 초기화
-            setMafiaList([]); // 마피아 리스트 초기화
-            // 여기에 남은 유저들의 상태 초기화 로직 추가
+            setIsGameStarted(false);
+            setIsDaytime(true);
+            setMafiaList([]);
             setUserList([...userIdList]);
             setIsRoomOwner(userIdList[0] === loginUser.id);
             setIsRoomFull(userIdList.length >= 1);
@@ -463,13 +458,12 @@ const MafiaGameRoom = () => {
                         const res = await axiosUtils.patch("/users/score", {
                             u_seq: loginUser.u_seq,
                         });
+
                         if (res) {
                             alert("마피아가 승리하셧습니다!!!. 스코어점수가 올라갑니다.");
                         }
                     }
                 }
-                // 마피아가 이겼을 때의 로직
-                // 여기에 마피아가 이겼을 때의 추가적인 처리 로직을 작성하세요.
             } else {
                 for (let user of victoryList) {
                     if (user === loginUser.id) {
@@ -483,12 +477,15 @@ const MafiaGameRoom = () => {
                 }
             }
 
+            axiosUtils.patch(`/games/state/${room}`, { type: "stop" });
+
+
             // setTimeout(() => {
             //     outBtn();
             // }, 10000);
+
         });
         newSocket.on("restart", (data) => {
-            // 게임 다시 시작 처리
             console.log(data.isDaytime ? "마피아시간" : "낮투표시간");
             let message;
             let newMessage = {};
@@ -509,8 +506,6 @@ const MafiaGameRoom = () => {
             }
             setMessages((prevMessages) => [...prevMessages, newMessage]);
             if (data.isDaytime) {
-                //전 투표가 낮이면(true)마피아 투표 로직
-
                 if (data.maxVote === loginUser.id) {
                     setTimeout(() => {
                         console.log(data.maxVote, "종료합니다");
@@ -533,7 +528,6 @@ const MafiaGameRoom = () => {
                     }
                 }
             } else {
-                //전 투표가 밤이면(false)시민 투표 로직
                 if (data.maxVote === loginUser.id) {
                     setTimeout(() => {
                         console.log(data.maxVote, "종료합니다");
@@ -561,7 +555,7 @@ const MafiaGameRoom = () => {
         return () => {
             newSocket.off("message");
             newSocket.off("userList");
-            newSocket.off("restart"); // restart 이벤트 리스너 제거
+            newSocket.off("restart");
             newSocket.close();
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("beforeunload", outBtn);
