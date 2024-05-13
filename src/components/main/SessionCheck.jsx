@@ -3,7 +3,8 @@ import axios from "axios";
 
 function SessionCheck() {
     useEffect(() => {
-        const intervalId = setInterval(checkSession, 60000 * 5);
+        const intervalId = setInterval(checkSession, 60000); // 1분마다 함수 실행
+
 
         return () => clearInterval(intervalId);
     }, []);
