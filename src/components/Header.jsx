@@ -593,7 +593,6 @@ export default function Header() {
             if (response.status === 200) {
                 if (response.data.imageUrl) {
                     const newImageUrl = response.data.imageUrl; // 응답 구조에 따라 경로 조정 필요
-                    console.log("새로운 이미지 URL:", newImageUrl);
                     setImageUrl(newImageUrl);
                     setUser({ ...user, image: newImageUrl });
                 } else {
@@ -602,8 +601,7 @@ export default function Header() {
             } else {
                 alert("이미지 업데이트에 실패했습니다.");
             }
-        } catch (error) {
-            console.error("프로필 이미지 업데이트 실패:", error);
+        } catch {
             alert("프로필 이미지 업데이트 중 에러가 발생했습니다.");
         }
     };
